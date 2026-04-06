@@ -7,64 +7,88 @@ st.set_page_config(page_title="Engine A Dashboard", layout="wide")
 st.title("ENGINE A — LIVE DASHBOARD")
 st.caption("Last refreshed: " + str(datetime.datetime.now().strftime("%d %b %Y %H:%M")))
 
-# ===== AUTO-FETCH DATA =====
 @st.cache_data(ttl=3600)
 def fetch_data():
-    nifty_1y = yf.download('^NSEI', period='1y', progress=False)
-    nifty_price = float(nifty_1y['Close'].iloc[-1])
-    dma200 = float(nifty_1y['Close'].rolling(200).mean().iloc[-1])
-    pct_dma = round((nifty_price - dma200) / dma200 * 100, 1)
-    
-    dma_lw = float(nifty_1y['Close'].rolling(200).mean().iloc[-6])
-    if dma200 > dma_lw * 1.001: dma_dir = "Rising"
-    elif dma200 < dma_lw * 0.999: dma_dir = "Falling"
-    else: dma_dir = "Flat"
-    
-    def gd(ticker):
-        h = yf.download(ticker, period='2mo', progress=False)
-        cur = float(h['Close'].iloc[-1])
-        old = float(h['Close'].iloc[0])
-        chg = round((cur-old)/old*100, 1)
-        if chg > 2: d = "Rising"
-        elif chg < -2: d = "Falling"
-        else: d = "Stable"
-        return cur, d, chg
-    
-    us10y, us10y_dir, _ = gd('^TNX')
-    dxy, _, _ = gd('DX-Y.NYB')
-    gvix, _, _ = gd('^VIX')
-    inr, _, inr_chg = gd('USDINR=X')
-    brent, crude_dir, _ = gd('BZ=F')
-    
-    if inr_chg > 2: inr_dir = "Weakening"
-    elif inr_chg < -2: inr_dir = "Strengthening"
-    else: inr_dir = "Stable"
-    
-    return {
-        'nifty_price': nifty_price, 'dma200': dma200, 'pct_dma': pct_dma,
-        'dma_dir': dma_dir, 'us10y': us10y, 'us10y_dir': us10y_dir,
-        'dxy': dxy, 'gvix': gvix, 'inr': inr, 'inr_dir': inr_dir,
-        'brent': brent, 'crude_dir': crude_dir
+    data = {}
+    tickers = {
+        'nifty': '^NSEI', 'us10y': '^TNX', 'dxy': 'DX-Y.NYB',
+        'gvix': '^VIX', 'inr': 'USDINR=X', 'brent': 'BZ=F'
     }
+    
+    for name, ticker in tickers.items():
+        try:
+            h = yf.download(ticker, period='1y', progress=False)
+            if len(h) == 0:
+                continue
+            cols = h.columns
+            close_col = [c for c in cols if 'Close' in str(c)][0]
+            prices = h[close_col].dropna()
+            
+            if len(prices) < 10:
+                continue
+            
+            cur = float(prices.iloc[-1])
+            
+            if name == 'nifty' and len(prices) >= 200:
+                sma = prices.rolling(200).mean()
+                dma200 = float(sma.iloc[-1])
+                dma_lw = float(sma.iloc[-6]) if len(sma) > 6 else dma200
+                data['nifty_price'] = cur
+                data['dma200'] = dma200
+                data['pct_dma'] = round((cur - dma200) / dma200 * 100, 1)
+                if dma200 > dma_lw * 1.001: data['dma_dir'] = "Rising"
+                elif dma200 < dma_lw * 0.999: data['dma_dir'] = "Falling"
+                else: data['dma_dir'] = "Flat"
+            
+            old = float(prices.iloc[0]) if name != 'nifty' else float(prices.iloc[-22])
+            chg = round((cur - old) / old * 100, 1)
+            
+            if name == 'inr':
+                data['inr'] = cur
+                if chg > 2: data['inr_dir'] = "Weakening"
+                elif chg < -2: data['inr_dir'] = "Strengthening"
+                else: data['inr_dir'] = "Stable"
+            elif name == 'us10y':
+                data['us10y'] = cur
+                if chg > 2: data['us10y_dir'] = "Rising"
+                elif chg < -2: data['us10y_dir'] = "Falling"
+                else: data['us10y_dir'] = "Stable"
+            elif name == 'brent':
+                data['brent'] = cur
+                if chg > 2: data['crude_dir'] = "Rising"
+                elif chg < -2: data['crude_dir'] = "Falling"
+                else: data['crude_dir'] = "Stable"
+            elif name == 'dxy':
+                data['dxy'] = cur
+            elif name == 'gvix':
+                data['gvix'] = cur
+        except:
+            continue
+    
+    defaults = {'nifty_price':22000,'dma200':25000,'pct_dma':-10,'dma_dir':'Falling',
+                'us10y':4.3,'us10y_dir':'Stable','dxy':100,'gvix':24,
+                'inr':92,'inr_dir':'Weakening','brent':109,'crude_dir':'Rising'}
+    for k,v in defaults.items():
+        if k not in data:
+            data[k] = v
+    return data
 
 with st.spinner("Fetching live data..."):
     d = fetch_data()
 
-# ===== SIDEBAR — MANUAL INPUTS =====
 st.sidebar.header("MANUAL INPUTS")
-st.sidebar.caption("Update these every Sunday")
+st.sidebar.caption("Update every Sunday")
 nifty_pe = st.sidebar.number_input("Nifty PE", value=20.5, step=0.1)
-breadth = st.sidebar.number_input("Breadth % (Nifty500 > 200DMA)", value=20.0, step=1.0)
+breadth = st.sidebar.number_input("Breadth %", value=20.0, step=1.0)
 india_vix = st.sidebar.number_input("India VIX", value=24.0, step=0.1)
-fii_30d = st.sidebar.number_input("FII 30D Net (Rs Cr)", value=-100000, step=1000)
-dii_30d = st.sidebar.number_input("DII 30D Net (Rs Cr)", value=130000, step=1000)
+fii_30d = st.sidebar.number_input("FII 30D (Cr)", value=-100000, step=1000)
+dii_30d = st.sidebar.number_input("DII 30D (Cr)", value=130000, step=1000)
 rbi_stance = st.sidebar.selectbox("RBI Stance", ["Accommodative-Cutting","Accommodative-Paused","Neutral","Tightening-Paused","Tightening-Hiking"], index=2)
 cpi = st.sidebar.number_input("CPI %", value=3.21, step=0.1)
 pmi = st.sidebar.number_input("PMI", value=53.8, step=0.1)
-yc_inv = st.sidebar.selectbox("Yield Curve Inverted?", ["No","Yes"], index=0)
+yc_inv = st.sidebar.selectbox("Yield Curve Inverted?", ["No","Yes"])
 last_score = st.sidebar.number_input("Last Week Score", value=34, step=1)
 
-# ===== SCORING =====
 if nifty_pe < 18: val_score = 15
 elif nifty_pe < 20: val_score = 12
 elif nifty_pe < 22: val_score = 9
@@ -72,8 +96,7 @@ elif nifty_pe < 24: val_score = 4
 elif nifty_pe < 26: val_score = 2
 else: val_score = 0
 
-pct_dma = d['pct_dma']
-dma_dir = d['dma_dir']
+pct_dma = d['pct_dma']; dma_dir = d['dma_dir']
 if pct_dma > 10: trend_score = 15 if dma_dir == "Rising" else 13
 elif pct_dma > 5: trend_score = 13 if dma_dir == "Rising" else 11
 elif pct_dma > 0: trend_score = 10 if dma_dir == "Rising" else 7
@@ -195,49 +218,40 @@ if gvix > 25 or brent > 100 or inr_dir == "Weakening": gold_signal = "ACCUMULATE
 elif gvix < 15 and brent < 60: gold_signal = "TRIM"
 else: gold_signal = "HOLD"
 
-# ===== DISPLAY =====
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.metric("ENGINE A SCORE", f"{smoothed}/100", f"Raw: {raw_score}")
+    st.metric("ENGINE A SCORE", str(smoothed) + "/100", "Raw: " + str(raw_score))
 with col2:
     st.metric("CONDITION", condition)
 with col3:
-    rf_text = "YES" if red_flag else "No"
-    st.metric("RED FLAG", rf_text)
+    st.metric("RED FLAG", "YES" if red_flag else "No")
 
 st.divider()
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    eq_color = "inverse" if eq <= 25 else "normal"
-    st.metric("EQUITY", f"{eq}%", f"B:{round(eq*b_pct/100)}% C:{round(eq*c_pct/100)}%")
+    st.metric("EQUITY", str(eq) + "%", "B:" + str(round(eq*b_pct/100)) + "% C:" + str(round(eq*c_pct/100)) + "%")
 with col2:
-    st.metric("DEBT", f"{debt}%", duration)
+    st.metric("DEBT", str(debt) + "%", duration)
 with col3:
-    st.metric("GOLD", f"{gold}%", gold_signal)
+    st.metric("GOLD", str(gold) + "%", gold_signal)
 with col4:
-    st.metric("B:C SPLIT", f"{b_pct}:{c_pct}")
+    st.metric("B:C SPLIT", str(b_pct) + ":" + str(c_pct))
 
 st.divider()
 st.subheader("Component Scores")
 
-scores = {
-    "Valuation": (val_score, 15),
-    "Trend": (trend_score, 15),
-    "Breadth": (br_score, 12),
-    "Volatility": (vix_score, 10),
-    "Flows": (flow_score, 12),
-    "Macro": (macro_score, 12),
-    "Global": (global_score, 12),
-    "Crude": (crude_score, 12),
-}
+scores = {"Valuation": (val_score, 15), "Trend": (trend_score, 15),
+          "Breadth": (br_score, 12), "Volatility": (vix_score, 10),
+          "Flows": (flow_score, 12), "Macro": (macro_score, 12),
+          "Global": (global_score, 12), "Crude": (crude_score, 12)}
 
 cols = st.columns(4)
 for i, (name, (score, mx)) in enumerate(scores.items()):
     with cols[i % 4]:
         pct = score / mx * 100
-        color = "🟢" if pct > 60 else ("🟡" if pct > 30 else "🔴")
-        st.metric(f"{color} {name}", f"{score}/{mx}")
+        icon = "🟢" if pct > 60 else ("🟡" if pct > 30 else "🔴")
+        st.metric(icon + " " + name, str(score) + "/" + str(mx))
 
 st.divider()
 st.subheader("Live Market Data")
@@ -245,23 +259,23 @@ st.subheader("Live Market Data")
 col1, col2 = st.columns(2)
 with col1:
     st.markdown("**INDIA**")
-    st.write(f"Nifty: **{round(d['nifty_price'])}** ({d['pct_dma']}% vs 200DMA)")
-    st.write(f"200 DMA: {round(d['dma200'])} ({d['dma_dir']})")
-    st.write(f"Nifty PE: {nifty_pe}")
-    st.write(f"India VIX: {india_vix}")
-    st.write(f"Breadth: {breadth}%")
-    st.write(f"FII 30D: {fii_30d:,} Cr")
-    st.write(f"DII 30D: {dii_30d:,} Cr")
+    st.write("Nifty: **" + str(round(d['nifty_price'])) + "** (" + str(d['pct_dma']) + "% vs 200DMA)")
+    st.write("200 DMA: " + str(round(d['dma200'])) + " (" + d['dma_dir'] + ")")
+    st.write("Nifty PE: " + str(nifty_pe))
+    st.write("India VIX: " + str(india_vix))
+    st.write("Breadth: " + str(breadth) + "%")
+    st.write("FII 30D: " + str(fii_30d) + " Cr")
+    st.write("DII 30D: " + str(dii_30d) + " Cr")
 
 with col2:
     st.markdown("**GLOBAL**")
-    st.write(f"US 10Y: **{round(d['us10y'],2)}%** ({d['us10y_dir']})")
-    st.write(f"DXY: {round(d['dxy'],1)}")
-    st.write(f"Global VIX: {round(d['gvix'],1)}")
-    st.write(f"INR/USD: {round(d['inr'],2)} ({d['inr_dir']})")
-    st.write(f"Brent: ${round(d['brent'],1)} ({d['crude_dir']})")
-    st.write(f"RBI: {rbi_stance}")
-    st.write(f"CPI: {cpi}% | PMI: {pmi}")
+    st.write("US 10Y: **" + str(round(d['us10y'],2)) + "%** (" + d['us10y_dir'] + ")")
+    st.write("DXY: " + str(round(d['dxy'],1)))
+    st.write("Global VIX: " + str(round(d['gvix'],1)))
+    st.write("INR/USD: " + str(round(d['inr'],2)) + " (" + d['inr_dir'] + ")")
+    st.write("Brent: $" + str(round(d['brent'],1)) + " (" + d['crude_dir'] + ")")
+    st.write("RBI: " + rbi_stance)
+    st.write("CPI: " + str(cpi) + "% | PMI: " + str(pmi))
 
 st.divider()
 st.caption("Built by Abhishek | Engine A v2 | Auto-fetches 10 inputs, 7 manual")
