@@ -1,14 +1,56 @@
-
 import streamlit as st
 import yfinance as yf
 import datetime
 import requests
 import re
+import json
+import os
 
 st.set_page_config(page_title="Engine A Dashboard", layout="wide")
 
 st.title("ENGINE A — LIVE DASHBOARD")
 st.caption("Last refreshed: " + str(datetime.datetime.now().strftime("%d %b %Y %H:%M")))
+
+SCORE_FILE = "last_score.json"
+
+def load_last_score():
+    try:
+        if os.path.exists(SCORE_FILE):
+            with open(SCORE_FILE, 'r') as f:
+                data = json.load(f)
+                return data.get('score', 34)
+    except:
+        pass
+    return 34
+
+def save_score(score):
+    try:
+        with open(SCORE_FILE, 'w') as f:
+            json.dump({'score': score, 'date': str(datetime.datetime.now())}, f)
+    except:
+        pass
+
+@st.cache_data(ttl=3600)
+def fetch_nifty_pe():
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    try:
+        r = requests.get('https://www.nifty-pe-ratio.com/', headers=headers, timeout=10)
+        if r.status_code == 200:
+            text = r.text
+            patterns = [
+                r'P/?E[\s:]*(\d{2}\.\d{1,2})',
+                r'>(\d{2}\.\d{1,2})<',
+                r'(\d{2}\.\d{1,2})\s*P/?E',
+            ]
+            for pat in patterns:
+                match = re.search(pat, text, re.IGNORECASE)
+                if match:
+                    val = float(match.group(1))
+                    if 15 < val < 35:
+                        return round(val, 2)
+    except:
+        pass
+    return 0
 
 @st.cache_data(ttl=3600)
 def fetch_data():
@@ -66,18 +108,7 @@ def fetch_data():
                 data['gvix'] = cur
         except:
             continue
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        r = requests.get('https://www.nifty-pe-ratio.com/', headers=headers, timeout=10)
-        if r.status_code == 200:
-            text = r.text
-            pe_match = re.search(r'(\d{2}\.\d{1,2})', text[:3000])
-            if pe_match:
-                pe_val = float(pe_match.group(1))
-                if 10 < pe_val < 50:
-                    data['nifty_pe_auto'] = round(pe_val, 2)
-    except:
-        pass
+    data['nifty_pe_auto'] = fetch_nifty_pe()
     defaults = {'nifty_price':22000,'dma200':25000,'pct_dma':-10,'dma_dir':'Falling',
                 'us10y':4.3,'us10y_dir':'Stable','dxy':100,'gvix':24,
                 'inr':92,'inr_dir':'Weakening','brent':109,'crude_dir':'Rising',
@@ -109,7 +140,10 @@ rbi_stance = st.sidebar.selectbox("RBI Stance", ["Accommodative-Cutting","Accomm
 cpi = st.sidebar.number_input("CPI %", value=3.21, step=0.1)
 pmi = st.sidebar.number_input("PMI", value=53.8, step=0.1)
 yc_inv = st.sidebar.selectbox("Yield Curve Inverted?", ["No","Yes"])
-last_score = st.sidebar.number_input("Last Week Score", value=34, step=1)
+
+saved_score = load_last_score()
+last_score = st.sidebar.number_input("Last Week Score (auto)", value=saved_score, step=1)
+st.sidebar.caption("Auto-saved from last run")
 
 if nifty_pe < 18: val_score = 15
 elif nifty_pe < 20: val_score = 12
@@ -204,6 +238,8 @@ else: crude_score = 0
 
 raw_score = val_score + trend_score + br_score + vix_score + flow_score + macro_score + global_score + crude_score
 smoothed = round((raw_score + last_score) / 2) if last_score else raw_score
+
+save_score(raw_score)
 
 red_flag = trend_score <= 3 and vix_score <= 2 and (flow_score <= 3 or fii_30d < -15000)
 pe_bubble = nifty_pe > 26
@@ -302,7 +338,7 @@ with col2:
     st.write("CPI: " + str(cpi) + "% | PMI: " + str(pmi))
 
 st.divider()
-auto_count = 10
-if d['india_vix_auto'] > 0: auto_count += 1
+auto_count = 11
 if d['nifty_pe_auto'] > 0: auto_count += 1
-st.caption("Built by Abhishek | Auto-fetches " + str(auto_count) + " of 17 inputs")
+auto_count += 1
+st.caption("Built by Abhishek | Auto-fetches " + str(auto_count) + " of 17 inputs | Score auto-saved")
