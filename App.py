@@ -1,6 +1,9 @@
+
 import streamlit as st
 import yfinance as yf
 import datetime
+import requests
+import re
 
 st.set_page_config(page_title="Engine A Dashboard", layout="wide")
 
@@ -12,9 +15,9 @@ def fetch_data():
     data = {}
     tickers = {
         'nifty': '^NSEI', 'us10y': '^TNX', 'dxy': 'DX-Y.NYB',
-        'gvix': '^VIX', 'inr': 'USDINR=X', 'brent': 'BZ=F'
+        'gvix': '^VIX', 'inr': 'USDINR=X', 'brent': 'BZ=F',
+        'indiavix': '^INDIAVIX'
     }
-    
     for name, ticker in tickers.items():
         try:
             h = yf.download(ticker, period='1y', progress=False)
@@ -23,12 +26,9 @@ def fetch_data():
             cols = h.columns
             close_col = [c for c in cols if 'Close' in str(c)][0]
             prices = h[close_col].dropna()
-            
-            if len(prices) < 10:
+            if len(prices) < 5:
                 continue
-            
             cur = float(prices.iloc[-1])
-            
             if name == 'nifty' and len(prices) >= 200:
                 sma = prices.rolling(200).mean()
                 dma200 = float(sma.iloc[-1])
@@ -39,10 +39,12 @@ def fetch_data():
                 if dma200 > dma_lw * 1.001: data['dma_dir'] = "Rising"
                 elif dma200 < dma_lw * 0.999: data['dma_dir'] = "Falling"
                 else: data['dma_dir'] = "Flat"
-            
-            old = float(prices.iloc[0]) if name != 'nifty' else float(prices.iloc[-22])
+                continue
+            if name == 'indiavix':
+                data['india_vix_auto'] = round(cur, 1)
+                continue
+            old = float(prices.iloc[-22]) if len(prices) > 22 else float(prices.iloc[0])
             chg = round((cur - old) / old * 100, 1)
-            
             if name == 'inr':
                 data['inr'] = cur
                 if chg > 2: data['inr_dir'] = "Weakening"
@@ -64,10 +66,22 @@ def fetch_data():
                 data['gvix'] = cur
         except:
             continue
-    
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        r = requests.get('https://www.nifty-pe-ratio.com/', headers=headers, timeout=10)
+        if r.status_code == 200:
+            text = r.text
+            pe_match = re.search(r'(\d{2}\.\d{1,2})', text[:3000])
+            if pe_match:
+                pe_val = float(pe_match.group(1))
+                if 10 < pe_val < 50:
+                    data['nifty_pe_auto'] = round(pe_val, 2)
+    except:
+        pass
     defaults = {'nifty_price':22000,'dma200':25000,'pct_dma':-10,'dma_dir':'Falling',
                 'us10y':4.3,'us10y_dir':'Stable','dxy':100,'gvix':24,
-                'inr':92,'inr_dir':'Weakening','brent':109,'crude_dir':'Rising'}
+                'inr':92,'inr_dir':'Weakening','brent':109,'crude_dir':'Rising',
+                'india_vix_auto':0, 'nifty_pe_auto':0}
     for k,v in defaults.items():
         if k not in data:
             data[k] = v
@@ -77,10 +91,18 @@ with st.spinner("Fetching live data..."):
     d = fetch_data()
 
 st.sidebar.header("MANUAL INPUTS")
-st.sidebar.caption("Update every Sunday")
-nifty_pe = st.sidebar.number_input("Nifty PE", value=20.5, step=0.1)
+
+if d['nifty_pe_auto'] > 0:
+    nifty_pe = st.sidebar.number_input("Nifty PE (auto)", value=d['nifty_pe_auto'], step=0.1)
+else:
+    nifty_pe = st.sidebar.number_input("Nifty PE", value=20.5, step=0.1)
+
+if d['india_vix_auto'] > 0:
+    india_vix = st.sidebar.number_input("India VIX (auto)", value=d['india_vix_auto'], step=0.1)
+else:
+    india_vix = st.sidebar.number_input("India VIX", value=24.0, step=0.1)
+
 breadth = st.sidebar.number_input("Breadth %", value=20.0, step=1.0)
-india_vix = st.sidebar.number_input("India VIX", value=24.0, step=0.1)
 fii_30d = st.sidebar.number_input("FII 30D (Cr)", value=-100000, step=1000)
 dii_30d = st.sidebar.number_input("DII 30D (Cr)", value=130000, step=1000)
 rbi_stance = st.sidebar.selectbox("RBI Stance", ["Accommodative-Cutting","Accommodative-Paused","Neutral","Tightening-Paused","Tightening-Hiking"], index=2)
@@ -261,8 +283,10 @@ with col1:
     st.markdown("**INDIA**")
     st.write("Nifty: **" + str(round(d['nifty_price'])) + "** (" + str(d['pct_dma']) + "% vs 200DMA)")
     st.write("200 DMA: " + str(round(d['dma200'])) + " (" + d['dma_dir'] + ")")
-    st.write("Nifty PE: " + str(nifty_pe))
-    st.write("India VIX: " + str(india_vix))
+    pe_src = " (auto)" if d['nifty_pe_auto'] > 0 else " (manual)"
+    st.write("Nifty PE: " + str(nifty_pe) + pe_src)
+    vx_src = " (auto)" if d['india_vix_auto'] > 0 else " (manual)"
+    st.write("India VIX: " + str(india_vix) + vx_src)
     st.write("Breadth: " + str(breadth) + "%")
     st.write("FII 30D: " + str(fii_30d) + " Cr")
     st.write("DII 30D: " + str(dii_30d) + " Cr")
@@ -278,4 +302,7 @@ with col2:
     st.write("CPI: " + str(cpi) + "% | PMI: " + str(pmi))
 
 st.divider()
-st.caption("Built by Abhishek | Engine A v2 | Auto-fetches 10 inputs, 7 manual")
+auto_count = 10
+if d['india_vix_auto'] > 0: auto_count += 1
+if d['nifty_pe_auto'] > 0: auto_count += 1
+st.caption("Built by Abhishek | Auto-fetches " + str(auto_count) + " of 17 inputs")
