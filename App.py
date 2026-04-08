@@ -37,11 +37,7 @@ def fetch_nifty_pe():
         r = requests.get('https://www.nifty-pe-ratio.com/', headers=headers, timeout=10)
         if r.status_code == 200:
             text = r.text
-            patterns = [
-                r'P/?E[\s:]*(\d{2}\.\d{1,2})',
-                r'>(\d{2}\.\d{1,2})<',
-                r'(\d{2}\.\d{1,2})\s*P/?E',
-            ]
+            patterns = [r'P/?E[\s:]*(\d{2}\.\d{1,2})', r'>(\d{2}\.\d{1,2})<', r'(\d{2}\.\d{1,2})\s*P/?E']
             for pat in patterns:
                 match = re.search(pat, text, re.IGNORECASE)
                 if match:
@@ -51,6 +47,38 @@ def fetch_nifty_pe():
     except:
         pass
     return 0
+
+@st.cache_data(ttl=3600)
+def fetch_fii_dii():
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    fii_total = 0
+    dii_total = 0
+    try:
+        r = requests.get('https://www.moneycontrol.com/stocks/marketstats/fii_dii_activity/index.php', headers=headers, timeout=15)
+        if r.status_code == 200:
+            text = r.text
+            rows = re.findall(r'<tr[^>]*>(.*?)</tr>', text, re.DOTALL)
+            count = 0
+            for row in rows:
+                if count >= 22:
+                    break
+                cells = re.findall(r'<td[^>]*>(.*?)</td>', row, re.DOTALL)
+                if len(cells) >= 7:
+                    try:
+                        fii_net_str = re.sub(r'<[^>]+>', '', cells[3]).strip().replace(',', '')
+                        dii_net_str = re.sub(r'<[^>]+>', '', cells[6]).strip().replace(',', '')
+                        fii_net = float(fii_net_str)
+                        dii_net = float(dii_net_str)
+                        fii_total += fii_net
+                        dii_total += dii_net
+                        count += 1
+                    except:
+                        continue
+            if count > 0:
+                return round(fii_total), round(dii_total)
+    except:
+        pass
+    return 0, 0
 
 @st.cache_data(ttl=3600)
 def fetch_data():
@@ -109,10 +137,13 @@ def fetch_data():
         except:
             continue
     data['nifty_pe_auto'] = fetch_nifty_pe()
+    fii_auto, dii_auto = fetch_fii_dii()
+    data['fii_auto'] = fii_auto
+    data['dii_auto'] = dii_auto
     defaults = {'nifty_price':22000,'dma200':25000,'pct_dma':-10,'dma_dir':'Falling',
                 'us10y':4.3,'us10y_dir':'Stable','dxy':100,'gvix':24,
                 'inr':92,'inr_dir':'Weakening','brent':109,'crude_dir':'Rising',
-                'india_vix_auto':0, 'nifty_pe_auto':0}
+                'india_vix_auto':0, 'nifty_pe_auto':0, 'fii_auto':0, 'dii_auto':0}
     for k,v in defaults.items():
         if k not in data:
             data[k] = v
@@ -134,8 +165,17 @@ else:
     india_vix = st.sidebar.number_input("India VIX", value=24.0, step=0.1)
 
 breadth = st.sidebar.number_input("Breadth %", value=20.0, step=1.0)
-fii_30d = st.sidebar.number_input("FII 30D (Cr)", value=-100000, step=1000)
-dii_30d = st.sidebar.number_input("DII 30D (Cr)", value=130000, step=1000)
+
+if d['fii_auto'] != 0:
+    fii_30d = st.sidebar.number_input("FII 30D Cr (auto)", value=d['fii_auto'], step=1000)
+else:
+    fii_30d = st.sidebar.number_input("FII 30D (Cr)", value=-100000, step=1000)
+
+if d['dii_auto'] != 0:
+    dii_30d = st.sidebar.number_input("DII 30D Cr (auto)", value=d['dii_auto'], step=1000)
+else:
+    dii_30d = st.sidebar.number_input("DII 30D (Cr)", value=130000, step=1000)
+
 rbi_stance = st.sidebar.selectbox("RBI Stance", ["Accommodative-Cutting","Accommodative-Paused","Neutral","Tightening-Paused","Tightening-Hiking"], index=2)
 cpi = st.sidebar.number_input("CPI %", value=3.21, step=0.1)
 pmi = st.sidebar.number_input("PMI", value=53.8, step=0.1)
@@ -324,8 +364,10 @@ with col1:
     vx_src = " (auto)" if d['india_vix_auto'] > 0 else " (manual)"
     st.write("India VIX: " + str(india_vix) + vx_src)
     st.write("Breadth: " + str(breadth) + "%")
-    st.write("FII 30D: " + str(fii_30d) + " Cr")
-    st.write("DII 30D: " + str(dii_30d) + " Cr")
+    fii_src = " (auto)" if d['fii_auto'] != 0 else " (manual)"
+    st.write("FII 30D: " + str(fii_30d) + " Cr" + fii_src)
+    dii_src = " (auto)" if d['dii_auto'] != 0 else " (manual)"
+    st.write("DII 30D: " + str(dii_30d) + " Cr" + dii_src)
 
 with col2:
     st.markdown("**GLOBAL**")
@@ -340,5 +382,7 @@ with col2:
 st.divider()
 auto_count = 11
 if d['nifty_pe_auto'] > 0: auto_count += 1
+if d['fii_auto'] != 0: auto_count += 1
+if d['dii_auto'] != 0: auto_count += 1
 auto_count += 1
-st.caption("Built by Abhishek | Auto-fetches " + str(auto_count) + " of 17 inputs | Score auto-saved")
+st.caption("Built by Abhishek | Auto-fetches " + str(auto_count) + " of 17 inputs")
