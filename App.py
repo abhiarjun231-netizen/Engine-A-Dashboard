@@ -1,6 +1,7 @@
 import streamlit as st
 import yfinance as yf
 import datetime, requests, re, json, os
+import pandas as pd
 
 st.set_page_config(page_title="Investment Dashboard", layout="wide", initial_sidebar_state="collapsed")
 
@@ -30,6 +31,8 @@ h1,h2,h3{color:#f1f5f9!important;font-weight:700}
 </style>""", unsafe_allow_html=True)
 
 SCORE_FILE = "last_score.json"
+HISTORY_FILE = "score_history.json"
+PORTFOLIO_FILE = "portfolio_history.json"
 
 def load_last_score():
     try:
@@ -44,6 +47,38 @@ def save_score(score):
         with open(SCORE_FILE, 'w') as f:
             json.dump({'score': score, 'date': str(datetime.datetime.now())}, f)
     except: pass
+
+def log_score_history(score, condition):
+    try:
+        history = []
+        if os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, 'r') as f:
+                history = json.load(f)
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        history = [h for h in history if h.get('date') != today]
+        history.append({'date': today, 'score': score, 'condition': condition, 'timestamp': str(datetime.datetime.now())})
+        history = history[-90:]
+        with open(HISTORY_FILE, 'w') as f:
+            json.dump(history, f)
+        return history
+    except:
+        return []
+
+def log_portfolio(invested, current, pnl):
+    try:
+        history = []
+        if os.path.exists(PORTFOLIO_FILE):
+            with open(PORTFOLIO_FILE, 'r') as f:
+                history = json.load(f)
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        history = [h for h in history if h.get('date') != today]
+        history.append({'date': today, 'invested': invested, 'current': current, 'pnl': pnl, 'timestamp': str(datetime.datetime.now())})
+        history = history[-90:]
+        with open(PORTFOLIO_FILE, 'w') as f:
+            json.dump(history, f)
+        return history
+    except:
+        return []
 
 @st.cache_data(ttl=3600)
 def fetch_nifty_pe():
@@ -146,23 +181,19 @@ pmi = st.sidebar.number_input("PMI", value=53.8, step=0.1)
 yc_inv = st.sidebar.selectbox("Yield Inverted?", ["No","Yes"])
 last_score = st.sidebar.number_input("Last Week Score", value=load_last_score(), step=1)
 
-if nifty_pe < 18: vs = 15
-elif nifty_pe < 20: vs = 12
-elif nifty_pe < 22: vs = 9
-elif nifty_pe < 24: vs = 4
-elif nifty_pe < 26: vs = 2
-else: vs = 0
-val_score = vs
-
+if nifty_pe < 18: val_score = 15
+elif nifty_pe < 20: val_score = 12
+elif nifty_pe < 22: val_score = 9
+elif nifty_pe < 24: val_score = 4
+elif nifty_pe < 26: val_score = 2
+else: val_score = 0
 pd_v = d['pct_dma']; dd = d['dma_dir']
-if pd_v > 10: ts = 15 if dd == "Rising" else 13
-elif pd_v > 5: ts = 13 if dd == "Rising" else 11
-elif pd_v > 0: ts = 10 if dd == "Rising" else 7
-elif pd_v > -5: ts = 5
-elif pd_v > -10: ts = 3
-else: ts = 0
-trend_score = ts
-
+if pd_v > 10: trend_score = 15 if dd == "Rising" else 13
+elif pd_v > 5: trend_score = 13 if dd == "Rising" else 11
+elif pd_v > 0: trend_score = 10 if dd == "Rising" else 7
+elif pd_v > -5: trend_score = 5
+elif pd_v > -10: trend_score = 3
+else: trend_score = 0
 if breadth > 70: br_score = 12
 elif breadth > 60: br_score = 10
 elif breadth > 50: br_score = 8
@@ -170,14 +201,12 @@ elif breadth > 40: br_score = 6
 elif breadth > 30: br_score = 4
 elif breadth > 20: br_score = 2
 else: br_score = 0
-
 if india_vix < 12: vix_score = 10
 elif india_vix < 15: vix_score = 8
 elif india_vix < 18: vix_score = 6
 elif india_vix < 22: vix_score = 4
 elif india_vix < 30: vix_score = 2
 else: vix_score = 0
-
 if fii_30d > 5000: fii_s = 6
 elif fii_30d > 0: fii_s = 5
 elif fii_30d > -5000: fii_s = 4
@@ -191,7 +220,6 @@ elif dii_30d > 0: dii_s = 3
 elif dii_30d > -5000: dii_s = 1
 else: dii_s = 0
 flow_score = min(12, fii_s + dii_s)
-
 rbi_map = {"Accommodative-Cutting":4,"Accommodative-Paused":3,"Neutral":2,"Tightening-Paused":1,"Tightening-Hiking":0}
 rbi_s = rbi_map.get(rbi_stance, 0)
 if cpi < 4.5: cpi_s = 4
@@ -206,7 +234,6 @@ elif pmi > 48: pmi_s = 1
 else: pmi_s = 0
 yc_p = 2 if yc_inv == "Yes" else 0
 macro_score = max(0, rbi_s + cpi_s + pmi_s - yc_p)
-
 us10y = d['us10y']; us10y_dir = d['us10y_dir']; dxy = d['dxy']; gvix = d['gvix']; inr_dir = d['inr_dir']; brent = d['brent']
 if us10y_dir == "Falling" and us10y < 4: us_s = 3
 elif us10y_dir == "Falling": us_s = 2
@@ -227,7 +254,6 @@ elif inr_dir == "Stable": ir_s = 2
 elif inr_dir == "Weakening": ir_s = 1
 else: ir_s = 0
 global_score = min(12, us_s + dx_s + gv_s + ir_s)
-
 if brent < 50: crude_score = 12
 elif brent < 60: crude_score = 10
 elif brent < 70: crude_score = 8
@@ -241,7 +267,6 @@ smoothed = round((raw_score + last_score) / 2) if last_score else raw_score
 save_score(raw_score)
 red_flag = trend_score <= 3 and vix_score <= 2 and (flow_score <= 3 or fii_30d < -15000)
 pe_bubble = nifty_pe > 26
-
 if smoothed <= 20: eq, gold = 10, 25
 elif smoothed <= 30: eq, gold = 25, 25
 elif smoothed <= 40: eq, gold = 40, 20
@@ -251,27 +276,25 @@ else: eq, gold = 85, 5
 if red_flag: eq = min(eq, 25); gold = 25
 if pe_bubble: eq = min(eq, 70)
 debt = 100 - eq - gold
-
 if smoothed <= 20: b_pct, c_pct = 30, 70
 elif smoothed <= 30: b_pct, c_pct = 35, 65
 elif smoothed <= 40: b_pct, c_pct = 40, 60
 elif smoothed <= 52: b_pct, c_pct = 45, 55
 else: b_pct, c_pct = 50, 50
-
 if smoothed <= 20: condition = "TERRIBLE"
 elif smoothed <= 30: condition = "WEAK"
 elif smoothed <= 40: condition = "BELOW AVG"
 elif smoothed <= 52: condition = "NEUTRAL"
 elif smoothed <= 62: condition = "GOOD"
 else: condition = "EXCELLENT"
-
 if rbi_stance in ["Accommodative-Cutting","Accommodative-Paused"] and yc_inv == "No": duration = "LONG DURATION"
 elif rbi_stance == "Neutral": duration = "MEDIUM DURATION"
 else: duration = "SHORT / CASH"
-
 if gvix > 25 or brent > 100 or inr_dir == "Weakening": gold_signal = "ACCUMULATE"
 elif gvix < 15 and brent < 60: gold_signal = "TRIM"
 else: gold_signal = "HOLD"
+
+score_history = log_score_history(smoothed, condition)
 
 c1, c2 = st.columns([1, 2])
 with c1:
@@ -281,6 +304,14 @@ with c2:
     ft = "🚨 RED FLAG" if red_flag else "✅ ALL CLEAR"
     pc = "#10b981" if d['pct_dma'] > 0 else "#ef4444"
     st.markdown(f"<div class='metric-card'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;'><span style='color:#94a3b8;font-size:13px;'>MARKET STATUS</span><span class='{fb}'>{ft}</span></div><div style='display:grid;grid-template-columns:1fr 1fr;gap:14px;'><div><div style='color:#94a3b8;font-size:12px;'>Nifty 50</div><div style='font-size:22px;font-weight:700;color:#f1f5f9;'>{round(d['nifty_price']):,}</div></div><div><div style='color:#94a3b8;font-size:12px;'>vs 200 DMA</div><div style='font-size:22px;font-weight:700;color:{pc};'>{d['pct_dma']}%</div></div><div><div style='color:#94a3b8;font-size:12px;'>India VIX</div><div style='font-size:22px;font-weight:700;color:#f1f5f9;'>{india_vix}</div></div><div><div style='color:#94a3b8;font-size:12px;'>Brent</div><div style='font-size:22px;font-weight:700;color:#f1f5f9;'>${round(d['brent'])}</div></div></div></div>", unsafe_allow_html=True)
+
+if len(score_history) >= 2:
+    st.markdown("<div class='section-header'>📈 Score History (Auto-Logged)</div>", unsafe_allow_html=True)
+    df_hist = pd.DataFrame(score_history)
+    df_hist['date'] = pd.to_datetime(df_hist['date'])
+    df_hist = df_hist.set_index('date')
+    st.line_chart(df_hist['score'], height=200)
+    st.caption(f"📊 {len(score_history)} data points logged automatically")
 
 st.markdown("<div class='section-header'>💼 Asset Allocation</div>", unsafe_allow_html=True)
 a1, a2, a3, a4 = st.columns(4)
@@ -294,11 +325,27 @@ tc = sum(s['current'] * s['qty'] for s in holdings.values())
 tp = tc - ti
 tpp = (tp / ti) * 100 if ti > 0 else 0
 
+portfolio_history = log_portfolio(ti, tc, tp)
+
 st.markdown("<div class='section-header'>📊 Total Portfolio</div>", unsafe_allow_html=True)
 po1, po2, po3 = st.columns(3)
 with po1: st.metric("Invested", f"₹{ti:,.0f}")
 with po2: st.metric("Current", f"₹{tc:,.0f}", f"₹{tp:+,.0f}")
 with po3: st.metric("P&L %", f"{tpp:+.2f}%")
+
+if len(portfolio_history) >= 2:
+    st.markdown("<div class='section-header'>📉 Portfolio Value History</div>", unsafe_allow_html=True)
+    df_p = pd.DataFrame(portfolio_history)
+    df_p['date'] = pd.to_datetime(df_p['date'])
+    df_p = df_p.set_index('date')
+    st.line_chart(df_p['current'], height=200)
+    max_val = df_p['current'].max()
+    min_val = df_p['current'].min()
+    drawdown = ((min_val - max_val) / max_val * 100) if max_val > 0 else 0
+    dc1, dc2, dc3 = st.columns(3)
+    with dc1: st.metric("Peak Value", f"₹{max_val:,.0f}")
+    with dc2: st.metric("Lowest Value", f"₹{min_val:,.0f}")
+    with dc3: st.metric("Max Drawdown", f"{drawdown:.2f}%")
 
 def render(title, ef):
     st.markdown(f"<div class='section-header'>{title}</div>", unsafe_allow_html=True)
@@ -325,10 +372,4 @@ for i, (n, (s, m)) in enumerate(sd.items()):
         co = "#10b981" if p > 60 else ("#f59e0b" if p > 30 else "#ef4444")
         st.markdown(f"<div class='metric-card' style='padding:14px;'><div style='font-size:12px;color:#94a3b8;'>{n}</div><div style='font-size:22px;font-weight:700;color:{co};margin-top:4px;'>{s}/{m}</div><div style='height:4px;background:#1e293b;border-radius:2px;margin-top:6px;'><div style='height:100%;width:{p}%;background:{co};border-radius:2px;'></div></div></div>", unsafe_allow_html=True)
 
-st.markdown("<div class='section-header'>🔗 Quick Sources</div>", unsafe_allow_html=True)
-q1, q2, q3 = st.columns(3)
-with q1: st.link_button("📊 Breadth", "https://trendlyne.com/fundamentals/stock-screener/797020/nifty-500-above-200-sma/index/NIFTY500/nifty-500/", use_container_width=True)
-with q2: st.link_button("💰 FII/DII", "https://trendlyne.com/macro-data/fii-dii/latest/cash-pastmonth/", use_container_width=True)
-with q3: st.link_button("🏛️ RBI", "https://www.rbi.org.in/scripts/Annualpolicy.aspx", use_container_width=True)
-
-st.markdown(f"<div style='text-align:center;color:#64748b;font-size:12px;padding:20px;'>Built by Abhishek • v4 Pro Dark • {datetime.datetime.now().strftime('%H:%M')}</div>", unsafe_allow_html=True)
+st.markdown(
