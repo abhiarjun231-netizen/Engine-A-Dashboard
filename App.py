@@ -372,4 +372,4 @@ for i, (n, (s, m)) in enumerate(sd.items()):
         co = "#10b981" if p > 60 else ("#f59e0b" if p > 30 else "#ef4444")
         st.markdown(f"<div class='metric-card' style='padding:14px;'><div style='font-size:12px;color:#94a3b8;'>{n}</div><div style='font-size:22px;font-weight:700;color:{co};margin-top:4px;'>{s}/{m}</div><div style='height:4px;background:#1e293b;border-radius:2px;margin-top:6px;'><div style='height:100%;width:{p}%;background:{co};border-radius:2px;'></div></div></div>", unsafe_allow_html=True)
 
-st.markdown(
+st.mast.markdown(f"<div class='stock-row {sc}'>...
