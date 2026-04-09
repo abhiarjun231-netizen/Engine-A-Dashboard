@@ -328,13 +328,46 @@ score_history = log_score_history(smoothed, condition)
 
 c1, c2 = st.columns([1, 2])
 with c1:
-    score_html = "<div class='score-card'><div class='score-label'>Engine A Score</div><div class='score-number'>" + str(smoothed) + "</div><div class='score-label'>out of 100</div><div style='margin-top:12px;font-size:18px;font-weight:600;color:white;'>" + condition + "</div></div>"
+    score_html = f"""
+    <div class='score-card'>
+        <div class='score-label'>Engine A Score</div>
+        <div class='score-number'>{smoothed}</div>
+        <div class='score-label'>out of 100</div>
+        <div style='margin-top:12px;font-size:18px;font-weight:600;color:white;'>{condition}</div>
+    </div>
+    """
     st.markdown(score_html, unsafe_allow_html=True)
 with c2:
     fb = "badge-red" if red_flag else "badge-green"
     ft = "RED FLAG" if red_flag else "ALL CLEAR"
     pc = "#10b981" if d['pct_dma'] > 0 else "#ef4444"
-    market_html = "<div class='metric-card'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;'><span style='color:#94a3b8;font-size:13px;'>MARKET STATUS</span><span class='" + fb + "'>" + ft + "</span></div><div style='display:grid;grid-template-columns:1fr 1fr;gap:14px;'><div><div style='color:#94a3b8;font-size:12px;'>Nifty 50</div><div style='font-size:22px;font-weight:700;color:#f1f5f9;'>" + format(round(d['nifty_price']), ',') + "</div></div><div><div style='color:#94a3b8;font-size:12px;'>vs 200 DMA</div><div style='font-size:22px;font-weight:700;color:" + pc + ";'>" + str(d['pct_dma']) + "%</div></div><div><div style='color:#94a3b8;font-size:12px;'>India VIX</div><div style='font-size:22px;font-weight:700;color:#f1f5f9;'>" + str(india_vix) + "</div></div><div><div style='color:#94a3b8;font-size:12px;'>Brent</div><div style='font-size:22px;font-weight:700;color:#f1f5f9;'>$" + str(round(d['brent'])) + "</div></div></div></div>"
+    nifty_formatted = format(round(d['nifty_price']), ',')
+    market_html = f"""
+    <div class='metric-card'>
+        <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;'>
+            <span style='color:#94a3b8;font-size:13px;'>MARKET STATUS</span>
+            <span class='{fb}'>{ft}</span>
+        </div>
+        <div style='display:grid;grid-template-columns:1fr 1fr;gap:14px;'>
+            <div>
+                <div style='color:#94a3b8;font-size:12px;'>Nifty 50</div>
+                <div style='font-size:22px;font-weight:700;color:#f1f5f9;'>{nifty_formatted}</div>
+            </div>
+            <div>
+                <div style='color:#94a3b8;font-size:12px;'>vs 200 DMA</div>
+                <div style='font-size:22px;font-weight:700;color:{pc};'>{d['pct_dma']}%</div>
+            </div>
+            <div>
+                <div style='color:#94a3b8;font-size:12px;'>India VIX</div>
+                <div style='font-size:22px;font-weight:700;color:#f1f5f9;'>{india_vix}</div>
+            </div>
+            <div>
+                <div style='color:#94a3b8;font-size:12px;'>Brent</div>
+                <div style='font-size:22px;font-weight:700;color:#f1f5f9;'>${round(d['brent'])}</div>
+            </div>
+        </div>
+    </div>
+    """
     st.markdown(market_html, unsafe_allow_html=True)
 
 if len(score_history) >= 2:
@@ -343,14 +376,14 @@ if len(score_history) >= 2:
     df_hist['date'] = pd.to_datetime(df_hist['date'])
     df_hist = df_hist.set_index('date')
     st.line_chart(df_hist['score'], height=200)
-    st.caption(str(len(score_history)) + " data points logged")
+    st.caption(f"{len(score_history)} data points logged")
 
 st.markdown("<div class='section-header'>Asset Allocation</div>", unsafe_allow_html=True)
 a1, a2, a3, a4 = st.columns(4)
-with a1: st.metric("Equity", str(eq) + "%", "B:" + str(round(eq*b_pct/100)) + "% C:" + str(round(eq*c_pct/100)) + "%")
-with a2: st.metric("Debt", str(debt) + "%", duration)
-with a3: st.metric("Gold", str(gold) + "%", gold_signal)
-with a4: st.metric("B:C Split", str(b_pct) + ":" + str(c_pct))
+with a1: st.metric("Equity", f"{eq}%", f"B:{round(eq*b_pct/100)}% C:{round(eq*c_pct/100)}%")
+with a2: st.metric("Debt", f"{debt}%", duration)
+with a3: st.metric("Gold", f"{gold}%", gold_signal)
+with a4: st.metric("B:C Split", f"{b_pct}:{c_pct}")
 
 ti = sum(s['entry'] * s['qty'] for s in holdings.values())
 tc = sum(s['current'] * s['qty'] for s in holdings.values())
@@ -361,9 +394,9 @@ portfolio_history = log_portfolio(ti, tc, tp)
 
 st.markdown("<div class='section-header'>Total Portfolio</div>", unsafe_allow_html=True)
 po1, po2, po3 = st.columns(3)
-with po1: st.metric("Invested", "Rs " + format(int(ti), ','))
-with po2: st.metric("Current", "Rs " + format(int(tc), ','), "Rs " + format(int(tp), ','))
-with po3: st.metric("P&L %", str(round(tpp, 2)) + "%")
+with po1: st.metric("Invested", f"Rs {format(int(ti), ',')}")
+with po2: st.metric("Current", f"Rs {format(int(tc), ',')}", f"Rs {format(int(tp), ',')}")
+with po3: st.metric("P&L %", f"{round(tpp, 2)}%")
 
 if len(portfolio_history) >= 2:
     st.markdown("<div class='section-header'>Portfolio Value History</div>", unsafe_allow_html=True)
@@ -375,19 +408,36 @@ if len(portfolio_history) >= 2:
     min_val = df_p['current'].min()
     drawdown = ((min_val - max_val) / max_val * 100) if max_val > 0 else 0
     dc1, dc2, dc3 = st.columns(3)
-    with dc1: st.metric("Peak Value", "Rs " + format(int(max_val), ','))
-    with dc2: st.metric("Lowest", "Rs " + format(int(min_val), ','))
-    with dc3: st.metric("Max Drawdown", str(round(drawdown, 2)) + "%")
+    with dc1: st.metric("Peak Value", f"Rs {format(int(max_val), ',')}")
+    with dc2: st.metric("Lowest", f"Rs {format(int(min_val), ',')}")
+    with dc3: st.metric("Max Drawdown", f"{round(drawdown, 2)}%")
 
 def render(title, ef):
-    st.markdown("<div class='section-header'>" + title + "</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='section-header'>{title}</div>", unsafe_allow_html=True)
     for t, s in holdings.items():
         if s['engine'] != ef: continue
         sc = {'EXIT':'stock-row-danger','WARN':'stock-row-warn','PROFIT':'stock-row-safe'}.get(s['status'], 'stock-row')
         bc = {'EXIT':'badge-red','WARN':'badge-yellow','PROFIT':'badge-green'}.get(s['status'], 'badge-green')
         pc = "#10b981" if s['pnl_pct'] >= 0 else "#ef4444"
-        st_txt = " | Stop: Rs " + str(s['stop']) if s['stop'] > 0 else ""
-        row = "<div class='stock-row " + sc + "'><div style='display:flex;justify-content:space-between;align-items:center;'><div><div style='font-weight:600;font-size:15px;color:#f1f5f9;'>" + s['name'] + "</div><div style='font-size:12px;color:#94a3b8;margin-top:2px;'>Qty: " + str(s['qty']) + " | Entry: Rs " + str(s['entry']) + st_txt + "</div></div><div style='text-align:right;'><div style='font-weight:700;font-size:16px;color:#f1f5f9;'>Rs " + str(s['current']) + "</div><div style='font-size:13px;font-weight:600;color:" + pc + ";'>" + str(s['pnl_pct']) + "% (Rs " + str(s['pnl']) + ")</div></div></div><div style='display:flex;justify-content:space-between;align-items:center;margin-top:8px;'><span class='" + bc + "'>" + s['status'] + "</span><span style='font-size:12px;color:#94a3b8;'>" + s['action'] + "</span></div></div>"
+        st_txt = f" | Stop: Rs {s['stop']}" if s['stop'] > 0 else ""
+        row = f"""
+        <div class='stock-row {sc}'>
+            <div style='display:flex;justify-content:space-between;align-items:center;'>
+                <div>
+                    <div style='font-weight:600;font-size:15px;color:#f1f5f9;'>{s['name']}</div>
+                    <div style='font-size:12px;color:#94a3b8;margin-top:2px;'>Qty: {s['qty']} | Entry: Rs {s['entry']}{st_txt}</div>
+                </div>
+                <div style='text-align:right;'>
+                    <div style='font-weight:700;font-size:16px;color:#f1f5f9;'>Rs {s['current']}</div>
+                    <div style='font-size:13px;font-weight:600;color:{pc};'>{s['pnl_pct']}% (Rs {s['pnl']})</div>
+                </div>
+            </div>
+            <div style='display:flex;justify-content:space-between;align-items:center;margin-top:8px;'>
+                <span class='{bc}'>{s['status']}</span>
+                <span style='font-size:12px;color:#94a3b8;'>{s['action']}</span>
+            </div>
+        </div>
+        """
         st.markdown(row, unsafe_allow_html=True)
 
 render("Engine B - Trading", "B")
@@ -396,11 +446,4 @@ render("Engine D - Debt", "D")
 render("Engine E - Gold", "E")
 
 st.markdown("<div class='section-header'>Component Scores</div>", unsafe_allow_html=True)
-sd = {"Valuation":(val_score,15),"Trend":(trend_score,15),"Breadth":(br_score,12),"Volatility":(vix_score,10),"Flows":(flow_score,12),"Macro":(macro_score,12),"Global":(global_score,12),"Crude":(crude_score,12)}
-sc1, sc2, sc3, sc4 = st.columns(4)
-cl = [sc1, sc2, sc3, sc4]
-for i, (n, (s, m)) in enumerate(sd.items()):
-    with cl[i % 4]:
-        p = s / m * 100
-        co = "#10b981" if p > 60 else ("#f59e0b" if p > 30 else "#ef4444")
-        comp = "<div class='metric-card
+sd = {"Valuation":(val_score
