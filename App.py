@@ -2,6 +2,7 @@ import streamlit as st
 import yfinance as yf
 import datetime, requests, re, json, os
 import pandas as pd
+
 st.set_page_config(page_title="Investment Dashboard", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""<style>
@@ -28,6 +29,7 @@ h1,h2,h3{color:#f1f5f9!important;font-weight:700}
 .stNumberInput input,.stSelectbox > div{background-color:#1e293b!important;color:#f1f5f9!important;border:1px solid #334155!important}
 .stLinkButton > a{background:#131826!important;color:#818cf8!important;border:1px solid #334155!important;border-radius:8px!important;font-weight:600!important;padding:10px 14px!important}
 </style>""", unsafe_allow_html=True)
+
 SCORE_FILE = "last_score.json"
 HISTORY_FILE = "score_history.json"
 PORTFOLIO_FILE = "portfolio_history.json"
@@ -61,7 +63,8 @@ def log_score_history(score, condition):
         return history
     except:
         return []
-      def log_portfolio(invested, current, pnl):
+
+def log_portfolio(invested, current, pnl):
     try:
         history = []
         if os.path.exists(PORTFOLIO_FILE):
@@ -76,7 +79,8 @@ def log_score_history(score, condition):
         return history
     except:
         return []
-      @st.cache_data(ttl=3600)
+
+@st.cache_data(ttl=3600)
 def fetch_nifty_pe():
     try:
         r = requests.get('https://www.nifty-pe-ratio.com/', headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
@@ -99,8 +103,8 @@ def fetch_holdings():
         'HINDZINC.NS': {'name':'Hindustan Zinc','qty':8,'entry':559,'stop':520,'engine':'B'},
         'GOLDBEES.NS': {'name':'Gold BeES','qty':121,'entry':124.39,'stop':0,'engine':'E'},
         'LIQUIDBEES.NS': {'name':'Liquid BeES','qty':31,'entry':999.99,'stop':0,'engine':'C'},
-          }
-for t, i in h.items():
+    }
+    for t, i in h.items():
         i['current'] = i['entry']
         try:
             df = yf.download(t, period='5d', progress=False, auto_adjust=True)
@@ -122,6 +126,7 @@ for t, i in h.items():
         else: i['status']='OK'; i['action']='Long-term hold'
     h['BHARATBOND'] = {'name':'Bharat Bond ETF Apr30','qty':19,'entry':1562.18,'stop':0,'current':1562.18,'engine':'D','pnl':0,'pnl_pct':0,'status':'OK','action':'Long-term hold'}
     return h
+
 @st.cache_data(ttl=3600)
 def fetch_data():
     d = {}
@@ -165,6 +170,7 @@ def fetch_data():
     for k, v in df.items():
         if k not in d: d[k] = v
     return d
+
 st.markdown("# 🎯 Investment Dashboard")
 st.markdown(f"<p style='color:#64748b;font-size:14px;margin-top:-10px;'>Live • {datetime.datetime.now().strftime('%d %b %Y, %H:%M')}</p>", unsafe_allow_html=True)
 
@@ -190,6 +196,7 @@ elif nifty_pe < 22: val_score = 9
 elif nifty_pe < 24: val_score = 4
 elif nifty_pe < 26: val_score = 2
 else: val_score = 0
+
 pd_v = d['pct_dma']
 dd = d['dma_dir']
 if pd_v > 10: trend_score = 15 if dd == "Rising" else 13
@@ -213,6 +220,7 @@ elif india_vix < 18: vix_score = 6
 elif india_vix < 22: vix_score = 4
 elif india_vix < 30: vix_score = 2
 else: vix_score = 0
+
 if fii_30d > 5000: fii_s = 6
 elif fii_30d > 0: fii_s = 5
 elif fii_30d > -5000: fii_s = 4
@@ -248,6 +256,7 @@ dxy = d['dxy']
 gvix = d['gvix']
 inr_dir = d['inr_dir']
 brent = d['brent']
+
 if us10y_dir == "Falling" and us10y < 4: us_s = 3
 elif us10y_dir == "Falling": us_s = 2
 elif us10y_dir == "Stable": us_s = 2
@@ -275,6 +284,7 @@ elif brent < 80: crude_score = 6
 elif brent < 90: crude_score = 4
 elif brent < 100: crude_score = 2
 else: crude_score = 0
+
 raw_score = val_score + trend_score + br_score + vix_score + flow_score + macro_score + global_score + crude_score
 smoothed = round((raw_score + last_score) / 2) if last_score else raw_score
 save_score(raw_score)
@@ -313,6 +323,7 @@ else: duration = "SHORT / CASH"
 if gvix > 25 or brent > 100 or inr_dir == "Weakening": gold_signal = "ACCUMULATE"
 elif gvix < 15 and brent < 60: gold_signal = "TRIM"
 else: gold_signal = "HOLD"
+
 score_history = log_score_history(smoothed, condition)
 
 c1, c2 = st.columns([1, 2])
@@ -347,6 +358,7 @@ tp = tc - ti
 tpp = (tp / ti) * 100 if ti > 0 else 0
 
 portfolio_history = log_portfolio(ti, tc, tp)
+
 st.markdown("<div class='section-header'>Total Portfolio</div>", unsafe_allow_html=True)
 po1, po2, po3 = st.columns(3)
 with po1: st.metric("Invested", "Rs " + format(int(ti), ','))
@@ -382,6 +394,7 @@ render("Engine B - Trading", "B")
 render("Engine C - Compounders", "C")
 render("Engine D - Debt", "D")
 render("Engine E - Gold", "E")
+
 st.markdown("<div class='section-header'>Component Scores</div>", unsafe_allow_html=True)
 sd = {"Valuation":(val_score,15),"Trend":(trend_score,15),"Breadth":(br_score,12),"Volatility":(vix_score,10),"Flows":(flow_score,12),"Macro":(macro_score,12),"Global":(global_score,12),"Crude":(crude_score,12)}
 sc1, sc2, sc3, sc4 = st.columns(4)
@@ -400,5 +413,3 @@ with q2: st.link_button("FII/DII", "https://trendlyne.com/macro-data/fii-dii/lat
 with q3: st.link_button("RBI", "https://www.rbi.org.in/scripts/Annualpolicy.aspx", use_container_width=True)
 
 st.markdown("<div style='text-align:center;color:#64748b;font-size:12px;padding:20px;'>Built by Abhishek | v5 Auto-Logger | " + str(len(score_history)) + " scores logged</div>", unsafe_allow_html=True)
-
-
