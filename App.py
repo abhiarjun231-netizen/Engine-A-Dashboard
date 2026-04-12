@@ -7,66 +7,66 @@ st.set_page_config(page_title="Engine A Dashboard", layout="wide")
 st.title("📊 Engine A — Market Strength Dashboard")
 st.caption(f"Last refresh: {datetime.now().strftime('%d %b %Y, %H:%M:%S')}")
 
-@st.cache_data(ttl=300)
-def get_nse_nifty():
+def to_float(v):
     try:
-        d = nse_get_index_quote("NIFTY 50")
-        return {
-            "price": float(d.get("last", 0)),
-            "pe": float(d.get("pe", 0)),
-            "advances": int(d.get("advances", 0)),
-            "declines": int(d.get("declines", 0)),
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-@st.cache_data(ttl=300)
-def get_india_vix():
-    try:
-        d = nse_get_index_quote("INDIA VIX")
-        return float(d.get("last", 0))
+        return float(str(v).replace(",", "").strip())
     except:
         return None
 
-@st.cache_data(ttl=600)
-def get_yf(ticker):
+@st.cache_data(ttl=300)
+def get_nse(index):
     try:
-        h = yf.Ticker(ticker).history(period="1d")
-        return float(h["Close"].iloc[-1]) if not h.empty else None
+        d = nse_get_index_quote(index)
+        return d
+    except Exception as e:
+        return {"error": str(e)}
+
+@st.cache_data(ttl=600)
+def get_yf_price(ticker):
+    try:
+        h = yf.download(ticker, period="5d", progress=False, auto_adjust=True)
+        if h.empty:
+            return None
+        close = h["Close"]
+        if hasattr(close, "columns"):
+            close = close.iloc[:, 0]
+        return float(close.dropna().iloc[-1])
     except:
         return None
 
 @st.cache_data(ttl=3600)
 def get_dma():
     try:
-        h = yf.download("^NSEI", period="300d", progress=False)
-        dma = h["Close"].rolling(200).mean()
+        h = yf.download("^NSEI", period="320d", progress=False, auto_adjust=True)
+        close = h["Close"]
+        if hasattr(close, "columns"):
+            close = close.iloc[:, 0]
+        dma = close.rolling(200).mean().dropna()
         return float(dma.iloc[-1]), float(dma.iloc[-6])
     except:
         return None, None
 
-nifty = get_nse_nifty()
-vix = get_india_vix()
-us10y = get_yf("^TNX")
-dxy = get_yf("DX-Y.NYB")
-gvix = get_yf("^VIX")
-inr = get_yf("INR=X")
-brent = get_yf("BZ=F")
+nifty_raw = get_nse("NIFTY 50")
+vix_raw = get_nse("INDIA VIX")
+
+nifty_price = to_float(nifty_raw.get("last")) if "error" not in nifty_raw else get_yf_price("^NSEI")
+nifty_pe = to_float(nifty_raw.get("pe")) if "error" not in nifty_raw else None
+adv = to_float(nifty_raw.get("advances")) if "error" not in nifty_raw else None
+dec = to_float(nifty_raw.get("declines")) if "error" not in nifty_raw else None
+vix = to_float(vix_raw.get("last")) if "error" not in vix_raw else None
+
+us10y = get_yf_price("^TNX")
+dxy = get_yf_price("DX-Y.NYB")
+gvix = get_yf_price("^VIX")
+inr = get_yf_price("INR=X")
+brent = get_yf_price("BZ=F")
 dma_now, dma_prev = get_dma()
 
 st.header("🟢 Live Auto-Fetched Data")
 
-if "error" in nifty:
-    st.warning(f"NSE direct failed, using fallback. ({nifty['error'][:50]})")
-    nifty_price = get_yf("^NSEI")
-    nifty_pe = None
-else:
-    nifty_price = nifty["price"]
-    nifty_pe = nifty["pe"]
-
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Nifty 50", f"{nifty_price:,.2f}" if nifty_price else "N/A")
-c2.metric("Nifty PE", f"{nifty_pe:.2f}" if nifty_pe else "Manual")
+c2.metric("Nifty PE", f"{nifty_pe:.2f}" if nifty_pe else "N/A")
 c3.metric("India VIX", f"{vix:.2f}" if vix else "N/A")
 c4.metric("200 DMA", f"{dma_now:,.2f}" if dma_now else "N/A")
 
@@ -81,11 +81,17 @@ c9.metric("Brent", f"${brent:.2f}" if brent else "N/A")
 if nifty_price and dma_now:
     pct = (nifty_price - dma_now) / dma_now * 100
     c10.metric("% vs 200DMA", f"{pct:+.2f}%")
+else:
+    c10.metric("% vs 200DMA", "N/A")
 if dma_now and dma_prev:
     c11.metric("DMA Direction", "Rising ↑" if dma_now > dma_prev else "Falling ↓")
-if "error" not in nifty:
-    breadth = nifty["advances"] / max(nifty["advances"] + nifty["declines"], 1) * 100
+else:
+    c11.metric("DMA Direction", "N/A")
+if adv and dec:
+    breadth = adv / max(adv + dec, 1) * 100
     c12.metric("Nifty50 A/D", f"{breadth:.0f}%")
+else:
+    c12.metric("Nifty50 A/D", "N/A")
 
 st.header("✍️ Manual Inputs")
 m1, m2, m3 = st.columns(3)
