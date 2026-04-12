@@ -1,1 +1,5 @@
-# Engine-A-Dashboard
+streamlit
+nsepython
+yfinance
+requests
+pandas
