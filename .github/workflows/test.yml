@@ -1,0 +1,19 @@
+name: Test Angel One Connection
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install smartapi-python pyotp
+      - env:
+          ANGEL_CLIENT_ID: ${{ secrets.ANGEL_CLIENT_ID }}
+          ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
+          ANGEL_SECRET_KEY: ${{ secrets.ANGEL_SECRET_KEY }}
+          ANGEL_TOTP_SECRET: ${{ secrets.ANGEL_TOTP_SECRET }}
+          ANGEL_MPIN: ${{ secrets.ANGEL_MPIN }}
+        run: python test_angel.py
