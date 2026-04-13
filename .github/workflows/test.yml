@@ -9,7 +9,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install smartapi-python pyotp
+      - run: pip install smartapi-python pyotp logzero websocket-client pandas
       - env:
           ANGEL_CLIENT_ID: ${{ secrets.ANGEL_CLIENT_ID }}
           ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
