@@ -3,3 +3,5 @@ nsepython
 yfinance
 requests
 pandas
+smartapi-python
+pyotp
