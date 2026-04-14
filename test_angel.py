@@ -1,13 +1,12 @@
 """
-test_angel.py - Engine A Live Data Fetcher v6
-NEW in v6: Unified historical price store (data/historical_prices.csv).
-- Bootstraps 300 days of daily closes on first run.
-- Incremental updates on every run after.
-- Single source of truth for 200-DMA, 4-week directions, future indicators.
-- Long format: date, symbol, close, source - easy to scale to Engine B/C.
+test_angel.py - Engine A Live Data Fetcher v7
+NEW in v7: Trading day check - skips Saturdays and NSE 2026 holidays.
+Sunday is whitelisted (our scoring day).
+Mon-Fri non-holidays run normally.
 """
 import os
 import csv
+import sys
 import time
 import pyotp
 import yfinance as yf
@@ -16,8 +15,53 @@ from pathlib import Path
 from SmartApi import SmartConnect
 
 print("=" * 50)
-print("ENGINE A - LIVE DATA FETCHER v6")
+print("ENGINE A - LIVE DATA FETCHER v7")
 print("=" * 50)
+
+# ============================================================
+# TRADING DAY CHECK (NEW in v7)
+# ============================================================
+
+# NSE 2026 holiday list (source: NSE official holiday calendar)
+# Update once per year in December for the following year.
+NSE_HOLIDAYS_2026 = {
+    "2026-01-26",  # Republic Day
+    "2026-02-17",  # Mahashivratri
+    "2026-03-03",  # Holi
+    "2026-03-20",  # Eid-ul-Fitr (Ramzan Id)
+    "2026-04-03",  # Good Friday
+    "2026-04-14",  # Dr. Ambedkar Jayanti
+    "2026-05-01",  # Maharashtra Day
+    "2026-05-27",  # Eid al-Adha (Bakri Id)
+    "2026-08-15",  # Independence Day (Saturday - market closed anyway)
+    "2026-08-26",  # Ganesh Chaturthi
+    "2026-10-02",  # Gandhi Jayanti
+    "2026-10-21",  # Diwali Laxmi Pujan (Muhurat trading separate)
+    "2026-11-04",  # Guru Nanak Jayanti
+    "2026-12-25",  # Christmas
+}
+
+today = datetime.now()
+today_str = today.strftime("%Y-%m-%d")
+weekday = today.weekday()  # Mon=0, Tue=1, ..., Sat=5, Sun=6
+
+print(f"Today: {today_str} ({today.strftime('%A')})")
+
+# Saturday = always skip (NSE closed, no Engine A scoring)
+if weekday == 5:
+    print("Saturday - market closed. Skipping run.")
+    sys.exit(0)
+
+# NSE holiday = skip (but Sunday is whitelisted for Engine A scoring)
+if today_str in NSE_HOLIDAYS_2026 and weekday != 6:
+    print(f"NSE Holiday - skipping run.")
+    sys.exit(0)
+
+print("Trading day check PASSED - proceeding with fetch")
+
+# ============================================================
+# (Rest of the file is identical to v6)
+# ============================================================
 
 # ---------- INDIAN SYMBOLS (Angel One) ----------
 SYMBOLS = {
@@ -66,7 +110,7 @@ except Exception as e:
     exit(1)
 
 # ============================================================
-# PART 1: LIVE LTP FETCH (unchanged from v5)
+# PART 1: LIVE LTP FETCH
 # ============================================================
 
 def fetch_ltp(name, exchange, tradingsymbol, token):
@@ -127,12 +171,11 @@ with open("data/global_prices.csv", "w", newline="") as f:
 print("Live LTP fetch complete")
 
 # ============================================================
-# PART 2: HISTORICAL PRICE STORE (NEW in v6)
+# PART 2: HISTORICAL PRICE STORE
 # ============================================================
 
 print("\n--- HISTORICAL PRICE STORE ---")
 
-# Step 1: Read existing history (if any)
 existing_history = []
 existing_keys = set()
 latest_date_per_symbol = {}
@@ -150,9 +193,8 @@ if Path(HISTORY_FILE).exists():
 else:
     print("No existing history - will bootstrap 300 days")
 
-# Step 2: Determine fetch start date per symbol
-today = datetime.now().date()
-default_from = today - timedelta(days=BOOTSTRAP_DAYS)
+today_date = datetime.now().date()
+default_from = today_date - timedelta(days=BOOTSTRAP_DAYS)
 
 def get_fetch_from(symbol_name):
     latest = latest_date_per_symbol.get(symbol_name)
@@ -164,7 +206,6 @@ def get_fetch_from(symbol_name):
     except Exception:
         return default_from
 
-# Step 3: Angel One historical fetcher
 def fetch_angel_history(name, exchange, token, from_date, to_date):
     try:
         params = {
@@ -192,7 +233,6 @@ def fetch_angel_history(name, exchange, token, from_date, to_date):
         print(f"  {name}: EXCEPTION - {e}")
         return []
 
-# Step 4: yfinance historical fetcher
 def fetch_yfinance_history(name, ticker, from_date, to_date):
     try:
         t = yf.Ticker(ticker)
@@ -213,29 +253,27 @@ def fetch_yfinance_history(name, ticker, from_date, to_date):
         print(f"  {name}: EXCEPTION - {e}")
         return []
 
-# Step 5: Fetch history for all symbols
 new_rows = []
 
 print("\nIndian indices history:")
 for name, (exchange, tradingsymbol, token) in SYMBOLS.items():
     from_date = get_fetch_from(name)
-    if from_date > today:
+    if from_date > today_date:
         print(f"  {name}: up to date")
         continue
-    rows = fetch_angel_history(name, exchange, token, from_date, today)
+    rows = fetch_angel_history(name, exchange, token, from_date, today_date)
     new_rows.extend(rows)
-    time.sleep(0.4)  # respect Angel One rate limit (3 req/sec)
+    time.sleep(0.4)
 
 print("\nGlobal symbols history:")
 for name, ticker in GLOBAL_SYMBOLS.items():
     from_date = get_fetch_from(name)
-    if from_date > today:
+    if from_date > today_date:
         print(f"  {name}: up to date")
         continue
-    rows = fetch_yfinance_history(name, ticker, from_date, today)
+    rows = fetch_yfinance_history(name, ticker, from_date, today_date)
     new_rows.extend(rows)
 
-# Step 6: Merge with existing, dedupe, sort, save
 merged = list(existing_history)
 added = 0
 for row in new_rows:
