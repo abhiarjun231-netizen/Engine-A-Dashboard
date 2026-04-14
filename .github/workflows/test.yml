@@ -20,17 +20,20 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install smartapi-python pyotp logzero websocket-client pandas yfinance
-      - env:
+      - name: Fetch live + historical data
+        env:
           ANGEL_CLIENT_ID: ${{ secrets.ANGEL_CLIENT_ID }}
           ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
           ANGEL_SECRET_KEY: ${{ secrets.ANGEL_SECRET_KEY }}
           ANGEL_TOTP_SECRET: ${{ secrets.ANGEL_TOTP_SECRET }}
           ANGEL_MPIN: ${{ secrets.ANGEL_MPIN }}
         run: python test_angel.py
+      - name: Calculate Engine A score
+        run: python calculate_engine_a_score.py
       - name: Commit data to repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update live data"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update live data + score"
           git push
