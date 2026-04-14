@@ -1,7 +1,6 @@
 """
 test_angel.py — Engine A Live Data Fetcher v3
-Uses hardcoded symbol tokens for reliability.
-Adding a new data point = add one line to KNOWN_TOKENS + SYMBOLS.
+Uses verified hardcoded symbol tokens from Angel One docs.
 """
 
 import os
@@ -17,9 +16,10 @@ print("=" * 50)
 
 # ---------- SYMBOLS TO FETCH ----------
 # Format: "display name": (exchange, tradingsymbol, symboltoken)
+# Tokens verified from Angel One official docs
 SYMBOLS = {
     "Nifty 50":   ("NSE", "Nifty 50",  "99926000"),
-    "India VIX":  ("NSE", "India VIX", "99919000"),
+    "India VIX":  ("NSE", "India VIX", "99926017"),
 }
 
 # ---------- LOAD SECRETS ----------
