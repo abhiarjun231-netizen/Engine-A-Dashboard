@@ -1,6 +1,6 @@
 """
-test_angel.py — Engine A Live Data Fetcher v3
-Uses verified hardcoded symbol tokens from Angel One docs.
+test_angel.py — Engine A Live Data Fetcher v4
+Fetches Indian indices from Angel One.
 """
 
 import os
@@ -11,15 +11,18 @@ from pathlib import Path
 from SmartApi import SmartConnect
 
 print("=" * 50)
-print("ENGINE A — LIVE DATA FETCHER v3")
+print("ENGINE A — LIVE DATA FETCHER v4")
 print("=" * 50)
 
 # ---------- SYMBOLS TO FETCH ----------
 # Format: "display name": (exchange, tradingsymbol, symboltoken)
 # Tokens verified from Angel One official docs
 SYMBOLS = {
-    "Nifty 50":   ("NSE", "Nifty 50",  "99926000"),
-    "India VIX":  ("NSE", "India VIX", "99926017"),
+    "Nifty 50":         ("NSE", "Nifty 50",         "99926000"),
+    "India VIX":        ("NSE", "India VIX",        "99926017"),
+    "Nifty 500":        ("NSE", "Nifty 500",        "99926004"),
+    "Nifty Midcap 100": ("NSE", "Nifty Midcap 100", "99926011"),
+    "Nifty Midcap 50":  ("NSE", "Nifty Midcap 50",  "99926014"),
 }
 
 # ---------- LOAD SECRETS ----------
@@ -67,7 +70,7 @@ def fetch_ltp(name, exchange, tradingsymbol, token):
         return None, "EXCEPTION"
 
 # ---------- FETCH ALL SYMBOLS ----------
-print("\n--- Fetching data ---")
+print(f"\n--- Fetching {len(SYMBOLS)} symbols ---")
 results = []
 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -90,7 +93,10 @@ with open(csv_path, "w", newline="") as f:
     writer.writeheader()
     writer.writerows(results)
 
+# ---------- SUMMARY ----------
+ok_count = sum(1 for r in results if r["status"] == "OK")
 print(f"\n✅ Saved {len(results)} rows to {csv_path}")
+print(f"✅ Success rate: {ok_count}/{len(results)}")
 print("=" * 50)
 print("✅ FETCHER RUN COMPLETE")
 print("=" * 50)
