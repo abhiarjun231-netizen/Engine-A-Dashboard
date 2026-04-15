@@ -7,7 +7,7 @@
     "value": 20.9,
     "input_type": "number",
     "source": "manual",
-    "where_to_find": "https://trendlyne.com/equity/Nifty-50/",
+    "where_to_find": "https://trendlyne.com/equity/1887/NIFTY/nifty-50/",
     "source_label": "Trendlyne",
     "update_frequency": "weekly",
     "notes": "Nifty 50 PE from Trendlyne main page. Used for Valuation score (max 15)."
@@ -37,7 +37,7 @@
     "value": 32.2,
     "input_type": "number",
     "source": "manual",
-    "where_to_find": "https://trendlyne.com/fundamentals/preset-screeners/nifty-500-above-200-sma/",
+    "where_to_find": "https://trendlyne.com/fundamentals/stock-screener/797020/nifty-500-above-200-sma/index/NIFTY500/nifty-500/",
     "source_label": "Trendlyne",
     "update_frequency": "weekly",
     "notes": "Count of Nifty 500 above 200 SMA, divided by 500, times 100. Used for Breadth score (max 12)."
