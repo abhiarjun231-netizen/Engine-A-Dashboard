@@ -318,15 +318,20 @@ for label, val, mx in components:
     pct = val / mx if mx > 0 else 0
     bar_w = int(pct * 100)
     color = bar_color(pct)
-    rows_html += f"""
-    <div class='comp-row'>
-        <div class='comp-label'>{label}</div>
-        <div class='comp-bar-wrap'>
-            <div class='comp-bar' style='width:{bar_w}%; background:{color}'></div>
-        </div>
-        <div class='comp-score' style='color:{color}'>{val} / {mx}</div>
-    </div>
-    """
+    rows_html = ""
+for label, val, mx in components:
+    pct = val / mx if mx > 0 else 0
+    bar_w = int(pct * 100)
+    color = bar_color(pct)
+    rows_html += (
+        f"<div class='comp-row'>"
+        f"<div class='comp-label'>{label}</div>"
+        f"<div class='comp-bar-wrap'>"
+        f"<div class='comp-bar' style='width:{bar_w}%; background:{color}'></div>"
+        f"</div>"
+        f"<div class='comp-score' style='color:{color}'>{val} / {mx}</div>"
+        f"</div>"
+    )
 
 st.markdown(f"<div class='data-card'>{rows_html}</div>", unsafe_allow_html=True)
 
