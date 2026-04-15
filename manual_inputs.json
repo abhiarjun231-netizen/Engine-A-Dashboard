@@ -1,6 +1,6 @@
 {
-  "_comment": "Engine A manual inputs. Update from Trendlyne Sunday morning.",
-  "_last_updated": "2026-04-14",
+  "_comment": "Engine A manual inputs. Update from Trendlyne + Trading Economics Sunday morning.",
+  "_last_updated": "2026-04-15",
   "_updated_by": "abhishek",
 
   "nifty_pe": {
@@ -8,6 +8,7 @@
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/equity/Nifty-50/",
+    "source_label": "Trendlyne",
     "update_frequency": "weekly",
     "notes": "Nifty 50 PE from Trendlyne main page. Used for Valuation score (max 15)."
   },
@@ -17,6 +18,7 @@
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/",
+    "source_label": "Trendlyne",
     "update_frequency": "weekly",
     "notes": "FII Net 30-day in Rs Crores. Negative = net sellers. Used for Flows score."
   },
@@ -26,6 +28,7 @@
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/",
+    "source_label": "Trendlyne",
     "update_frequency": "weekly",
     "notes": "DII Net 30-day in Rs Crores. Positive = net buyers. Used for Flows score."
   },
@@ -35,6 +38,7 @@
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/fundamentals/preset-screeners/nifty-500-above-200-sma/",
+    "source_label": "Trendlyne",
     "update_frequency": "weekly",
     "notes": "Count of Nifty 500 above 200 SMA, divided by 500, times 100. Used for Breadth score (max 12)."
   },
@@ -44,9 +48,10 @@
     "input_type": "dropdown",
     "options": ["Yes", "No"],
     "source": "manual",
-    "where_to_find": "https://www.ccilindia.com/web/ccil/yield-curve",
+    "where_to_find": "https://tradingeconomics.com/india/government-bond-yield",
+    "source_label": "Trading Economics",
     "update_frequency": "weekly",
-    "notes": "Yes if 1Y yield greater than 10Y yield. Used for Macro score."
+    "notes": "Yes if 1Y yield greater than 10Y yield. Check yield curve chart on Trading Economics."
   },
 
   "rbi_stance": {
@@ -60,26 +65,29 @@
       "Tightening-Hiking"
     ],
     "source": "manual",
-    "where_to_find": "https://www.rbi.org.in/Scripts/AnnualPolicy.aspx",
+    "where_to_find": "https://tradingeconomics.com/india/interest-rate",
+    "source_label": "Trading Economics",
     "update_frequency": "after RBI policy (6x/year)",
-    "notes": "Current RBI policy stance. Used for Macro score."
+    "notes": "Check repo rate timeline. Recent cuts = Accommodative-Cutting. Holds = Paused. Hikes = Tightening-Hiking."
   },
 
   "cpi_pct": {
     "value": 5.0,
     "input_type": "number",
     "source": "manual",
-    "where_to_find": "https://www.mospi.gov.in/cpi",
+    "where_to_find": "https://tradingeconomics.com/india/inflation-cpi",
+    "source_label": "Trading Economics",
     "update_frequency": "monthly (around 12th)",
-    "notes": "Latest headline CPI inflation percent. Used for Macro score."
+    "notes": "Latest YoY headline CPI inflation percent from MoSPI release."
   },
 
   "pmi_manufacturing": {
     "value": 55.0,
     "input_type": "number",
     "source": "manual",
-    "where_to_find": "https://www.pmi.spglobal.com/Public/Release/PressReleases",
+    "where_to_find": "https://tradingeconomics.com/india/manufacturing-pmi",
+    "source_label": "Trading Economics",
     "update_frequency": "monthly (1st)",
-    "notes": "Latest India Manufacturing PMI. Above 50 = expansion. Used for Macro score."
+    "notes": "Latest HSBC/S&P Global India Manufacturing PMI. Above 50 = expansion."
   }
 }
