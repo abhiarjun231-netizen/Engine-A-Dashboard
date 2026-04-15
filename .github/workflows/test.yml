@@ -5,8 +5,10 @@ on:
   schedule:
     # Sunday 9:00 AM IST = Sunday 03:30 UTC (Engine A weekly run)
     - cron: '30 3 * * 0'
-    # Mon-Fri 4:00 PM IST = Mon-Fri 10:30 UTC (Engine B/C daily close)
-    - cron: '30 10 * * 1-5'
+    # Mon-Fri every 30 min during market hours (9:15 AM to 3:45 PM IST)
+    # 9:15 IST = 03:45 UTC, 3:45 PM IST = 10:15 UTC
+    - cron: '45 3-9 * * 1-5'    # at minute :45 from 03:45 to 09:45 UTC = 9:15 IST to 3:15 IST
+    - cron: '15 4-10 * * 1-5'   # at minute :15 from 04:15 to 10:15 UTC = 9:45 IST to 3:45 IST
 
 permissions:
   contents: write
