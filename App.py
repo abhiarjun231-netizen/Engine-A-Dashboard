@@ -1,6 +1,6 @@
 """
-App.py - Engine A Dashboard v3 (8.1 + 8.2 + 8.3 + 8.4)
-Hero + allocation + live data + breakdown + INPUT FORM with save-back to GitHub.
+App.py - Engine A Dashboard v4 (8.1 + 8.2 + 8.3 + 8.4 + Refresh button)
+Hero + REFRESH BUTTON + allocation + live data + breakdown + INPUT FORM with save-back to GitHub.
 """
 
 import streamlit as st
@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# GITHUB CONFIG (for save-back functionality)
+# GITHUB CONFIG
 # ============================================================
 GITHUB_OWNER = "abhiarjun231-netizen"
 GITHUB_REPO = "Engine-A-Dashboard"
@@ -31,11 +31,29 @@ MANUAL_FILE_PATH = "manual_inputs.json"
 WORKFLOW_FILE = "test.yml"
 
 def get_github_token():
-    """Fetch GitHub PAT from Streamlit secrets."""
     try:
         return st.secrets["GITHUB_TOKEN"]
     except Exception:
         return None
+
+def trigger_workflow():
+    """Trigger the GitHub Actions workflow. Returns (success, message)."""
+    token = get_github_token()
+    if not token:
+        return False, "GITHUB_TOKEN not configured in Streamlit secrets."
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    wf_url = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{WORKFLOW_FILE}/dispatches"
+    try:
+        resp = requests.post(wf_url, headers=headers, json={"ref": GITHUB_BRANCH}, timeout=15)
+        if resp.status_code == 204:
+            return True, "Refresh triggered. Reload the page in ~45 seconds to see new data."
+        return False, f"Trigger failed ({resp.status_code}). Try again or use Save & Rescore."
+    except requests.RequestException as e:
+        return False, f"Network error: {e}"
 
 # ============================================================
 # STYLES
@@ -97,9 +115,7 @@ st.markdown("""
     .data-label { color: #cbd5e1; }
     .data-value { font-family: 'Courier New', monospace; font-weight: 600; color: #e2e8f0; }
 
-    .input-card-label {
-        font-size: 13px; font-weight: 600; color: #e2e8f0; margin-top: 8px;
-    }
+    .input-card-label { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-top: 8px; }
     .input-card-current { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
 
     .ok    { color: #22c55e; }
@@ -134,7 +150,6 @@ def load_global():
     return dict(zip(df["symbol"], df["price"]))
 
 def load_manual_full():
-    """Load full manual_inputs.json including metadata fields."""
     if not MANUAL_FILE.exists(): return {}
     with open(MANUAL_FILE, "r") as f:
         return json.load(f)
@@ -202,6 +217,19 @@ st.markdown(f"""
     <div class='score-timestamp'>Last updated: {ts_pretty}</div>
 </div>
 """, unsafe_allow_html=True)
+
+# ============================================================
+# 🔄 REFRESH NOW BUTTON  (NEW)
+# ============================================================
+if st.button("🔄 Refresh Now", type="primary", use_container_width=True,
+             help="Fetch the latest market data from Angel One + Yahoo. Takes ~45 seconds. After it completes, reload the page to see fresh numbers."):
+    with st.spinner("⏳ Fetching latest market data... ~45 seconds"):
+        ok, msg = trigger_workflow()
+    if ok:
+        st.success(f"✅ {msg}")
+        st.balloons()
+    else:
+        st.error(f"❌ {msg}")
 
 # ALLOCATION
 eq = int(score["equity_pct"]); eb = int(score["engine_b_pct"]); ec = int(score["engine_c_pct"])
@@ -307,10 +335,7 @@ if not token:
 
 with st.expander("Tap to expand & edit", expanded=False):
     st.caption("For each input: tap the source link, read the value, type it in, then hit Save & Rescore at the bottom.")
-
     new_values = {}
-
-    # Build form fields based on manual_inputs.json structure
     input_order = [
         "nifty_pe", "fii_30day_net_cr", "dii_30day_net_cr",
         "breadth_pct_above_200dma", "yield_curve_inverted",
@@ -329,8 +354,7 @@ with st.expander("Tap to expand & edit", expanded=False):
 
     for key in input_order:
         obj = manual_full.get(key, {})
-        if not obj:
-            continue
+        if not obj: continue
         label = pretty_labels.get(key, key)
         cur_val = obj.get("value")
         url = obj.get("where_to_find", "")
@@ -367,7 +391,6 @@ with st.expander("Tap to expand & edit", expanded=False):
                 label_visibility="collapsed",
                 format="%.2f",
             )
-
         st.markdown("<div style='margin-bottom:12px'></div>", unsafe_allow_html=True)
 
     st.markdown("---")
@@ -377,20 +400,16 @@ with st.expander("Tap to expand & edit", expanded=False):
             st.error("Cannot save: GITHUB_TOKEN not configured in Streamlit secrets.")
         else:
             with st.spinner("Saving values to GitHub..."):
-                # Build updated JSON
-                updated = json.loads(json.dumps(manual_full))  # deep copy
+                updated = json.loads(json.dumps(manual_full))
                 for key, val in new_values.items():
                     if key in updated:
-                        # Convert to int for fields stored as int
                         if key in ("fii_30day_net_cr", "dii_30day_net_cr"):
                             try: val = int(val)
                             except: pass
                         updated[key]["value"] = val
                 updated["_last_updated"] = datetime.now().strftime("%Y-%m-%d")
-
                 new_content = json.dumps(updated, indent=2, ensure_ascii=False)
 
-                # GitHub API: get current SHA of file
                 api_base = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/contents/{MANUAL_FILE_PATH}"
                 headers = {
                     "Authorization": f"Bearer {token}",
@@ -404,7 +423,6 @@ with st.expander("Tap to expand & edit", expanded=False):
                         st.stop()
                     cur_sha = get_resp.json().get("sha")
 
-                    # PUT new content
                     put_body = {
                         "message": f"Dashboard update: manual inputs ({datetime.now().strftime('%Y-%m-%d %H:%M')})",
                         "content": base64.b64encode(new_content.encode("utf-8")).decode("ascii"),
@@ -418,18 +436,14 @@ with st.expander("Tap to expand & edit", expanded=False):
                         st.error(f"GitHub PUT failed: {put_resp.status_code} {put_resp.text[:200]}")
                         st.stop()
 
-                    # Trigger workflow
-                    wf_url = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{WORKFLOW_FILE}/dispatches"
-                    wf_body = {"ref": GITHUB_BRANCH}
-                    wf_resp = requests.post(wf_url, headers=headers, json=wf_body, timeout=15)
-                    if wf_resp.status_code == 204:
-                        st.success("✅ Rescore triggered! New score will appear in ~45 sec. Refresh the page after.")
+                    ok, msg = trigger_workflow()
+                    if ok:
+                        st.success(f"✅ {msg}")
                         st.balloons()
                     else:
-                        st.warning(f"Save succeeded but workflow trigger failed ({wf_resp.status_code}). You can manually trigger via Actions tab.")
-
+                        st.warning(f"Save succeeded but: {msg}")
                 except requests.RequestException as e:
                     st.error(f"Network error: {e}")
 
 # FOOTER
-st.markdown("<div style='text-align:center; margin-top:24px; color:#64748b; font-size:11px'>Engine A v1.4 · Sunday-only scoring · 2-week smoothing</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center; margin-top:24px; color:#64748b; font-size:11px'>Engine A v1.5 · Live data + Refresh</div>", unsafe_allow_html=True)
