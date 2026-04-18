@@ -1,58 +1,47 @@
 """
-test_angel.py - Engine A Live Data Fetcher v7
-NEW in v7: Trading day check - skips Saturdays and NSE 2026 holidays.
-Sunday is whitelisted (our scoring day).
-Mon-Fri non-holidays run normally.
+test_angel.py - Engine A Live Data Fetcher v8
+NEW in v8: Auto-fetches Engine B stock prices.
+- Reads stock list from data/engine_b_stocks.json
+- Auto-resolves Angel One tokens from instrument master
+- Caches tokens so master download only happens once
+- Saves live prices to data/engine_b_prices.csv
 """
 import os
 import csv
 import sys
+import json
 import time
 import pyotp
 import yfinance as yf
+import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 from SmartApi import SmartConnect
 
 print("=" * 50)
-print("ENGINE A - LIVE DATA FETCHER v7")
+print("ENGINE A - LIVE DATA FETCHER v8")
 print("=" * 50)
 
 # ============================================================
-# TRADING DAY CHECK (NEW in v7)
+# TRADING DAY CHECK
 # ============================================================
-
-# NSE 2026 holiday list (source: NSE official holiday calendar)
-# Update once per year in December for the following year.
 NSE_HOLIDAYS_2026 = {
-    "2026-01-26",  # Republic Day
-    "2026-02-17",  # Mahashivratri
-    "2026-03-03",  # Holi
-    "2026-03-20",  # Eid-ul-Fitr (Ramzan Id)
-    "2026-04-03",  # Good Friday
-    "2026-04-14",  # Dr. Ambedkar Jayanti
-    "2026-05-01",  # Maharashtra Day
-    "2026-05-27",  # Eid al-Adha (Bakri Id)
-    "2026-08-15",  # Independence Day (Saturday - market closed anyway)
-    "2026-08-26",  # Ganesh Chaturthi
-    "2026-10-02",  # Gandhi Jayanti
-    "2026-10-21",  # Diwali Laxmi Pujan (Muhurat trading separate)
-    "2026-11-04",  # Guru Nanak Jayanti
-    "2026-12-25",  # Christmas
+    "2026-01-26", "2026-02-17", "2026-03-03", "2026-03-20",
+    "2026-04-03", "2026-04-14", "2026-05-01", "2026-05-27",
+    "2026-08-15", "2026-08-26", "2026-10-02", "2026-10-21",
+    "2026-11-04", "2026-12-25",
 }
 
 today = datetime.now()
 today_str = today.strftime("%Y-%m-%d")
-weekday = today.weekday()  # Mon=0, Tue=1, ..., Sat=5, Sun=6
+weekday = today.weekday()
 
 print(f"Today: {today_str} ({today.strftime('%A')})")
 
-# Saturday = always skip (NSE closed, no Engine A scoring)
 if weekday == 5:
     print("Saturday - market closed. Skipping run.")
     sys.exit(0)
 
-# NSE holiday = skip (but Sunday is whitelisted for Engine A scoring)
 if today_str in NSE_HOLIDAYS_2026 and weekday != 6:
     print(f"NSE Holiday - skipping run.")
     sys.exit(0)
@@ -60,10 +49,8 @@ if today_str in NSE_HOLIDAYS_2026 and weekday != 6:
 print("Trading day check PASSED - proceeding with fetch")
 
 # ============================================================
-# (Rest of the file is identical to v6)
+# INDIAN SYMBOLS (Angel One - indices)
 # ============================================================
-
-# ---------- INDIAN SYMBOLS (Angel One) ----------
 SYMBOLS = {
     "Nifty 50":         ("NSE", "Nifty 50",         "99926000"),
     "India VIX":        ("NSE", "India VIX",        "99926017"),
@@ -72,7 +59,9 @@ SYMBOLS = {
     "Nifty Midcap 50":  ("NSE", "Nifty Midcap 50",  "99926014"),
 }
 
-# ---------- GLOBAL SYMBOLS (yfinance) ----------
+# ============================================================
+# GLOBAL SYMBOLS (yfinance)
+# ============================================================
 GLOBAL_SYMBOLS = {
     "US 10Y Yield": "^TNX",
     "DXY":          "DX-Y.NYB",
@@ -81,11 +70,95 @@ GLOBAL_SYMBOLS = {
     "Brent Crude":  "BZ=F",
 }
 
-# ---------- HISTORY CONFIG ----------
+# ============================================================
+# HISTORY CONFIG
+# ============================================================
 HISTORY_FILE = "data/historical_prices.csv"
 BOOTSTRAP_DAYS = 300
 
-# ---------- LOAD SECRETS ----------
+# ============================================================
+# ENGINE B STOCK LIST
+# ============================================================
+ENGINE_B_FILE = "data/engine_b_stocks.json"
+
+def load_engine_b_stocks():
+    if not Path(ENGINE_B_FILE).exists():
+        print("No engine_b_stocks.json found - skipping stock fetch")
+        return None
+    with open(ENGINE_B_FILE, "r") as f:
+        return json.load(f)
+
+def save_engine_b_stocks(data):
+    with open(ENGINE_B_FILE, "w") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+def resolve_tokens(stock_data):
+    """Auto-resolve Angel One tokens for stocks that don't have cached tokens."""
+    cache = stock_data.get("_token_cache", {})
+    all_stocks = stock_data.get("engine_b", []) + stock_data.get("engine_c", [])
+    
+    # Find stocks that need token resolution
+    need_tokens = []
+    for s in all_stocks:
+        ticker = s.get("ticker", "")
+        if ticker and ticker not in cache:
+            need_tokens.append(ticker)
+    
+    if not need_tokens:
+        print("All tokens cached - no master download needed")
+        return cache
+    
+    print(f"Need tokens for: {need_tokens}")
+    print("Downloading Angel One instrument master...")
+    
+    try:
+        url = "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json"
+        response = urllib.request.urlopen(url, timeout=60)
+        master = json.loads(response.read().decode())
+        print(f"Downloaded {len(master)} instruments")
+        
+        for ticker in need_tokens:
+            found = False
+            for item in master:
+                if (item.get("exch_seg") == "NSE" and 
+                    item.get("symbol") == ticker + "-EQ"):
+                    cache[ticker] = {
+                        "token": item["token"],
+                        "symbol": item["symbol"],
+                        "name": item.get("name", ""),
+                    }
+                    print(f"  {ticker}: token={item['token']}")
+                    found = True
+                    break
+            if not found:
+                # Try without -EQ suffix
+                for item in master:
+                    if (item.get("exch_seg") == "NSE" and
+                        item.get("symbol") == ticker):
+                        cache[ticker] = {
+                            "token": item["token"],
+                            "symbol": item["symbol"],
+                            "name": item.get("name", ""),
+                        }
+                        print(f"  {ticker}: token={item['token']}")
+                        found = True
+                        break
+            if not found:
+                print(f"  {ticker}: NOT FOUND in master")
+        
+        stock_data["_token_cache"] = cache
+        stock_data["_last_token_update"] = today_str
+        save_engine_b_stocks(stock_data)
+        print("Token cache updated and saved")
+        
+    except Exception as e:
+        print(f"Master download failed: {e}")
+    
+    return cache
+
+# ============================================================
+# LOAD SECRETS
+# ============================================================
 client_id   = os.environ.get("ANGEL_CLIENT_ID")
 api_key     = os.environ.get("ANGEL_API_KEY")
 totp_secret = os.environ.get("ANGEL_TOTP_SECRET")
@@ -96,7 +169,9 @@ if not all([client_id, api_key, totp_secret, mpin]):
     exit(1)
 print("Secrets loaded")
 
-# ---------- LOGIN TO ANGEL ONE ----------
+# ============================================================
+# LOGIN TO ANGEL ONE
+# ============================================================
 try:
     totp_code = pyotp.TOTP(totp_secret).now()
     smart = SmartConnect(api_key=api_key)
@@ -110,7 +185,7 @@ except Exception as e:
     exit(1)
 
 # ============================================================
-# PART 1: LIVE LTP FETCH
+# PART 1: LIVE LTP FETCH (indices)
 # ============================================================
 
 def fetch_ltp(name, exchange, tradingsymbol, token):
@@ -138,7 +213,7 @@ def fetch_yfinance_ltp(name, ticker):
     except Exception as e:
         return None, "EXCEPTION"
 
-print("\n--- LIVE LTP FETCH ---")
+print("\n--- LIVE LTP FETCH (Indices) ---")
 indian_results = []
 global_results = []
 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -171,7 +246,57 @@ with open("data/global_prices.csv", "w", newline="") as f:
 print("Live LTP fetch complete")
 
 # ============================================================
-# PART 2: HISTORICAL PRICE STORE
+# PART 2: ENGINE B STOCK PRICES (NEW in v8)
+# ============================================================
+
+print("\n--- ENGINE B STOCK PRICES ---")
+
+stock_data = load_engine_b_stocks()
+
+if stock_data:
+    token_cache = resolve_tokens(stock_data)
+    
+    all_stocks = stock_data.get("engine_b", []) + stock_data.get("engine_c", [])
+    stock_results = []
+    
+    for s in all_stocks:
+        ticker = s.get("ticker", "")
+        stock_name = s.get("stock", ticker)
+        cached = token_cache.get(ticker, {})
+        token = cached.get("token")
+        symbol = cached.get("symbol", ticker)
+        
+        if not token:
+            print(f"  {stock_name}: no token - skipping")
+            stock_results.append({
+                "timestamp": timestamp, "stock": stock_name,
+                "ticker": ticker, "price": "", "status": "NO_TOKEN",
+                "entry": s.get("entry", ""), "qty": s.get("qty", ""),
+            })
+            continue
+        
+        price, status = fetch_ltp(stock_name, "NSE", symbol, token)
+        stock_results.append({
+            "timestamp": timestamp, "stock": stock_name,
+            "ticker": ticker, "price": price if price else "",
+            "status": status, "entry": s.get("entry", ""),
+            "qty": s.get("qty", ""),
+        })
+        time.sleep(0.3)
+    
+    with open("data/engine_b_prices.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=[
+            "timestamp", "stock", "ticker", "price", "status", "entry", "qty"
+        ])
+        writer.writeheader()
+        writer.writerows(stock_results)
+    
+    print(f"Engine B prices saved: {len(stock_results)} stocks")
+else:
+    print("No Engine B stocks configured")
+
+# ============================================================
+# PART 3: HISTORICAL PRICE STORE
 # ============================================================
 
 print("\n--- HISTORICAL PRICE STORE ---")
