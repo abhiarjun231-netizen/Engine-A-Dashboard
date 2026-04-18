@@ -1,12 +1,63 @@
 {
   "engine_b": [
-    {"stock": "Hindustan Zinc", "ticker": "HINDZINC", "qty": 8, "entry": 559.00},
-    {"stock": "Indus Towers", "ticker": "INDUSTOWER", "qty": 11, "entry": 441.00},
-    {"stock": "National Aluminium", "ticker": "NATIONALUM", "qty": 12, "entry": 400.00},
-    {"stock": "Engineers India", "ticker": "ENGINERSIN", "qty": 24, "entry": 206.00},
-    {"stock": "Torrent Power", "ticker": "TORNTPOWER", "qty": 3, "entry": 1448.00}
+    {
+      "stock": "Hindustan Zinc",
+      "ticker": "HINDZINC",
+      "qty": 8,
+      "entry": 559.0
+    },
+    {
+      "stock": "Indus Towers",
+      "ticker": "INDUSTOWER",
+      "qty": 11,
+      "entry": 441.0
+    },
+    {
+      "stock": "National Aluminium",
+      "ticker": "NATIONALUM",
+      "qty": 12,
+      "entry": 400.0
+    },
+    {
+      "stock": "Engineers India",
+      "ticker": "ENGINERSIN",
+      "qty": 24,
+      "entry": 206.0
+    },
+    {
+      "stock": "Torrent Power",
+      "ticker": "TORNTPOWER",
+      "qty": 3,
+      "entry": 1448.0
+    }
   ],
   "engine_c": [],
-  "_token_cache": {},
-  "_last_token_update": ""
+  "_token_cache": {
+    "HINDZINC": {
+      "token": "1424",
+      "symbol": "HINDZINC-EQ",
+      "name": "HINDZINC"
+    },
+    "INDUSTOWER": {
+      "token": "29135",
+      "symbol": "INDUSTOWER-EQ",
+      "name": "INDUSTOWER"
+    },
+    "NATIONALUM": {
+      "token": "6364",
+      "symbol": "NATIONALUM-EQ",
+      "name": "NATIONALUM"
+    },
+    "ENGINERSIN": {
+      "token": "4907",
+      "symbol": "ENGINERSIN-EQ",
+      "name": "ENGINERSIN"
+    },
+    "TORNTPOWER": {
+      "token": "13786",
+      "symbol": "TORNTPOWER-EQ",
+      "name": "TORNTPOWER"
+    }
+  },
+  "_last_token_update": "2026-04-18"
 }
