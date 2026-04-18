@@ -1,10 +1,10 @@
 {
   "engine_b": [
-    {"stock": "Hindustan Zinc", "qty": 8, "entry": 559.00},
-    {"stock": "Indus Towers", "qty": 11, "entry": 441.00},
-    {"stock": "National Aluminium", "qty": 12, "entry": 400.00},
-    {"stock": "Engineers India", "qty": 24, "entry": 206.00},
-    {"stock": "Torrent Power", "qty": 3, "entry": 1448.00}
+    {"stock": "Hindustan Zinc", "ticker": "HINDZINC", "qty": 8, "entry": 559.00},
+    {"stock": "Indus Towers", "ticker": "INDUSTOWER", "qty": 11, "entry": 441.00},
+    {"stock": "National Aluminium", "ticker": "NATIONALUM", "qty": 12, "entry": 400.00},
+    {"stock": "Engineers India", "ticker": "ENGINERSIN", "qty": 24, "entry": 206.00},
+    {"stock": "Torrent Power", "ticker": "TORNTPOWER", "qty": 3, "entry": 1448.00}
   ],
   "engine_c": [],
   "_token_cache": {},
