@@ -1,0 +1,12 @@
+{
+  "engine_b": [
+    {"stock": "Hindustan Zinc", "qty": 8, "entry": 559.00},
+    {"stock": "Indus Towers", "qty": 11, "entry": 441.00},
+    {"stock": "National Aluminium", "qty": 12, "entry": 400.00},
+    {"stock": "Engineers India", "qty": 24, "entry": 206.00},
+    {"stock": "Torrent Power", "qty": 3, "entry": 1448.00}
+  ],
+  "engine_c": [],
+  "_token_cache": {},
+  "_last_token_update": ""
+}
