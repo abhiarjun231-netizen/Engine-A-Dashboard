@@ -1,10 +1,7 @@
 """
-test_angel.py - Engine A Live Data Fetcher v8
-NEW in v8: Auto-fetches Engine B stock prices.
-- Reads stock list from data/engine_b_stocks.json
-- Auto-resolves Angel One tokens from instrument master
-- Caches tokens so master download only happens once
-- Saves live prices to data/engine_b_prices.csv
+test_angel.py - Engine A Live Data Fetcher v9
+NEW in v9: Fetches LTP even on weekends/holidays (last traded price).
+Only skips historical store on non-market days.
 """
 import os
 import csv
@@ -19,7 +16,7 @@ from pathlib import Path
 from SmartApi import SmartConnect
 
 print("=" * 50)
-print("ENGINE A - LIVE DATA FETCHER v8")
+print("ENGINE A - LIVE DATA FETCHER v9")
 print("=" * 50)
 
 # ============================================================
@@ -38,15 +35,17 @@ weekday = today.weekday()
 
 print(f"Today: {today_str} ({today.strftime('%A')})")
 
+is_market_day = True
+
 if weekday == 5:
-    print("Saturday - market closed. Skipping run.")
-    sys.exit(0)
+    print("Saturday - market closed. Will fetch LTP only (no history).")
+    is_market_day = False
 
 if today_str in NSE_HOLIDAYS_2026 and weekday != 6:
-    print(f"NSE Holiday - skipping run.")
-    sys.exit(0)
+    print("NSE Holiday - will fetch LTP only (no history).")
+    is_market_day = False
 
-print("Trading day check PASSED - proceeding with fetch")
+print(f"Market day: {is_market_day} - proceeding with fetch")
 
 # ============================================================
 # INDIAN SYMBOLS (Angel One - indices)
@@ -93,11 +92,9 @@ def save_engine_b_stocks(data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def resolve_tokens(stock_data):
-    """Auto-resolve Angel One tokens for stocks that don't have cached tokens."""
     cache = stock_data.get("_token_cache", {})
     all_stocks = stock_data.get("engine_b", []) + stock_data.get("engine_c", [])
     
-    # Find stocks that need token resolution
     need_tokens = []
     for s in all_stocks:
         ticker = s.get("ticker", "")
@@ -131,7 +128,6 @@ def resolve_tokens(stock_data):
                     found = True
                     break
             if not found:
-                # Try without -EQ suffix
                 for item in master:
                     if (item.get("exch_seg") == "NSE" and
                         item.get("symbol") == ticker):
@@ -246,7 +242,7 @@ with open("data/global_prices.csv", "w", newline="") as f:
 print("Live LTP fetch complete")
 
 # ============================================================
-# PART 2: ENGINE B STOCK PRICES (NEW in v8)
+# PART 2: ENGINE B STOCK PRICES
 # ============================================================
 
 print("\n--- ENGINE B STOCK PRICES ---")
@@ -296,8 +292,15 @@ else:
     print("No Engine B stocks configured")
 
 # ============================================================
-# PART 3: HISTORICAL PRICE STORE
+# PART 3: HISTORICAL PRICE STORE (skip on non-market days)
 # ============================================================
+
+if not is_market_day:
+    print("\nSkipping historical store (not a market day)")
+    print("=" * 50)
+    print("FETCHER RUN COMPLETE")
+    print("=" * 50)
+    sys.exit(0)
 
 print("\n--- HISTORICAL PRICE STORE ---")
 
