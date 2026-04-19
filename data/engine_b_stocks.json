@@ -47,6 +47,15 @@
       "peak": 22378.0,
       "source": "B1",
       "buy_date": "2026-04-19"
+    },
+    {
+      "stock": "Jammu & Kashmir Bank",
+      "ticker": "J&KBANK",
+      "entry": 131.25,
+      "qty": 1,
+      "peak": 131.25,
+      "source": "B1",
+      "buy_date": "2026-04-19"
     }
   ],
   "engine_c": [],
