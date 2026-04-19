@@ -1,17 +1,63 @@
 """
 engine_b_ui.py - Engine B display logic
-Phase 1: Upload B1+B2 CSVs, parse, deduplicate, flag Double Qualifiers
+Phase 1: Upload CSVs, parse, deduplicate, Double Qualifiers
+Phase 2: Confirm Buy button — adds stock to engine_b_stocks.json via GitHub API
 """
 import streamlit as st
 import pandas as pd
+import json
+import base64
+import requests
 from pathlib import Path
 
 # ============================================================
-# DATA
+# CONSTANTS
 # ============================================================
 SCORE_FILE = Path("data/engine_a_score.csv")
 PRICES_FILE = Path("data/engine_b_prices.csv")
+STOCKS_FILE = Path("data/engine_b_stocks.json")
+REPO_OWNER = "abhiarjun231-netizen"
+REPO_NAME = "Engine-A-Dashboard"
+STOCKS_PATH = "data/engine_b_stocks.json"
 
+# ============================================================
+# GITHUB API HELPERS
+# ============================================================
+def get_github_token():
+    token = st.secrets.get("GITHUB_TOKEN", "")
+    return token
+
+def get_file_from_github(token):
+    """GET current engine_b_stocks.json from GitHub (for SHA + content)."""
+    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{STOCKS_PATH}"
+    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+    resp = requests.get(url, headers=headers)
+    if resp.status_code == 200:
+        data = resp.json()
+        content = base64.b64decode(data["content"]).decode("utf-8")
+        return json.loads(content), data["sha"]
+    return None, None
+
+def save_file_to_github(token, new_content, sha, message):
+    """PUT updated engine_b_stocks.json to GitHub."""
+    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{STOCKS_PATH}"
+    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+    encoded = base64.b64encode(json.dumps(new_content, indent=2).encode("utf-8")).decode("utf-8")
+    body = {"message": message, "content": encoded, "sha": sha}
+    resp = requests.put(url, headers=headers, json=body)
+    return resp.status_code in [200, 201]
+
+def trigger_workflow(token):
+    """Trigger GitHub Actions workflow to fetch new stock prices."""
+    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/workflows/test.yml/dispatches"
+    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+    body = {"ref": "main"}
+    resp = requests.post(url, headers=headers, json=body)
+    return resp.status_code == 204
+
+# ============================================================
+# DATA LOADERS
+# ============================================================
 def load_engine_a_score():
     if not SCORE_FILE.exists(): return None
     df = pd.read_csv(SCORE_FILE)
@@ -27,6 +73,13 @@ def load_stock_prices():
             "status": row.get("status", ""),
         }
     return prices
+
+def load_positions():
+    if STOCKS_FILE.exists():
+        with open(STOCKS_FILE, "r") as f:
+            stock_data = json.load(f)
+        return stock_data.get("engine_b", [])
+    return []
 
 # ============================================================
 # GATE STATUS
@@ -56,14 +109,11 @@ def get_stage(pct_change):
 # FLEXIBLE COLUMN FINDER
 # ============================================================
 def find_column(df, candidates):
-    """Find a column by trying multiple name variants."""
-    # Normalize df columns: strip whitespace
     col_map = {c.strip(): c for c in df.columns}
     for candidate in candidates:
         candidate_clean = candidate.strip()
         if candidate_clean in col_map:
             return col_map[candidate_clean]
-        # Try case-insensitive
         for col_clean, col_orig in col_map.items():
             if col_clean.lower() == candidate_clean.lower():
                 return col_orig
@@ -73,7 +123,6 @@ def find_column(df, candidates):
 # CSV/EXCEL PARSER
 # ============================================================
 def parse_trendlyne_file(uploaded_file):
-    """Parse Trendlyne export — handles CSV and Excel."""
     try:
         fname = uploaded_file.name.lower()
         if fname.endswith(".xlsx") or fname.endswith(".xls"):
@@ -81,7 +130,6 @@ def parse_trendlyne_file(uploaded_file):
         else:
             df = pd.read_csv(uploaded_file)
 
-        # Flexible column matching
         col_stock = find_column(df, ["Stock"])
         col_ticker = find_column(df, ["NSE Code"])
         col_ltp = find_column(df, ["LTP"])
@@ -233,15 +281,7 @@ def show_engine_b():
     # --- ACTIVE POSITIONS ---
     st.markdown("<div class='section-title'>Engine B — Active Positions</div>", unsafe_allow_html=True)
 
-    # Read from JSON (single source of truth)
-    import json
-    positions_file = Path("data/engine_b_stocks.json")
-    if positions_file.exists():
-        with open(positions_file, "r") as f:
-            stock_data = json.load(f)
-        positions = stock_data.get("engine_b", [])
-    else:
-        positions = []
+    positions = load_positions()
 
     if not positions:
         st.markdown(
@@ -286,7 +326,9 @@ def show_engine_b():
             pnl_sign = "+" if total_pnl >= 0 else ""
             pnl_pct = round(total_pnl / total_invested * 100, 2) if total_invested > 0 else 0
             summary_value = f"₹{total_current:,.0f}"
-            summary_detail = f"Invested: ₹{total_invested:,.0f} · P&L: <span style='color:{pnl_color};font-weight:700;'>{pnl_sign}₹{total_pnl:,.0f} ({pnl_sign}{pnl_pct}%)</span>"
+            summary_detail = (f"Invested: ₹{total_invested:,.0f} · P&L: "
+                              f"<span style='color:{pnl_color};font-weight:700;'>"
+                              f"{pnl_sign}₹{total_pnl:,.0f} ({pnl_sign}{pnl_pct}%)</span>")
         else:
             summary_value = f"₹{total_invested:,.0f}"
             summary_detail = f"{len(positions)} positions · Live prices pending"
@@ -368,15 +410,32 @@ def show_engine_b():
                 else:
                     source_label = "B2"
                     source_color = "#38bdf8"
+
                 is_holding = stock["ticker"] in holding_tickers
                 render_qualifier(stock, source_label, source_color, is_holding)
 
-    # --- ENGINE C PLACEHOLDER ---
-    st.markdown("<div class='section-title'>Engine C — Long-Term Compounders</div>", unsafe_allow_html=True)
-    st.markdown(
-        "<div style='background:#1e293b;border-radius:12px;padding:20px 16px;"
-        "border:1px solid #334155;text-align:center;color:#64748b;font-size:13px;'>"
-        "Engine C will have its own tab — coming next"
-        "</div>",
-        unsafe_allow_html=True
-                            )
+                # --- CONFIRM BUY BUTTON (only for NEW stocks) ---
+                if not is_holding and gate_status == "ACTIVE":
+                    ticker_key = stock["ticker"]
+                    with st.expander(f"Buy {stock['stock']}?", expanded=False):
+                        st.markdown(
+                            f"<div style='font-size:12px;color:#94a3b8;margin-bottom:8px;'>"
+                            f"Entry: ₹{stock['ltp']:,.2f} · Stop: ₹{stock['ltp'] * 0.93:,.2f} (-7%)"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+                        qty = st.number_input(
+                            "Quantity",
+                            min_value=1,
+                            value=1,
+                            step=1,
+                            key=f"qty_{ticker_key}"
+                        )
+                        invested = qty * stock["ltp"]
+                        st.markdown(
+                            f"<div style='font-size:12px;color:#e2e8f0;'>"
+                            f"Investment: ₹{invested:,.2f}</div>",
+                            unsafe_allow_html=True
+                        )
+                        if st.button(f"Confirm Buy {stock['stock']}", key=f"buy_{ticker_key}"):
+      
