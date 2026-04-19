@@ -452,132 +452,187 @@ def show_engine_b():
             )
             st.markdown(sizer_html, unsafe_allow_html=True)
 
-    # --- SCREENER UPLOAD ---
-    st.markdown("<div class='section-title'>Upload Screener Results</div>", unsafe_allow_html=True)
+    # --- SCREENER UPLOAD & WATCHLIST ---
+    st.markdown("<div class='section-title'>Screener Watchlist</div>", unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        b1_files = st.file_uploader(
-            "B1 CSVs (4-filter)",
-            type=None,
-            accept_multiple_files=True,
-            key="b1_upload"
-        )
-    with col2:
-        b2_files = st.file_uploader(
-            "B2 CSVs (6-filter)",
-            type=None,
-            accept_multiple_files=True,
-            key="b2_upload"
-        )
+    # Load saved watchlist
+    saved_watchlist = []
+    watchlist_date = ""
+    if STOCKS_FILE.exists():
+        with open(STOCKS_FILE, "r") as f:
+            _wl = json.load(f)
+        saved_watchlist = _wl.get("engine_b_watchlist", [])
+        watchlist_date = _wl.get("_watchlist_date", "")
 
-    if b1_files or b2_files:
-        b1_stocks = []
-        b2_stocks = []
-        for f in (b1_files or []):
-            b1_stocks.extend(parse_trendlyne_file(f))
-        for f in (b2_files or []):
-            b2_stocks.extend(parse_trendlyne_file(f))
-
-        combined = combine_screeners(b1_stocks, b2_stocks)
-
-        if combined:
-            # Count stats
-            double_count = sum(1 for s in combined if s["source"] == "Double")
-            b1_only = sum(1 for s in combined if s["source"] == "B1")
-            b2_only = sum(1 for s in combined if s["source"] == "B2")
-            holding_tickers = [p.get("ticker", "") for p in positions]
-
-            stats_html = (
-                f"<div style='background:#0f172a;border-radius:12px;padding:14px 16px;"
-                f"border:1px solid #334155;margin-bottom:12px;'>"
-                f"<div style='font-size:13px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>Screener Results</div>"
-                f"<div style='display:flex;justify-content:space-between;font-size:13px;'>"
-                f"<div style='color:#e2e8f0;'>Total: <span style='font-weight:700;'>{len(combined)}</span></div>"
-                f"<div style='color:#fbbf24;'>Double: <span style='font-weight:700;'>{double_count}</span></div>"
-                f"<div style='color:#22c55e;'>B1: <span style='font-weight:700;'>{b1_only}</span></div>"
-                f"<div style='color:#38bdf8;'>B2: <span style='font-weight:700;'>{b2_only}</span></div>"
-                f"</div>"
-                f"</div>"
+    # Upload section (inside expander to keep it clean)
+    with st.expander("Upload New Screener CSVs", expanded=len(saved_watchlist) == 0):
+        col1, col2 = st.columns(2)
+        with col1:
+            b1_files = st.file_uploader(
+                "B1 CSVs (4-filter)",
+                type=None,
+                accept_multiple_files=True,
+                key="b1_upload"
             )
-            st.markdown(stats_html, unsafe_allow_html=True)
+        with col2:
+            b2_files = st.file_uploader(
+                "B2 CSVs (6-filter)",
+                type=None,
+                accept_multiple_files=True,
+                key="b2_upload"
+            )
 
-            # --- DROPPED FROM SCREENER WARNING ---
-            combined_tickers = [s["ticker"] for s in combined]
-            for h_ticker in holding_tickers:
-                if h_ticker and h_ticker not in combined_tickers:
-                    h_name = next((p["stock"] for p in positions if p.get("ticker") == h_ticker), h_ticker)
+        if b1_files or b2_files:
+            b1_stocks = []
+            b2_stocks = []
+            for f in (b1_files or []):
+                b1_stocks.extend(parse_trendlyne_file(f))
+            for f in (b2_files or []):
+                b2_stocks.extend(parse_trendlyne_file(f))
+
+            combined = combine_screeners(b1_stocks, b2_stocks)
+
+            if combined and st.button("Save Watchlist", key="save_watchlist"):
+                token = get_github_token()
+                if token:
+                    file_data, sha = get_file_from_github(token)
+                    if file_data:
+                        # Add action tag to each stock
+                        for s in combined:
+                            s["action"] = "REVIEW"
+                        file_data["engine_b_watchlist"] = combined
+                        file_data["_watchlist_date"] = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M")
+                        if save_file_to_github(token, file_data, sha, "Update screener watchlist"):
+                            st.success(f"Watchlist saved: {len(combined)} stocks")
+                            st.rerun()
+                        else:
+                            st.error("Failed to save. Check token.")
+                    else:
+                        st.error("Could not read from GitHub.")
+                else:
+                    st.error("GitHub token not found.")
+
+    # --- DISPLAY SAVED WATCHLIST ---
+    if saved_watchlist:
+        holding_tickers = [p.get("ticker", "") for p in positions]
+
+        # Stats
+        double_count = sum(1 for s in saved_watchlist if s.get("source") == "Double")
+        b1_only = sum(1 for s in saved_watchlist if s.get("source") == "B1")
+        b2_only = sum(1 for s in saved_watchlist if s.get("source") == "B2")
+        avoid_count = sum(1 for s in saved_watchlist if s.get("action") == "AVOID")
+
+        stats_html = (
+            f"<div style='background:#0f172a;border-radius:12px;padding:14px 16px;"
+            f"border:1px solid #334155;margin-bottom:12px;'>"
+            f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;'>"
+            f"<div style='font-size:13px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;'>Watchlist</div>"
+            f"<div style='font-size:11px;color:#64748b;'>Updated: {watchlist_date}</div>"
+            f"</div>"
+            f"<div style='display:flex;justify-content:space-between;font-size:13px;'>"
+            f"<div style='color:#e2e8f0;'>Total: <span style='font-weight:700;'>{len(saved_watchlist)}</span></div>"
+            f"<div style='color:#fbbf24;'>Double: <span style='font-weight:700;'>{double_count}</span></div>"
+            f"<div style='color:#22c55e;'>B1: <span style='font-weight:700;'>{b1_only}</span></div>"
+            f"<div style='color:#38bdf8;'>B2: <span style='font-weight:700;'>{b2_only}</span></div>"
+            f"</div>"
+            f"</div>"
+        )
+        st.markdown(stats_html, unsafe_allow_html=True)
+
+        # --- DROPPED FROM SCREENER WARNING ---
+        combined_tickers = [s.get("ticker", "") for s in saved_watchlist]
+        for h_ticker in holding_tickers:
+            if h_ticker and h_ticker not in combined_tickers:
+                h_name = next((p["stock"] for p in positions if p.get("ticker") == h_ticker), h_ticker)
+                st.markdown(
+                    f"<div style='background:#7f1d1d;border-radius:8px;padding:8px 12px;"
+                    f"border:1px solid #ef4444;margin-bottom:6px;font-size:12px;color:#fca5a5;'>"
+                    f"⚠️ <b>{h_name}</b> no longer in screener — review for exit"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+
+        # Load cooldown data
+        closed_trades_data = []
+        if STOCKS_FILE.exists():
+            with open(STOCKS_FILE, "r") as f:
+                _cd = json.load(f)
+            closed_trades_data = _cd.get("engine_b_closed", [])
+
+        # Sort: Double first, then B1, then B2
+        sort_order = {"Double": 0, "B1": 1, "B2": 2}
+        saved_watchlist.sort(key=lambda x: sort_order.get(x.get("source", ""), 3))
+
+        for stock in saved_watchlist:
+            source = stock.get("source", "")
+            if source == "Double":
+                source_label = "DOUBLE"
+                source_color = "#fbbf24"
+            elif source == "B1":
+                source_label = "B1"
+                source_color = "#22c55e"
+            else:
+                source_label = "B2"
+                source_color = "#38bdf8"
+
+            action = stock.get("action", "REVIEW")
+            is_holding = stock.get("ticker", "") in holding_tickers
+
+            # Skip AVOID stocks (collapsed)
+            if action == "AVOID" and not is_holding:
+                st.markdown(
+                    f"<div style='background:#1e293b;border-radius:8px;padding:8px 12px;"
+                    f"border:1px solid #334155;margin-bottom:4px;opacity:0.5;'>"
+                    f"<div style='display:flex;justify-content:space-between;font-size:12px;'>"
+                    f"<span style='color:#64748b;'>{stock.get('stock', '')}</span>"
+                    f"<span style='color:#64748b;'>AVOIDED</span>"
+                    f"</div></div>",
+                    unsafe_allow_html=True
+                )
+                continue
+
+            render_qualifier(stock, source_label, source_color, is_holding)
+
+            # --- ACTION BUTTONS (only for NEW stocks) ---
+            if not is_holding and gate_status == "ACTIVE":
+                ticker_key = stock.get("ticker", "")
+
+                # Max 15 check
+                if len(positions) >= 15:
                     st.markdown(
-                        f"<div style='background:#7f1d1d;border-radius:8px;padding:8px 12px;"
-                        f"border:1px solid #ef4444;margin-bottom:6px;font-size:12px;color:#fca5a5;'>"
-                        f"⚠️ <b>{h_name}</b> no longer in screener — review for exit"
-                        f"</div>",
+                        "<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
+                        "⚠️ Max 15 positions reached — sell a position first</div>",
                         unsafe_allow_html=True
                     )
+                    continue
 
-            # Load cooldown data
-            closed_trades_data = []
-            if STOCKS_FILE.exists():
-                with open(STOCKS_FILE, "r") as f:
-                    _cd = json.load(f)
-                closed_trades_data = _cd.get("engine_b_closed", [])
+                # Cooldown check
+                in_cooldown = False
+                for ct in closed_trades_data:
+                    if ct.get("ticker") == ticker_key and ct.get("sell_date"):
+                        try:
+                            sell_dt = pd.Timestamp(ct["sell_date"])
+                            days_since = (pd.Timestamp.now() - sell_dt).days
+                            if days_since < 30:
+                                in_cooldown = True
+                                days_left = 30 - days_since
+                                st.markdown(
+                                    f"<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
+                                    f"⚠️ Cooldown: {days_left} days left (sold {ct['sell_date']})</div>",
+                                    unsafe_allow_html=True
+                                )
+                        except:
+                            pass
+                if in_cooldown:
+                    continue
 
-            # Sort: Double first, then B1, then B2
-            sort_order = {"Double": 0, "B1": 1, "B2": 2}
-            combined.sort(key=lambda x: sort_order.get(x["source"], 3))
-
-            for stock in combined:
-                source = stock["source"]
-                if source == "Double":
-                    source_label = "DOUBLE"
-                    source_color = "#fbbf24"
-                elif source == "B1":
-                    source_label = "B1"
-                    source_color = "#22c55e"
-                else:
-                    source_label = "B2"
-                    source_color = "#38bdf8"
-
-                is_holding = stock["ticker"] in holding_tickers
-                render_qualifier(stock, source_label, source_color, is_holding)
-
-                # --- CONFIRM BUY BUTTON (only for NEW stocks) ---
-                if not is_holding and gate_status == "ACTIVE":
-                    ticker_key = stock["ticker"]
-
-                    # Max 15 check
-                    if len(positions) >= 15:
-                        st.markdown(
-                            "<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
-                            "⚠️ Max 15 positions reached — sell a position first</div>",
-                            unsafe_allow_html=True
-                        )
-                        continue
-
-                    # Cooldown check (30 days after selling same stock)
-                    in_cooldown = False
-                    for ct in closed_trades_data:
-                        if ct.get("ticker") == ticker_key and ct.get("sell_date"):
-                            try:
-                                sell_dt = pd.Timestamp(ct["sell_date"])
-                                days_since = (pd.Timestamp.now() - sell_dt).days
-                                if days_since < 30:
-                                    in_cooldown = True
-                                    days_left = 30 - days_since
-                                    st.markdown(
-                                        f"<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
-                                        f"⚠️ Cooldown: {days_left} days left (sold {ct['sell_date']})</div>",
-                                        unsafe_allow_html=True
-                                    )
-                            except:
-                                pass
-                    if in_cooldown:
-                        continue
-
-                    with st.expander(f"Buy {stock['stock']}?", expanded=False):
+                # Buy and Avoid buttons side by side
+                bcol1, bcol2 = st.columns([3, 1])
+                with bcol1:
+                    with st.expander(f"Buy {stock.get('stock', '')}?", expanded=False):
                         st.markdown(
                             f"<div style='font-size:12px;color:#94a3b8;margin-bottom:8px;'>"
-                            f"Entry: ₹{stock['ltp']:,.2f} · Stop: ₹{stock['ltp'] * 0.93:,.2f} (-7%)"
+                            f"Entry: ₹{stock.get('ltp', 0):,.2f} · Stop: ₹{stock.get('ltp', 0) * 0.93:,.2f} (-7%)"
                             f"</div>",
                             unsafe_allow_html=True
                         )
@@ -588,13 +643,13 @@ def show_engine_b():
                             step=1,
                             key=f"qty_{ticker_key}"
                         )
-                        invested = qty * stock["ltp"]
+                        invested = qty * stock.get("ltp", 0)
                         st.markdown(
                             f"<div style='font-size:12px;color:#e2e8f0;'>"
                             f"Investment: ₹{invested:,.2f}</div>",
                             unsafe_allow_html=True
                         )
-                        if st.button(f"Confirm Buy {stock['stock']}", key=f"buy_{ticker_key}"):
+                        if st.button(f"Confirm Buy {stock.get('stock', '')}", key=f"buy_{ticker_key}"):
                             token = get_github_token()
                             if not token:
                                 st.error("GitHub token not found in secrets.")
@@ -604,32 +659,61 @@ def show_engine_b():
                                     st.error("Could not read engine_b_stocks.json from GitHub.")
                                 else:
                                     new_stock = {
-                                        "stock": stock["stock"],
-                                        "ticker": stock["ticker"],
-                                        "entry": stock["ltp"],
+                                        "stock": stock.get("stock", ""),
+                                        "ticker": stock.get("ticker", ""),
+                                        "entry": stock.get("ltp", 0),
                                         "qty": qty,
-                                        "peak": stock["ltp"],
-                                        "source": stock["source"],
+                                        "peak": stock.get("ltp", 0),
+                                        "source": stock.get("source", ""),
                                         "buy_date": pd.Timestamp.now().strftime("%Y-%m-%d")
                                     }
                                     if "engine_b" not in file_data:
                                         file_data["engine_b"] = []
                                     file_data["engine_b"].append(new_stock)
+                                    # Update watchlist action
+                                    for ws in file_data.get("engine_b_watchlist", []):
+                                        if ws.get("ticker") == ticker_key:
+                                            ws["action"] = "BOUGHT"
 
-                                    msg = f"Add {stock['stock']} to Engine B (qty: {qty}, entry: {stock['ltp']})"
+                                    msg = f"Add {stock.get('stock', '')} to Engine B (qty: {qty}, entry: {stock.get('ltp', 0)})"
                                     if save_file_to_github(token, file_data, sha, msg):
                                         trigger_workflow(token)
-                                        st.success(f"{stock['stock']} added! Prices update in ~45 sec.")
+                                        st.success(f"{stock.get('stock', '')} added! Prices update in ~45 sec.")
                                         st.rerun()
                                     else:
                                         st.error("Failed to save. Check token permissions.")
 
-                elif not is_holding and gate_status == "FROZEN":
-                    st.markdown(
-                        "<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
-                        "Engine A frozen — no new buys allowed</div>",
-                        unsafe_allow_html=True
-                    )
+                with bcol2:
+                    if st.button("Avoid", key=f"avoid_{ticker_key}"):
+                        token = get_github_token()
+                        if token:
+                            file_data, sha = get_file_from_github(token)
+                            if file_data:
+                                for ws in file_data.get("engine_b_watchlist", []):
+                                    if ws.get("ticker") == ticker_key:
+                                        ws["action"] = "AVOID"
+                                if save_file_to_github(token, file_data, sha, f"Avoid {stock.get('stock', '')}"):
+                                    st.rerun()
+
+            elif not is_holding and gate_status == "FROZEN":
+                st.markdown(
+                    "<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
+                    "Engine A frozen — no new buys allowed</div>",
+                    unsafe_allow_html=True
+                )
+
+        # Clear watchlist button
+        st.markdown("")
+        if st.button("🗑️ Clear Watchlist (New Quarter)", key="clear_watchlist"):
+            token = get_github_token()
+            if token:
+                file_data, sha = get_file_from_github(token)
+                if file_data:
+                    file_data["engine_b_watchlist"] = []
+                    file_data["_watchlist_date"] = ""
+                    if save_file_to_github(token, file_data, sha, "Clear watchlist for new quarter"):
+                        st.success("Watchlist cleared!")
+                        st.rerun()
 
     # --- CLOSED POSITIONS (Trade Log) ---
     st.markdown("<div class='section-title'>Closed Positions — Trade Log</div>", unsafe_allow_html=True)
