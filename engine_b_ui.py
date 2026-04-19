@@ -426,6 +426,32 @@ def show_engine_b():
         )
         st.markdown(summary_html, unsafe_allow_html=True)
 
+    # --- POSITION SIZER ---
+    if score_data and positions:
+        eq_pct = float(score_data.get("equity_pct", 55))
+        b_share = float(score_data.get("engine_b_share", 45))
+        with st.expander("Position Sizer", expanded=False):
+            capital = st.number_input("Total Capital (₹)", min_value=10000,
+                                       value=100000, step=10000, key="capital_input")
+            engine_b_budget = round(capital * (eq_pct / 100) * (b_share / 100))
+            max_per_stock = round(capital * 0.07)
+            slots = len(positions)
+            per_stock = round(engine_b_budget / max(slots, 1))
+            per_stock_capped = min(per_stock, max_per_stock)
+
+            sizer_html = (
+                f"<div style='font-size:12px;color:#94a3b8;line-height:1.8;'>"
+                f"Equity: {eq_pct:.0f}% · Engine B share: {b_share:.0f}%<br>"
+                f"Engine B budget: <span style='color:#e2e8f0;font-weight:700;'>"
+                f"₹{engine_b_budget:,.0f}</span><br>"
+                f"Active positions: {slots}/15<br>"
+                f"Per stock: <span style='color:#e2e8f0;font-weight:700;'>"
+                f"₹{per_stock_capped:,.0f}</span>"
+                f" (max 7%: ₹{max_per_stock:,.0f})"
+                f"</div>"
+            )
+            st.markdown(sizer_html, unsafe_allow_html=True)
+
     # --- SCREENER UPLOAD ---
     st.markdown("<div class='section-title'>Upload Screener Results</div>", unsafe_allow_html=True)
 
@@ -476,6 +502,26 @@ def show_engine_b():
             )
             st.markdown(stats_html, unsafe_allow_html=True)
 
+            # --- DROPPED FROM SCREENER WARNING ---
+            combined_tickers = [s["ticker"] for s in combined]
+            for h_ticker in holding_tickers:
+                if h_ticker and h_ticker not in combined_tickers:
+                    h_name = next((p["stock"] for p in positions if p.get("ticker") == h_ticker), h_ticker)
+                    st.markdown(
+                        f"<div style='background:#7f1d1d;border-radius:8px;padding:8px 12px;"
+                        f"border:1px solid #ef4444;margin-bottom:6px;font-size:12px;color:#fca5a5;'>"
+                        f"⚠️ <b>{h_name}</b> no longer in screener — review for exit"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+
+            # Load cooldown data
+            closed_trades_data = []
+            if STOCKS_FILE.exists():
+                with open(STOCKS_FILE, "r") as f:
+                    _cd = json.load(f)
+                closed_trades_data = _cd.get("engine_b_closed", [])
+
             # Sort: Double first, then B1, then B2
             sort_order = {"Double": 0, "B1": 1, "B2": 2}
             combined.sort(key=lambda x: sort_order.get(x["source"], 3))
@@ -498,6 +544,36 @@ def show_engine_b():
                 # --- CONFIRM BUY BUTTON (only for NEW stocks) ---
                 if not is_holding and gate_status == "ACTIVE":
                     ticker_key = stock["ticker"]
+
+                    # Max 15 check
+                    if len(positions) >= 15:
+                        st.markdown(
+                            "<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
+                            "⚠️ Max 15 positions reached — sell a position first</div>",
+                            unsafe_allow_html=True
+                        )
+                        continue
+
+                    # Cooldown check (30 days after selling same stock)
+                    in_cooldown = False
+                    for ct in closed_trades_data:
+                        if ct.get("ticker") == ticker_key and ct.get("sell_date"):
+                            try:
+                                sell_dt = pd.Timestamp(ct["sell_date"])
+                                days_since = (pd.Timestamp.now() - sell_dt).days
+                                if days_since < 30:
+                                    in_cooldown = True
+                                    days_left = 30 - days_since
+                                    st.markdown(
+                                        f"<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
+                                        f"⚠️ Cooldown: {days_left} days left (sold {ct['sell_date']})</div>",
+                                        unsafe_allow_html=True
+                                    )
+                            except:
+                                pass
+                    if in_cooldown:
+                        continue
+
                     with st.expander(f"Buy {stock['stock']}?", expanded=False):
                         st.markdown(
                             f"<div style='font-size:12px;color:#94a3b8;margin-bottom:8px;'>"
