@@ -275,6 +275,14 @@ def show_engine_b():
     )
     st.markdown(gate_html, unsafe_allow_html=True)
 
+    # --- REFRESH NOW BUTTON ---
+    if st.button("🔄 Refresh Now", key="engine_b_refresh"):
+        token = get_github_token()
+        if token and trigger_workflow(token):
+            st.success("Refresh triggered! Prices update in ~45 sec.")
+        else:
+            st.error("Could not trigger refresh. Check token.")
+
     # --- LOAD LIVE PRICES ---
     live_prices = load_stock_prices()
 
