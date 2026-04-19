@@ -134,7 +134,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -0.88,
       "profit_qoq": -8.32,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -150,7 +150,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 28.44,
       "profit_qoq": 47.83,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -166,7 +166,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 37.47,
       "profit_qoq": 123.49,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -182,7 +182,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -2.53,
       "profit_qoq": -17.72,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -214,7 +214,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -8.2,
       "profit_qoq": -15.44,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -230,7 +230,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -0.51,
       "profit_qoq": -3.45,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -246,7 +246,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 10.22,
       "profit_qoq": 11.55,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -262,7 +262,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 2.27,
       "profit_qoq": 15.81,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -294,7 +294,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -4.88,
       "profit_qoq": -23.18,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -310,7 +310,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 7.35,
       "profit_qoq": 0.48,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -326,7 +326,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -14.44,
       "profit_qoq": 124.36,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -358,7 +358,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 31.36,
       "profit_qoq": 315.84,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -374,7 +374,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 12.12,
       "profit_qoq": 20.02,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -390,7 +390,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -3.54,
       "profit_qoq": -0.47,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -422,7 +422,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 8.96,
       "profit_qoq": 49.78,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -438,7 +438,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -13.94,
       "profit_qoq": -11.14,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -454,7 +454,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 0.67,
       "profit_qoq": 17.49,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -470,7 +470,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 4.07,
       "profit_qoq": 26.95,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -486,7 +486,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -1.18,
       "profit_qoq": 24.21,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -502,7 +502,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -37.62,
       "profit_qoq": -40.35,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -518,7 +518,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": 1.89,
       "profit_qoq": -7.57,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
@@ -534,7 +534,7 @@
       "result_date": "2025-12-31",
       "rev_qoq": -4.74,
       "profit_qoq": -21.67,
-      "source": "B1",
+      "source": "Double",
       "action": "REVIEW"
     },
     {
