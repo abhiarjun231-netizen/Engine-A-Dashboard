@@ -2,7 +2,6 @@
 engine_b_ui.py - Engine B display logic
 Phase 1: Upload B1+B2 CSVs, parse, deduplicate, flag Double Qualifiers
 """
-
 import streamlit as st
 import pandas as pd
 from pathlib import Path
@@ -54,25 +53,61 @@ def get_stage(pct_change):
     return "RUNNING", "#22c55e"
 
 # ============================================================
-# CSV PARSER
+# FLEXIBLE COLUMN FINDER
 # ============================================================
-def parse_trendlyne_csv(uploaded_file):
+def find_column(df, candidates):
+    """Find a column by trying multiple name variants."""
+    # Normalize df columns: strip whitespace
+    col_map = {c.strip(): c for c in df.columns}
+    for candidate in candidates:
+        candidate_clean = candidate.strip()
+        if candidate_clean in col_map:
+            return col_map[candidate_clean]
+        # Try case-insensitive
+        for col_clean, col_orig in col_map.items():
+            if col_clean.lower() == candidate_clean.lower():
+                return col_orig
+    return None
+
+# ============================================================
+# CSV/EXCEL PARSER
+# ============================================================
+def parse_trendlyne_file(uploaded_file):
+    """Parse Trendlyne export — handles CSV and Excel."""
     try:
-        df = pd.read_csv(uploaded_file)
+        fname = uploaded_file.name.lower()
+        if fname.endswith(".xlsx") or fname.endswith(".xls"):
+            df = pd.read_excel(uploaded_file)
+        else:
+            df = pd.read_csv(uploaded_file)
+
+        # Flexible column matching
+        col_stock = find_column(df, ["Stock"])
+        col_ticker = find_column(df, ["NSE Code"])
+        col_ltp = find_column(df, ["LTP"])
+        col_roe = find_column(df, ["ROE Ann  %", "ROE Ann %", "ROE Annual %"])
+        col_pe = find_column(df, ["PE TTM", "PE TTM Price to Earnings"])
+        col_pio = find_column(df, ["Piotroski Score"])
+        col_mcap = find_column(df, ["Market Cap"])
+
+        if not col_stock or not col_ticker:
+            st.error("Could not find 'Stock' or 'NSE Code' columns in file.")
+            return []
+
         stocks = []
         for _, row in df.iterrows():
             stocks.append({
-                "stock": str(row.get("Stock", "")).strip(),
-                "ticker": str(row.get("NSE Code", "")).strip(),
-                "ltp": float(row.get("LTP", 0)),
-                "roe": float(row.get("ROE Ann  %", 0)),
-                "pe": float(row.get("PE TTM", 0)),
-                "piotroski": int(row.get("Piotroski Score", 0)),
-                "mcap": float(row.get("Market Cap", 0)),
+                "stock": str(row.get(col_stock, "")).strip(),
+                "ticker": str(row.get(col_ticker, "")).strip(),
+                "ltp": float(row.get(col_ltp, 0)) if col_ltp else 0,
+                "roe": float(row.get(col_roe, 0)) if col_roe else 0,
+                "pe": float(row.get(col_pe, 0)) if col_pe else 0,
+                "piotroski": int(float(row.get(col_pio, 0))) if col_pio else 0,
+                "mcap": float(row.get(col_mcap, 0)) if col_mcap else 0,
             })
         return stocks
     except Exception as e:
-        st.error(f"CSV parse error: {e}")
+        st.error(f"File parse error: {e}")
         return []
 
 def combine_screeners(b1_stocks, b2_stocks):
@@ -93,7 +128,6 @@ def combine_screeners(b1_stocks, b2_stocks):
 # ============================================================
 def render_position(stock_name, entry, qty, stop, peak, current_price):
     has_price = current_price is not None and current_price != ""
-
     if has_price:
         current = float(current_price)
         if peak and float(peak) > current:
@@ -176,7 +210,6 @@ def render_qualifier(stock, source_label, source_color, is_holding):
 # MAIN DISPLAY FUNCTION
 # ============================================================
 def show_engine_b():
-
     # --- ENGINE A GATE BANNER ---
     score_data = load_engine_a_score()
     score_val = int(score_data["raw_score"]) if score_data else None
@@ -277,14 +310,14 @@ def show_engine_b():
     with col1:
         b1_files = st.file_uploader(
             "B1 CSVs (4-filter)",
-            type=["csv"],
+            type=None,
             accept_multiple_files=True,
             key="b1_upload"
         )
     with col2:
         b2_files = st.file_uploader(
             "B2 CSVs (6-filter)",
-            type=["csv"],
+            type=None,
             accept_multiple_files=True,
             key="b2_upload"
         )
@@ -292,11 +325,10 @@ def show_engine_b():
     if b1_files or b2_files:
         b1_stocks = []
         b2_stocks = []
-
         for f in (b1_files or []):
-            b1_stocks.extend(parse_trendlyne_csv(f))
+            b1_stocks.extend(parse_trendlyne_file(f))
         for f in (b2_files or []):
-            b2_stocks.extend(parse_trendlyne_csv(f))
+            b2_stocks.extend(parse_trendlyne_file(f))
 
         combined = combine_screeners(b1_stocks, b2_stocks)
 
@@ -305,7 +337,6 @@ def show_engine_b():
             double_count = sum(1 for s in combined if s["source"] == "Double")
             b1_only = sum(1 for s in combined if s["source"] == "B1")
             b2_only = sum(1 for s in combined if s["source"] == "B2")
-
             holding_tickers = [p.get("ticker", "") for p in positions]
 
             stats_html = (
@@ -337,7 +368,6 @@ def show_engine_b():
                 else:
                     source_label = "B2"
                     source_color = "#38bdf8"
-
                 is_holding = stock["ticker"] in holding_tickers
                 render_qualifier(stock, source_label, source_color, is_holding)
 
@@ -349,4 +379,4 @@ def show_engine_b():
         "Engine C will have its own tab — coming next"
         "</div>",
         unsafe_allow_html=True
-                   )
+                            )
