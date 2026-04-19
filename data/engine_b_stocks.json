@@ -38,6 +38,15 @@
       "peak": 787.5,
       "source": "B1",
       "buy_date": "2026-04-19"
+    },
+    {
+      "stock": "Force Motors",
+      "ticker": "FORCEMOT",
+      "entry": 22378.0,
+      "qty": 1,
+      "peak": 22378.0,
+      "source": "B1",
+      "buy_date": "2026-04-19"
     }
   ],
   "engine_c": [],
