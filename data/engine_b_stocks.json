@@ -29,6 +29,15 @@
       "ticker": "TORNTPOWER",
       "qty": 3,
       "entry": 1448.0
+    },
+    {
+      "stock": "Vedanta",
+      "ticker": "VEDL",
+      "entry": 787.5,
+      "qty": 1,
+      "peak": 787.5,
+      "source": "B1",
+      "buy_date": "2026-04-19"
     }
   ],
   "engine_c": [],
