@@ -4,7 +4,8 @@
       "stock": "Hindustan Zinc",
       "ticker": "HINDZINC",
       "qty": 8,
-      "entry": 559.0
+      "entry": 559.0,
+      "peak": 592.3
     },
     {
       "stock": "Indus Towers",
@@ -16,19 +17,22 @@
       "stock": "National Aluminium",
       "ticker": "NATIONALUM",
       "qty": 12,
-      "entry": 400.0
+      "entry": 400.0,
+      "peak": 438.75
     },
     {
       "stock": "Engineers India",
       "ticker": "ENGINERSIN",
       "qty": 24,
-      "entry": 206.0
+      "entry": 206.0,
+      "peak": 241.8
     },
     {
       "stock": "Torrent Power",
       "ticker": "TORNTPOWER",
       "qty": 3,
-      "entry": 1448.0
+      "entry": 1448.0,
+      "peak": 1565.0
     },
     {
       "stock": "Vedanta",
