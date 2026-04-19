@@ -137,6 +137,7 @@ def parse_trendlyne_file(uploaded_file):
         col_pe = find_column(df, ["PE TTM", "PE TTM Price to Earnings"])
         col_pio = find_column(df, ["Piotroski Score"])
         col_mcap = find_column(df, ["Market Cap"])
+        col_sma200 = find_column(df, ["Day SMA200", "Day SMA 200", "SMA200"])
 
         if not col_stock or not col_ticker:
             st.error("Could not find 'Stock' or 'NSE Code' columns in file.")
@@ -152,6 +153,7 @@ def parse_trendlyne_file(uploaded_file):
                 "pe": float(row.get(col_pe, 0)) if col_pe else 0,
                 "piotroski": int(float(row.get(col_pio, 0))) if col_pio else 0,
                 "mcap": float(row.get(col_mcap, 0)) if col_mcap else 0,
+                "sma200": float(row.get(col_sma200, 0)) if col_sma200 else 0,
             })
         return stocks
     except Exception as e:
@@ -234,6 +236,26 @@ def render_qualifier(stock, source_label, source_color, is_holding):
     status_label = "HOLDING" if is_holding else "NEW"
     status_color = "#38bdf8" if is_holding else "#22c55e"
 
+    # Calculate % above 200DMA
+    ltp = stock.get('ltp', 0)
+    sma200 = stock.get('sma200', 0)
+    if sma200 > 0 and ltp > 0:
+        pct_above_dma = round((ltp - sma200) / sma200 * 100, 1)
+        dma_str = f"{'+' if pct_above_dma >= 0 else ''}{pct_above_dma}%"
+        dma_color = "#22c55e" if pct_above_dma >= 0 else "#ef4444"
+    else:
+        dma_str = "—"
+        dma_color = "#64748b"
+
+    # Format market cap
+    mcap = stock.get('mcap', 0)
+    if mcap >= 100000:
+        mcap_str = f"₹{mcap/100000:.0f}L Cr"
+    elif mcap >= 1000:
+        mcap_str = f"₹{mcap/1000:.0f}K Cr"
+    else:
+        mcap_str = f"₹{mcap:,.0f} Cr"
+
     card_html = (
         f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
         f"border:1px solid #334155;margin-bottom:6px;'>"
@@ -245,10 +267,14 @@ def render_qualifier(stock, source_label, source_color, is_holding):
         f"</div>"
         f"</div>"
         f"<div style='display:flex;justify-content:space-between;margin-top:6px;font-size:12px;'>"
-        f"<div style='color:#94a3b8;'>LTP: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>₹{stock['ltp']:,.2f}</span></div>"
+        f"<div style='color:#94a3b8;'>LTP: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>₹{ltp:,.2f}</span></div>"
         f"<div style='color:#94a3b8;'>ROE: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>{stock['roe']:.1f}%</span></div>"
         f"<div style='color:#94a3b8;'>PE: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>{stock['pe']:.1f}</span></div>"
         f"<div style='color:#94a3b8;'>Pio: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>{stock['piotroski']}</span></div>"
+        f"</div>"
+        f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
+        f"<div style='color:#64748b;'>MCap: <span style='color:#94a3b8;'>{mcap_str}</span></div>"
+        f"<div style='color:#64748b;'>vs 200DMA: <span style='color:{dma_color};font-weight:600;'>{dma_str}</span></div>"
         f"</div>"
         f"</div>"
     )
