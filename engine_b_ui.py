@@ -438,4 +438,48 @@ def show_engine_b():
                             unsafe_allow_html=True
                         )
                         if st.button(f"Confirm Buy {stock['stock']}", key=f"buy_{ticker_key}"):
-      
+                            token = get_github_token()
+                            if not token:
+                                st.error("GitHub token not found in secrets.")
+                            else:
+                                file_data, sha = get_file_from_github(token)
+                                if file_data is None:
+                                    st.error("Could not read engine_b_stocks.json from GitHub.")
+                                else:
+                                    new_stock = {
+                                        "stock": stock["stock"],
+                                        "ticker": stock["ticker"],
+                                        "entry": stock["ltp"],
+                                        "qty": qty,
+                                        "peak": stock["ltp"],
+                                        "source": stock["source"],
+                                        "buy_date": pd.Timestamp.now().strftime("%Y-%m-%d")
+                                    }
+                                    if "engine_b" not in file_data:
+                                        file_data["engine_b"] = []
+                                    file_data["engine_b"].append(new_stock)
+
+                                    msg = f"Add {stock['stock']} to Engine B (qty: {qty}, entry: {stock['ltp']})"
+                                    if save_file_to_github(token, file_data, sha, msg):
+                                        trigger_workflow(token)
+                                        st.success(f"{stock['stock']} added! Prices update in ~45 sec.")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to save. Check token permissions.")
+
+                elif not is_holding and gate_status == "FROZEN":
+                    st.markdown(
+                        "<div style='font-size:11px;color:#f59e0b;margin-bottom:8px;'>"
+                        "Engine A frozen — no new buys allowed</div>",
+                        unsafe_allow_html=True
+                    )
+
+    # --- ENGINE C PLACEHOLDER ---
+    st.markdown("<div class='section-title'>Engine C — Long-Term Compounders</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div style='background:#1e293b;border-radius:12px;padding:20px 16px;"
+        "border:1px solid #334155;text-align:center;color:#64748b;font-size:13px;'>"
+        "Engine C will have its own tab — coming next"
+        "</div>",
+        unsafe_allow_html=True
+    )
