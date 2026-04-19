@@ -56,6 +56,15 @@
       "peak": 131.25,
       "source": "B1",
       "buy_date": "2026-04-19"
+    },
+    {
+      "stock": "Jindal Saw",
+      "ticker": "JINDALSAW",
+      "entry": 236.28,
+      "qty": 1,
+      "peak": 236.28,
+      "source": "B1",
+      "buy_date": "2026-04-19"
     }
   ],
   "engine_c": [],
