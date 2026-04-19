@@ -178,7 +178,7 @@ def render_position(stock_name, entry, qty, stop, peak, current_price):
     has_price = current_price is not None and current_price != ""
     if has_price:
         current = float(current_price)
-        if peak and float(peak) > current:
+        if peak:
             trail_stop = round(float(peak) * 0.93, 2)
         else:
             trail_stop = stop
