@@ -138,6 +138,7 @@ def parse_trendlyne_file(uploaded_file):
         col_pio = find_column(df, ["Piotroski Score"])
         col_mcap = find_column(df, ["Market Cap"])
         col_sma200 = find_column(df, ["Day SMA200", "Day SMA 200", "SMA200"])
+        col_sector = find_column(df, ["Sector", "Industry", "Trendlyne Sector"])
 
         if not col_stock or not col_ticker:
             st.error("Could not find 'Stock' or 'NSE Code' columns in file.")
@@ -154,6 +155,7 @@ def parse_trendlyne_file(uploaded_file):
                 "piotroski": int(float(row.get(col_pio, 0))) if col_pio else 0,
                 "mcap": float(row.get(col_mcap, 0)) if col_mcap else 0,
                 "sma200": float(row.get(col_sma200, 0)) if col_sma200 else 0,
+                "sector": str(row.get(col_sector, "")).strip() if col_sector else "",
             })
         return stocks
     except Exception as e:
@@ -230,6 +232,42 @@ def render_position(stock_name, entry, qty, stop, peak, current_price):
     st.markdown(card_html, unsafe_allow_html=True)
 
 # ============================================================
+# CONVICTION SCORE (1-10)
+# ============================================================
+def calc_conviction(stock):
+    score = 0
+    # Double qualifier = highest conviction
+    if stock.get("source") == "Double":
+        score += 3
+    else:
+        score += 1
+    # Piotroski: 9=+3, 8=+2, 7=+1
+    pio = stock.get("piotroski", 0)
+    if pio >= 9:
+        score += 3
+    elif pio >= 8:
+        score += 2
+    elif pio >= 7:
+        score += 1
+    # ROE: >30=+2, 15-30=+1
+    roe = stock.get("roe", 0)
+    if roe > 30:
+        score += 2
+    elif roe > 15:
+        score += 1
+    # Entry timing: closer to 200DMA = better entry
+    ltp = stock.get("ltp", 0)
+    sma = stock.get("sma200", 0)
+    if sma > 0 and ltp > 0:
+        pct = (ltp - sma) / sma * 100
+        if pct < 10:
+            score += 2
+        elif pct < 20:
+            score += 1
+        # >20% = stretched, no points
+    return min(score, 10)
+
+# ============================================================
 # QUALIFIER CARD (from screener upload)
 # ============================================================
 def render_qualifier(stock, source_label, source_color, is_holding):
@@ -256,12 +294,26 @@ def render_qualifier(stock, source_label, source_color, is_holding):
     else:
         mcap_str = f"₹{mcap:,.0f} Cr"
 
+    # Conviction score
+    conv = calc_conviction(stock)
+    if conv >= 8:
+        conv_color = "#22c55e"
+    elif conv >= 5:
+        conv_color = "#fbbf24"
+    else:
+        conv_color = "#94a3b8"
+
+    # Sector
+    sector = stock.get('sector', '')
+    sector_str = f" · {sector}" if sector else ""
+
     card_html = (
         f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
         f"border:1px solid #334155;margin-bottom:6px;'>"
         f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
         f"<div style='font-size:14px;font-weight:600;color:#e2e8f0;'>{stock['stock']}</div>"
-        f"<div style='display:flex;gap:8px;'>"
+        f"<div style='display:flex;gap:8px;align-items:center;'>"
+        f"<span style='font-size:11px;font-weight:700;color:{conv_color};'>{conv}/10</span>"
         f"<span style='font-size:10px;font-weight:700;color:{source_color};background:{source_color}22;padding:2px 6px;border-radius:4px;'>{source_label}</span>"
         f"<span style='font-size:10px;font-weight:700;color:{status_color};background:{status_color}22;padding:2px 6px;border-radius:4px;'>{status_label}</span>"
         f"</div>"
@@ -273,7 +325,7 @@ def render_qualifier(stock, source_label, source_color, is_holding):
         f"<div style='color:#94a3b8;'>Pio: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>{stock['piotroski']}</span></div>"
         f"</div>"
         f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
-        f"<div style='color:#64748b;'>MCap: <span style='color:#94a3b8;'>{mcap_str}</span></div>"
+        f"<div style='color:#64748b;'>MCap: <span style='color:#94a3b8;'>{mcap_str}</span>{sector_str}</div>"
         f"<div style='color:#64748b;'>vs 200DMA: <span style='color:{dma_color};font-weight:600;'>{dma_str}</span></div>"
         f"</div>"
         f"</div>"
@@ -585,9 +637,8 @@ def show_engine_b():
                 _cd = json.load(f)
             closed_trades_data = _cd.get("engine_b_closed", [])
 
-        # Sort: Double first, then B1, then B2
-        sort_order = {"Double": 0, "B1": 1, "B2": 2}
-        saved_watchlist.sort(key=lambda x: sort_order.get(x.get("source", ""), 3))
+        # Sort: by conviction score (highest first), then Double > B1 > B2
+        saved_watchlist.sort(key=lambda x: (-calc_conviction(x), {"Double": 0, "B1": 1, "B2": 2}.get(x.get("source", ""), 3)))
 
         for stock in saved_watchlist:
             source = stock.get("source", "")
