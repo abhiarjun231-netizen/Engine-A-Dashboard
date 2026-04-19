@@ -328,6 +328,79 @@ def show_engine_b():
 
             render_position(p["stock"], entry, qty, stop, peak, current_price)
 
+            # --- SELL BUTTON ---
+            ticker_key = p.get("ticker", "")
+            with st.expander(f"Sell {p['stock']}?", expanded=False):
+                exit_reasons = ["Stop Hit (-7%)", "Trailing Stop", "Filter Break", "Manual Exit"]
+                reason = st.selectbox("Exit Reason", exit_reasons, key=f"reason_{ticker_key}")
+                if current_price != "" and current_price is not None:
+                    try:
+                        cp = float(current_price)
+                        exit_pnl = round((cp - entry) * qty, 2)
+                        exit_pct = round((cp - entry) / entry * 100, 2)
+                        pnl_sign = "+" if exit_pnl >= 0 else ""
+                        st.markdown(
+                            f"<div style='font-size:12px;color:#94a3b8;'>"
+                            f"Exit: ₹{cp:,.2f} · P&L: {pnl_sign}₹{exit_pnl:,.0f} ({pnl_sign}{exit_pct}%)"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+                    except:
+                        cp = entry
+                else:
+                    cp = entry
+                if st.button(f"Confirm Sell {p['stock']}", key=f"sell_{ticker_key}"):
+                    token = get_github_token()
+                    if not token:
+                        st.error("GitHub token not found.")
+                    else:
+                        file_data, sha = get_file_from_github(token)
+                        if file_data is None:
+                            st.error("Could not read from GitHub.")
+                        else:
+                            # Build closed trade record
+                            buy_date = p.get("buy_date", "")
+                            sell_date = pd.Timestamp.now().strftime("%Y-%m-%d")
+                            holding_days = 0
+                            if buy_date:
+                                try:
+                                    bd = pd.Timestamp(buy_date)
+                                    sd = pd.Timestamp(sell_date)
+                                    holding_days = (sd - bd).days
+                                except:
+                                    pass
+                            realized_pnl = round((cp - entry) * qty, 2)
+                            realized_pct = round((cp - entry) / entry * 100, 2)
+                            closed_trade = {
+                                "stock": p["stock"],
+                                "ticker": ticker_key,
+                                "entry": entry,
+                                "exit_price": cp,
+                                "qty": qty,
+                                "buy_date": buy_date,
+                                "sell_date": sell_date,
+                                "holding_days": holding_days,
+                                "realized_pnl": realized_pnl,
+                                "realized_pct": realized_pct,
+                                "exit_reason": reason,
+                                "result": "WIN" if realized_pnl >= 0 else "LOSS",
+                            }
+                            # Add to closed array
+                            if "engine_b_closed" not in file_data:
+                                file_data["engine_b_closed"] = []
+                            file_data["engine_b_closed"].append(closed_trade)
+                            # Remove from active array
+                            file_data["engine_b"] = [
+                                s for s in file_data.get("engine_b", [])
+                                if s.get("ticker", "") != ticker_key
+                            ]
+                            msg = f"Sell {p['stock']} ({reason}: {'+' if realized_pnl >= 0 else ''}₹{realized_pnl:,.0f})"
+                            if save_file_to_github(token, file_data, sha, msg):
+                                st.success(f"{p['stock']} sold! P&L: {'+' if realized_pnl >= 0 else ''}₹{realized_pnl:,.0f}")
+                                st.rerun()
+                            else:
+                                st.error("Failed to save. Check token.")
+
         # Portfolio summary
         if all_have_prices:
             pnl_color = "#22c55e" if total_pnl >= 0 else "#ef4444"
@@ -481,6 +554,89 @@ def show_engine_b():
                         "Engine A frozen — no new buys allowed</div>",
                         unsafe_allow_html=True
                     )
+
+    # --- CLOSED POSITIONS (Trade Log) ---
+    st.markdown("<div class='section-title'>Closed Positions — Trade Log</div>", unsafe_allow_html=True)
+
+    # Load closed trades from local JSON
+    closed_trades = []
+    if STOCKS_FILE.exists():
+        with open(STOCKS_FILE, "r") as f:
+            all_data = json.load(f)
+        closed_trades = all_data.get("engine_b_closed", [])
+
+    if not closed_trades:
+        st.markdown(
+            "<div style='background:#1e293b;border-radius:12px;padding:16px;"
+            "border:1px solid #334155;text-align:center;color:#64748b;font-size:13px;'>"
+            "No closed trades yet. Sell a position to start tracking results."
+            "</div>",
+            unsafe_allow_html=True
+        )
+    else:
+        # Stats summary
+        wins = sum(1 for t in closed_trades if t.get("result") == "WIN")
+        losses = sum(1 for t in closed_trades if t.get("result") == "LOSS")
+        total_trades = len(closed_trades)
+        win_rate = round(wins / total_trades * 100, 1) if total_trades > 0 else 0
+        total_realized = sum(t.get("realized_pnl", 0) for t in closed_trades)
+        avg_gain = round(total_realized / total_trades, 0) if total_trades > 0 else 0
+        r_color = "#22c55e" if total_realized >= 0 else "#ef4444"
+        r_sign = "+" if total_realized >= 0 else ""
+
+        stats_html = (
+            f"<div style='background:#0f172a;border-radius:12px;padding:14px 16px;"
+            f"border:1px solid #334155;margin-bottom:12px;'>"
+            f"<div style='font-size:13px;color:#94a3b8;text-transform:uppercase;"
+            f"letter-spacing:1px;margin-bottom:8px;'>Trade Stats</div>"
+            f"<div style='display:flex;justify-content:space-between;font-size:13px;'>"
+            f"<div style='color:#e2e8f0;'>Trades: <span style='font-weight:700;'>{total_trades}</span></div>"
+            f"<div style='color:#22c55e;'>Wins: <span style='font-weight:700;'>{wins}</span></div>"
+            f"<div style='color:#ef4444;'>Losses: <span style='font-weight:700;'>{losses}</span></div>"
+            f"<div style='color:#fbbf24;'>Win%: <span style='font-weight:700;'>{win_rate}%</span></div>"
+            f"</div>"
+            f"<div style='margin-top:8px;font-size:13px;color:#94a3b8;'>"
+            f"Total Realized: <span style='color:{r_color};font-weight:700;font-family:Courier New,monospace;'>"
+            f"{r_sign}₹{total_realized:,.0f}</span>"
+            f" · Avg/trade: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>"
+            f"{r_sign}₹{avg_gain:,.0f}</span>"
+            f"</div>"
+            f"</div>"
+        )
+        st.markdown(stats_html, unsafe_allow_html=True)
+
+        # Individual closed trades (most recent first)
+        for t in reversed(closed_trades):
+            pnl = t.get("realized_pnl", 0)
+            pct = t.get("realized_pct", 0)
+            pnl_color = "#22c55e" if pnl >= 0 else "#ef4444"
+            pnl_sign = "+" if pnl >= 0 else ""
+            result_label = t.get("result", "")
+            result_color = "#22c55e" if result_label == "WIN" else "#ef4444"
+
+            closed_html = (
+                f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
+                f"border:1px solid #334155;margin-bottom:6px;'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
+                f"<div style='font-size:14px;font-weight:600;color:#e2e8f0;'>{t.get('stock', '')}</div>"
+                f"<span style='font-size:10px;font-weight:700;color:{result_color};"
+                f"background:{result_color}22;padding:2px 6px;border-radius:4px;'>{result_label}</span>"
+                f"</div>"
+                f"<div style='display:flex;justify-content:space-between;margin-top:6px;font-size:12px;'>"
+                f"<div style='color:#94a3b8;'>Entry: <span style='color:#e2e8f0;"
+                f"font-family:Courier New,monospace;'>₹{t.get('entry', 0):,.0f}</span></div>"
+                f"<div style='color:#94a3b8;'>Exit: <span style='color:#e2e8f0;"
+                f"font-family:Courier New,monospace;'>₹{t.get('exit_price', 0):,.0f}</span></div>"
+                f"<div style='color:{pnl_color};font-family:Courier New,monospace;"
+                f"font-weight:700;'>{pnl_sign}₹{pnl:,.0f} ({pnl_sign}{pct}%)</div>"
+                f"</div>"
+                f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
+                f"<div style='color:#64748b;'>{t.get('buy_date', '')} → {t.get('sell_date', '')}</div>"
+                f"<div style='color:#64748b;'>{t.get('holding_days', 0)}d · {t.get('exit_reason', '')}</div>"
+                f"</div>"
+                f"</div>"
+            )
+            st.markdown(closed_html, unsafe_allow_html=True)
 
     # --- ENGINE C PLACEHOLDER ---
     st.markdown("<div class='section-title'>Engine C — Long-Term Compounders</div>", unsafe_allow_html=True)
