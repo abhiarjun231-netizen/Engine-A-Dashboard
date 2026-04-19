@@ -1,6 +1,7 @@
 """
-test_angel.py - Engine A Live Data Fetcher v9
-NEW in v9: Fetches LTP even on weekends/holidays (last traded price).
+test_angel.py - Engine A Live Data Fetcher v10
+NEW in v10: Updates peak prices in engine_b_stocks.json for trailing stop tracking.
+v9: Fetches LTP even on weekends/holidays (last traded price).
 Only skips historical store on non-market days.
 """
 import os
@@ -16,7 +17,7 @@ from pathlib import Path
 from SmartApi import SmartConnect
 
 print("=" * 50)
-print("ENGINE A - LIVE DATA FETCHER v9")
+print("ENGINE A - LIVE DATA FETCHER v10")
 print("=" * 50)
 
 # ============================================================
@@ -288,6 +289,57 @@ if stock_data:
         writer.writerows(stock_results)
     
     print(f"Engine B prices saved: {len(stock_results)} stocks")
+
+    # ----------------------------------------------------------
+    # PEAK PRICE TRACKER (NEW in v10)
+    # Updates peak in engine_b_stocks.json for trailing stop calc
+    # ----------------------------------------------------------
+    print("\n--- PEAK PRICE TRACKER ---")
+    peaks_updated = 0
+
+    # Build a price lookup from fetched results
+    price_lookup = {}
+    for r in stock_results:
+        if r["price"] != "" and r["price"] is not None:
+            try:
+                price_lookup[r["ticker"]] = float(r["price"])
+            except:
+                pass
+
+    # Update peaks for engine_b positions
+    for s in stock_data.get("engine_b", []):
+        ticker = s.get("ticker", "")
+        current = price_lookup.get(ticker)
+        if current is None:
+            continue
+        old_peak = float(s.get("peak", s.get("entry", 0)))
+        if current > old_peak:
+            s["peak"] = round(current, 2)
+            trail_stop = round(current * 0.93, 2)
+            print(f"  {s.get('stock', ticker)}: peak {old_peak} -> {current} (trail stop: {trail_stop})")
+            peaks_updated += 1
+        else:
+            trail_stop = round(old_peak * 0.93, 2)
+            print(f"  {s.get('stock', ticker)}: peak {old_peak} unchanged (trail stop: {trail_stop})")
+
+    # Update peaks for engine_c positions (same logic)
+    for s in stock_data.get("engine_c", []):
+        ticker = s.get("ticker", "")
+        current = price_lookup.get(ticker)
+        if current is None:
+            continue
+        old_peak = float(s.get("peak", s.get("entry", 0)))
+        if current > old_peak:
+            s["peak"] = round(current, 2)
+            print(f"  {s.get('stock', ticker)}: peak {old_peak} -> {current}")
+            peaks_updated += 1
+
+    if peaks_updated > 0:
+        save_engine_b_stocks(stock_data)
+        print(f"Peaks updated: {peaks_updated} stocks")
+    else:
+        print("No peaks updated (all at or below stored peak)")
+
 else:
     print("No Engine B stocks configured")
 
