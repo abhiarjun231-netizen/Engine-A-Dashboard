@@ -139,6 +139,9 @@ def parse_trendlyne_file(uploaded_file):
         col_mcap = find_column(df, ["Market Cap"])
         col_sma200 = find_column(df, ["Day SMA200", "Day SMA 200", "SMA200"])
         col_sector = find_column(df, ["Sector", "Industry", "Trendlyne Sector"])
+        col_result = find_column(df, ["Latest Financial Result"])
+        col_rev_qoq = find_column(df, ["Revenue QoQ Growth %"])
+        col_profit_qoq = find_column(df, ["Net Profit QoQ Growth %"])
 
         if not col_stock or not col_ticker:
             st.error("Could not find 'Stock' or 'NSE Code' columns in file.")
@@ -156,6 +159,9 @@ def parse_trendlyne_file(uploaded_file):
                 "mcap": float(row.get(col_mcap, 0)) if col_mcap else 0,
                 "sma200": float(row.get(col_sma200, 0)) if col_sma200 else 0,
                 "sector": str(row.get(col_sector, "")).strip() if col_sector else "",
+                "result_date": str(row.get(col_result, "")).strip() if col_result else "",
+                "rev_qoq": float(row.get(col_rev_qoq, 0)) if col_rev_qoq else 0,
+                "profit_qoq": float(row.get(col_profit_qoq, 0)) if col_profit_qoq else 0,
             })
         return stocks
     except Exception as e:
@@ -265,6 +271,12 @@ def calc_conviction(stock):
         elif pct < 20:
             score += 1
         # >20% = stretched, no points
+    # Profit acceleration
+    profit_qoq = stock.get("profit_qoq", 0)
+    if profit_qoq > 50:
+        score += 2
+    elif profit_qoq > 15:
+        score += 1
     return min(score, 10)
 
 # ============================================================
@@ -307,6 +319,19 @@ def render_qualifier(stock, source_label, source_color, is_holding):
     sector = stock.get('sector', '')
     sector_str = f" · {sector}" if sector else ""
 
+    # Growth data
+    rev_qoq = stock.get('rev_qoq', 0)
+    profit_qoq = stock.get('profit_qoq', 0)
+    rev_color = "#22c55e" if rev_qoq > 0 else "#ef4444" if rev_qoq < 0 else "#64748b"
+    prof_color = "#22c55e" if profit_qoq > 0 else "#ef4444" if profit_qoq < 0 else "#64748b"
+    rev_sign = "+" if rev_qoq > 0 else ""
+    prof_sign = "+" if profit_qoq > 0 else ""
+    result_date = stock.get('result_date', '')
+    if result_date:
+        result_str = result_date[:10]
+    else:
+        result_str = ""
+
     card_html = (
         f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
         f"border:1px solid #334155;margin-bottom:6px;'>"
@@ -327,6 +352,11 @@ def render_qualifier(stock, source_label, source_color, is_holding):
         f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
         f"<div style='color:#64748b;'>MCap: <span style='color:#94a3b8;'>{mcap_str}</span>{sector_str}</div>"
         f"<div style='color:#64748b;'>vs 200DMA: <span style='color:{dma_color};font-weight:600;'>{dma_str}</span></div>"
+        f"</div>"
+        f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
+        f"<div style='color:#64748b;'>Rev: <span style='color:{rev_color};'>{rev_sign}{rev_qoq:.1f}%</span>"
+        f" · Profit: <span style='color:{prof_color};'>{prof_sign}{profit_qoq:.1f}%</span></div>"
+        f"<div style='color:#64748b;'>Results: <span style='color:#94a3b8;'>{result_str}</span></div>"
         f"</div>"
         f"</div>"
     )
