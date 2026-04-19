@@ -93,7 +93,27 @@
       "token": "13786",
       "symbol": "TORNTPOWER-EQ",
       "name": "TORNTPOWER"
+    },
+    "VEDL": {
+      "token": "3063",
+      "symbol": "VEDL-EQ",
+      "name": "VEDL"
+    },
+    "FORCEMOT": {
+      "token": "11573",
+      "symbol": "FORCEMOT-EQ",
+      "name": "FORCEMOT"
+    },
+    "J&KBANK": {
+      "token": "5633",
+      "symbol": "J&KBANK-EQ",
+      "name": "J&KBANK"
+    },
+    "JINDALSAW": {
+      "token": "3024",
+      "symbol": "JINDALSAW-EQ",
+      "name": "JINDALSAW"
     }
   },
-  "_last_token_update": "2026-04-18"
+  "_last_token_update": "2026-04-19"
 }
