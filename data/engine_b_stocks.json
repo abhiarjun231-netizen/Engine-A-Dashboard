@@ -196,6 +196,17 @@
       "buy_date": "2026-04-20",
       "de": 0.01,
       "peg": 0.59
+    },
+    {
+      "stock": "Premier Energies",
+      "ticker": "PREMIERENE",
+      "entry": 1010.75,
+      "qty": 15,
+      "peak": 1010.75,
+      "source": "C1",
+      "buy_date": "2026-04-20",
+      "de": 0.67,
+      "peg": 0.46
     }
   ],
   "_token_cache": {
@@ -1008,7 +1019,7 @@
       "peg": 0.46,
       "profit_yoy": 305.05,
       "source": "C1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Viceroy Hotels",
