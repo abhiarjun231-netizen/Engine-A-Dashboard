@@ -64,7 +64,19 @@
       "buy_date": "2026-04-20"
     }
   ],
-  "engine_c": [],
+  "engine_c": [
+    {
+      "stock": "GE Power",
+      "ticker": "GVPIL",
+      "entry": 497.6,
+      "qty": 20,
+      "peak": 497.6,
+      "source": "Double",
+      "buy_date": "2026-04-20",
+      "de": 0.0,
+      "peg": 0.03
+    }
+  ],
   "_token_cache": {
     "HINDZINC": {
       "token": "1424",
@@ -799,7 +811,7 @@
       "peg": 0.03,
       "profit_yoy": 218.48,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Swaraj Engines",
