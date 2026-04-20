@@ -1,15 +1,5 @@
 {
-  "engine_b": [
-    {
-      "stock": "Jindal Saw",
-      "ticker": "JINDALSAW",
-      "entry": 236.28,
-      "qty": 1,
-      "peak": 240.85,
-      "source": "B1",
-      "buy_date": "2026-04-19"
-    }
-  ],
+  "engine_b": [],
   "engine_c": [],
   "_token_cache": {
     "HINDZINC": {
@@ -950,6 +940,20 @@
       "realized_pct": -0.02,
       "exit_reason": "Manual Exit",
       "result": "LOSS"
+    },
+    {
+      "stock": "Jindal Saw",
+      "ticker": "JINDALSAW",
+      "entry": 236.28,
+      "exit_price": 240.18,
+      "qty": 1,
+      "buy_date": "2026-04-19",
+      "sell_date": "2026-04-20",
+      "holding_days": 1,
+      "realized_pnl": 3.9,
+      "realized_pct": 1.65,
+      "exit_reason": "Manual Exit",
+      "result": "WIN"
     }
   ]
 }
