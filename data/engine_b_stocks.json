@@ -8,6 +8,15 @@
       "peak": 4036.2,
       "source": "Double",
       "buy_date": "2026-04-20"
+    },
+    {
+      "stock": "Swaraj Engines",
+      "ticker": "SWARAJENG",
+      "entry": 4036.2,
+      "qty": 2,
+      "peak": 4036.2,
+      "source": "Double",
+      "buy_date": "2026-04-20"
     }
   ],
   "engine_c": [],
