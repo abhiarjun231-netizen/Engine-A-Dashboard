@@ -1,12 +1,13 @@
 """
 App.py - Dashboard Router
-Tabs: Engine A | Engine B & C
+Tabs: Engine A | Engine B | Engine C
 Each engine lives in its own file.
 """
 
 import streamlit as st
 from engine_a_ui import show_engine_a
 from engine_b_ui import show_engine_b
+from engine_c_ui import show_engine_c
 
 # ============================================================
 # PAGE CONFIG
@@ -92,7 +93,7 @@ st.markdown("""
 # ============================================================
 # TABS
 # ============================================================
-tab1, tab2 = st.tabs(["Engine A", "Engine B & C"])
+tab1, tab2, tab3 = st.tabs(["Engine A", "Engine B", "Engine C"])
 
 with tab1:
     show_engine_a()
@@ -100,5 +101,8 @@ with tab1:
 with tab2:
     show_engine_b()
 
+with tab3:
+    show_engine_c()
+
 # FOOTER
-st.markdown("<div style='text-align:center; margin-top:24px; color:#64748b; font-size:11px'>Investment Dashboard v2.0 · Live data</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center; margin-top:24px; color:#64748b; font-size:11px'>Investment Dashboard v3.0 · Live data</div>", unsafe_allow_html=True)
