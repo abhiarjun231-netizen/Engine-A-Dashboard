@@ -424,8 +424,12 @@ def show_engine_c():
             if current_price != "" and current_price is not None:
                 try:
                     cp = float(current_price)
-                    total_current += cp * qty
-                    total_pnl += (cp - entry) * qty
+                    import math
+                    if math.isnan(cp):
+                        all_have_prices = False
+                    else:
+                        total_current += cp * qty
+                        total_pnl += (cp - entry) * qty
                 except:
                     all_have_prices = False
             else:
@@ -522,9 +526,31 @@ def show_engine_c():
         eq_pct = float(score_data.get("equity_pct", 55))
         b_pct = float(score_data.get("engine_b_pct", 25))
         c_pct = float(score_data.get("engine_c_pct", 30))
+
+        # Load saved capital from JSON
+        saved_capital = 100000
+        if STOCKS_FILE.exists():
+            with open(STOCKS_FILE, "r") as f:
+                _cap_data = json.load(f)
+            saved_capital = int(_cap_data.get("_capital", 100000))
+
         with st.expander("Position Sizer", expanded=False):
-            capital = st.number_input("Total Capital (₹)", min_value=10000,
-                                       value=100000, step=10000, key="c_capital_input")
+            cap_col1, cap_col2 = st.columns([3, 1])
+            with cap_col1:
+                capital = st.number_input("Total Capital (₹)", min_value=10000,
+                                           value=saved_capital, step=10000, key="c_capital_input")
+            with cap_col2:
+                st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+                if st.button("Save", key="c_save_capital"):
+                    token = get_github_token()
+                    if token:
+                        file_data, sha = get_file_from_github(token)
+                        if file_data:
+                            file_data["_capital"] = capital
+                            if save_file_to_github(token, file_data, sha, f"Update capital to {capital}"):
+                                st.success(f"Capital saved: ₹{capital:,.0f}")
+                                st.rerun()
+
             engine_c_budget = round(capital * c_pct / 100)
             max_per_stock = round(capital * 0.07)
             slots = len(positions) if positions else 0
