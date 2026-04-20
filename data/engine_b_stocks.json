@@ -8,6 +8,15 @@
       "peak": 908.75,
       "source": "Double",
       "buy_date": "2026-04-20"
+    },
+    {
+      "stock": "GE Power",
+      "ticker": "GVPIL",
+      "entry": 497.6,
+      "qty": 15,
+      "peak": 497.6,
+      "source": "Double",
+      "buy_date": "2026-04-20"
     }
   ],
   "engine_c": [],
@@ -266,7 +275,7 @@
       "rev_qoq": 37.47,
       "profit_qoq": 123.49,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Uniroyal Marine Exports",
