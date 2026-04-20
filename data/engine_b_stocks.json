@@ -53,6 +53,15 @@
       "peak": 571.1,
       "source": "Double",
       "buy_date": "2026-04-20"
+    },
+    {
+      "stock": "TVS Holdings",
+      "ticker": "TVSHLTD",
+      "entry": 14491.0,
+      "qty": 1,
+      "peak": 14491.0,
+      "source": "B1",
+      "buy_date": "2026-04-20"
     }
   ],
   "engine_c": [],
@@ -439,7 +448,7 @@
       "rev_qoq": 4.99,
       "profit_qoq": 11.36,
       "source": "B1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Pokarna",
