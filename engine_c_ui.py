@@ -490,6 +490,33 @@ def show_engine_c():
         )
         st.markdown(summary_html, unsafe_allow_html=True)
 
+    # --- POSITION SIZER ---
+    if score_data and positions:
+        eq_pct = float(score_data.get("equity_pct", 55))
+        b_pct = float(score_data.get("engine_b_pct", 25))
+        c_pct = float(score_data.get("engine_c_pct", 30))
+        with st.expander("Position Sizer", expanded=False):
+            capital = st.number_input("Total Capital (₹)", min_value=10000,
+                                       value=100000, step=10000, key="c_capital_input")
+            engine_c_budget = round(capital * c_pct / 100)
+            max_per_stock = round(capital * 0.07)
+            slots = len(positions)
+            per_stock = round(engine_c_budget / max(slots, 1))
+            per_stock_capped = min(per_stock, max_per_stock)
+
+            sizer_html = (
+                f"<div style='font-size:12px;color:#94a3b8;line-height:1.8;'>"
+                f"Equity: {eq_pct:.0f}% · Engine B: {b_pct:.0f}% · Engine C: {c_pct:.0f}%<br>"
+                f"Engine C budget: <span style='color:#e2e8f0;font-weight:700;'>"
+                f"₹{engine_c_budget:,.0f}</span><br>"
+                f"Active positions: {slots}/15<br>"
+                f"Per stock: <span style='color:#e2e8f0;font-weight:700;'>"
+                f"₹{per_stock_capped:,.0f}</span>"
+                f" (max 7%: ₹{max_per_stock:,.0f})"
+                f"</div>"
+            )
+            st.markdown(sizer_html, unsafe_allow_html=True)
+
     # --- WATCHLIST ---
     st.markdown("<div class='section-title'>Screener Watchlist</div>", unsafe_allow_html=True)
 

@@ -537,11 +537,12 @@ def show_engine_b():
     # --- POSITION SIZER ---
     if score_data and positions:
         eq_pct = float(score_data.get("equity_pct", 55))
-        b_share = float(score_data.get("engine_b_share", 45))
+        b_pct = float(score_data.get("engine_b_pct", 25))
+        c_pct = float(score_data.get("engine_c_pct", 30))
         with st.expander("Position Sizer", expanded=False):
             capital = st.number_input("Total Capital (₹)", min_value=10000,
                                        value=100000, step=10000, key="capital_input")
-            engine_b_budget = round(capital * (eq_pct / 100) * (b_share / 100))
+            engine_b_budget = round(capital * b_pct / 100)
             max_per_stock = round(capital * 0.07)
             slots = len(positions)
             per_stock = round(engine_b_budget / max(slots, 1))
@@ -549,7 +550,7 @@ def show_engine_b():
 
             sizer_html = (
                 f"<div style='font-size:12px;color:#94a3b8;line-height:1.8;'>"
-                f"Equity: {eq_pct:.0f}% · Engine B share: {b_share:.0f}%<br>"
+                f"Equity: {eq_pct:.0f}% · Engine B: {b_pct:.0f}% · Engine C: {c_pct:.0f}%<br>"
                 f"Engine B budget: <span style='color:#e2e8f0;font-weight:700;'>"
                 f"₹{engine_b_budget:,.0f}</span><br>"
                 f"Active positions: {slots}/15<br>"
