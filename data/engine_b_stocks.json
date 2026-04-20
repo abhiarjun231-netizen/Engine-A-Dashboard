@@ -163,6 +163,17 @@
       "buy_date": "2026-04-20",
       "de": 0.06,
       "peg": -4.07
+    },
+    {
+      "stock": "GE T&D",
+      "ticker": "GVT&D",
+      "entry": 4232.3,
+      "qty": 5,
+      "peak": 4232.3,
+      "source": "C1",
+      "buy_date": "2026-04-20",
+      "de": 0.0,
+      "peg": 0.85
     }
   ],
   "_token_cache": {
@@ -937,7 +948,7 @@
       "peg": 0.85,
       "profit_yoy": 236.0,
       "source": "C1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Arrow Greentech",
