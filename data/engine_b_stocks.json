@@ -936,6 +936,20 @@
       "realized_pct": -0.02,
       "exit_reason": "Manual Exit",
       "result": "LOSS"
+    },
+    {
+      "stock": "Jammu & Kashmir Bank",
+      "ticker": "J&KBANK",
+      "entry": 131.25,
+      "exit_price": 131.23,
+      "qty": 1,
+      "buy_date": "2026-04-19",
+      "sell_date": "2026-04-20",
+      "holding_days": 1,
+      "realized_pnl": -0.02,
+      "realized_pct": -0.02,
+      "exit_reason": "Manual Exit",
+      "result": "LOSS"
     }
   ]
 }
