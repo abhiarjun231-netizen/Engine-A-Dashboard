@@ -535,7 +535,7 @@ def show_engine_b():
         st.markdown(summary_html, unsafe_allow_html=True)
 
     # --- POSITION SIZER ---
-    if score_data and positions:
+    if score_data:
         eq_pct = float(score_data.get("equity_pct", 55))
         b_pct = float(score_data.get("engine_b_pct", 25))
         c_pct = float(score_data.get("engine_c_pct", 30))
