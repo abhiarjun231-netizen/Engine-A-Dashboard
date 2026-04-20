@@ -25,14 +25,14 @@
       "ticker": "ENGINERSIN",
       "qty": 24,
       "entry": 206.0,
-      "peak": 243.25
+      "peak": 246.85
     },
     {
       "stock": "Torrent Power",
       "ticker": "TORNTPOWER",
       "qty": 3,
       "entry": 1448.0,
-      "peak": 1598.5
+      "peak": 1630.6
     },
     {
       "stock": "Vedanta",
@@ -57,7 +57,7 @@
       "ticker": "J&KBANK",
       "entry": 131.25,
       "qty": 1,
-      "peak": 132.5,
+      "peak": 132.96,
       "source": "B1",
       "buy_date": "2026-04-19"
     },
@@ -66,7 +66,7 @@
       "ticker": "JINDALSAW",
       "entry": 236.28,
       "qty": 1,
-      "peak": 237.51,
+      "peak": 240.21,
       "source": "B1",
       "buy_date": "2026-04-19"
     }
