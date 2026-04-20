@@ -1,13 +1,6 @@
 {
   "engine_b": [
     {
-      "stock": "Hindustan Zinc",
-      "ticker": "HINDZINC",
-      "qty": 8,
-      "entry": 559.0,
-      "peak": 592.3
-    },
-    {
       "stock": "National Aluminium",
       "ticker": "NATIONALUM",
       "qty": 12,
@@ -893,6 +886,20 @@
       "realized_pct": -7.32,
       "exit_reason": "Stop Hit (-7%)",
       "result": "LOSS"
+    },
+    {
+      "stock": "Hindustan Zinc",
+      "ticker": "HINDZINC",
+      "entry": 559.0,
+      "exit_price": 590.3,
+      "qty": 8,
+      "buy_date": "",
+      "sell_date": "2026-04-20",
+      "holding_days": 0,
+      "realized_pnl": 250.4,
+      "realized_pct": 5.6,
+      "exit_reason": "Manual Exit",
+      "result": "WIN"
     }
   ]
 }
