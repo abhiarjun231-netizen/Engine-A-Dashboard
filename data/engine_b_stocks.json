@@ -218,6 +218,17 @@
       "buy_date": "2026-04-20",
       "de": 0.0,
       "peg": 0.94
+    },
+    {
+      "stock": "BSE",
+      "ticker": "BSE",
+      "entry": 3470.7,
+      "qty": 5,
+      "peak": 3470.7,
+      "source": "C1",
+      "buy_date": "2026-04-20",
+      "de": 0.0,
+      "peg": 0.48
     }
   ],
   "_token_cache": {
@@ -1087,7 +1098,7 @@
       "peg": 0.48,
       "profit_yoy": 70.34,
       "source": "C1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Multi Commodity Exchange",
