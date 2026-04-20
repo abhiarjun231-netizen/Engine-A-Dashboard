@@ -490,8 +490,8 @@ def show_engine_c():
         )
         st.markdown(summary_html, unsafe_allow_html=True)
 
-    # --- POSITION SIZER ---
-    if score_data and positions:
+    # --- POSITION SIZER (always visible) ---
+    if score_data:
         eq_pct = float(score_data.get("equity_pct", 55))
         b_pct = float(score_data.get("engine_b_pct", 25))
         c_pct = float(score_data.get("engine_c_pct", 30))
@@ -500,7 +500,7 @@ def show_engine_c():
                                        value=100000, step=10000, key="c_capital_input")
             engine_c_budget = round(capital * c_pct / 100)
             max_per_stock = round(capital * 0.07)
-            slots = len(positions)
+            slots = len(positions) if positions else 0
             per_stock = round(engine_c_budget / max(slots, 1))
             per_stock_capped = min(per_stock, max_per_stock)
 
