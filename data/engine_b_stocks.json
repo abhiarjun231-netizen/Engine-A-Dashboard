@@ -1,5 +1,15 @@
 {
-  "engine_b": [],
+  "engine_b": [
+    {
+      "stock": "Swaraj Engines",
+      "ticker": "SWARAJENG",
+      "entry": 4036.2,
+      "qty": 2,
+      "peak": 4036.2,
+      "source": "Double",
+      "buy_date": "2026-04-20"
+    }
+  ],
   "engine_c": [],
   "_token_cache": {
     "HINDZINC": {
@@ -128,7 +138,7 @@
       "rev_qoq": 15.34,
       "profit_qoq": 29.6,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Vedanta",
