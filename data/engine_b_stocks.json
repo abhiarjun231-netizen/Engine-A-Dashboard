@@ -1,24 +1,5 @@
 {
-  "engine_b": [
-    {
-      "stock": "Swaraj Engines",
-      "ticker": "SWARAJENG",
-      "entry": 4036.2,
-      "qty": 2,
-      "peak": 4036.2,
-      "source": "Double",
-      "buy_date": "2026-04-20"
-    },
-    {
-      "stock": "Swaraj Engines",
-      "ticker": "SWARAJENG",
-      "entry": 4036.2,
-      "qty": 2,
-      "peak": 4036.2,
-      "source": "Double",
-      "buy_date": "2026-04-20"
-    }
-  ],
+  "engine_b": [],
   "engine_c": [],
   "_token_cache": {
     "HINDZINC": {
@@ -1613,6 +1594,20 @@
       "holding_days": 1,
       "realized_pnl": 3.9,
       "realized_pct": 1.65,
+      "exit_reason": "Manual Exit",
+      "result": "WIN"
+    },
+    {
+      "stock": "Swaraj Engines",
+      "ticker": "SWARAJENG",
+      "entry": 4036.2,
+      "exit_price": 4036.2,
+      "qty": 2,
+      "buy_date": "2026-04-20",
+      "sell_date": "2026-04-20",
+      "holding_days": 0,
+      "realized_pnl": 0.0,
+      "realized_pct": 0.0,
       "exit_reason": "Manual Exit",
       "result": "WIN"
     }
