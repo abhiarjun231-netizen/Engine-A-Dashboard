@@ -8,6 +8,7 @@ import pandas as pd
 import json
 import base64
 import requests
+import io
 from pathlib import Path
 
 # ============================================================
@@ -872,6 +873,45 @@ def show_engine_b():
             f"</div>"
         )
         st.markdown(stats_html, unsafe_allow_html=True)
+
+        # --- DOWNLOAD TRADE LOG AS EXCEL ---
+        trade_df = pd.DataFrame(closed_trades)
+        col_order = ["stock", "ticker", "entry", "exit_price", "qty",
+                     "buy_date", "sell_date", "holding_days",
+                     "realized_pnl", "realized_pct", "exit_reason", "result"]
+        col_order = [c for c in col_order if c in trade_df.columns]
+        trade_df = trade_df[col_order]
+        col_rename = {
+            "stock": "Stock", "ticker": "NSE Code", "entry": "Entry ₹",
+            "exit_price": "Exit ₹", "qty": "Qty", "buy_date": "Buy Date",
+            "sell_date": "Sell Date", "holding_days": "Days Held",
+            "realized_pnl": "P&L ₹", "realized_pct": "P&L %",
+            "exit_reason": "Exit Reason", "result": "Result"
+        }
+        trade_df.rename(columns=col_rename, inplace=True)
+
+        stats_df = pd.DataFrame([{
+            "Total Trades": total_trades,
+            "Wins": wins,
+            "Losses": losses,
+            "Win Rate %": win_rate,
+            "Total Realized ₹": total_realized,
+            "Avg per Trade ₹": avg_gain,
+        }])
+
+        buf = io.BytesIO()
+        with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+            stats_df.to_excel(writer, sheet_name="Trade Stats", index=False)
+            trade_df.to_excel(writer, sheet_name="Trade Log", index=False)
+        buf.seek(0)
+
+        st.download_button(
+            label="📥 Download Trade Log (Excel)",
+            data=buf,
+            file_name="Engine_B_Trade_Log.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            key="download_trade_log"
+        )
 
         # Individual closed trades (most recent first)
         for t in reversed(closed_trades):
