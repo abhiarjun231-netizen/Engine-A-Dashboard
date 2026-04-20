@@ -97,6 +97,17 @@
       "buy_date": "2026-04-20",
       "de": 0.07,
       "peg": -0.52
+    },
+    {
+      "stock": "National Aluminium",
+      "ticker": "NATIONALUM",
+      "entry": 426.65,
+      "qty": 30,
+      "peak": 426.65,
+      "source": "Double",
+      "buy_date": "2026-04-20",
+      "de": 0.01,
+      "peg": 0.28
     }
   ],
   "_token_cache": {
@@ -1004,7 +1015,7 @@
       "peg": 0.28,
       "profit_yoy": 164.93,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Force Motors",
