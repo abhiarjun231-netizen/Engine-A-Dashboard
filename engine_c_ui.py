@@ -73,6 +73,24 @@ def load_positions():
             return json.load(f).get("engine_c", [])
     return []
 
+def load_stock_analysis():
+    """Load stock analysis data (volume, 52W, 60D/90D trends)."""
+    analysis_file = Path("data/stock_analysis.csv")
+    if not analysis_file.exists():
+        return {}
+    df = pd.read_csv(analysis_file)
+    result = {}
+    for _, row in df.iterrows():
+        result[row["ticker"]] = {
+            "vol_ratio": float(row.get("vol_ratio", 0)),
+            "high_52w": float(row.get("high_52w", 0)),
+            "low_52w": float(row.get("low_52w", 0)),
+            "pct_52w": float(row.get("pct_52w", 50)),
+            "change_60d": float(row.get("change_60d", 0)),
+            "change_90d": float(row.get("change_90d", 0)),
+        }
+    return result
+
 # ============================================================
 # GATE STATUS
 # ============================================================
@@ -183,34 +201,38 @@ def combine_screeners(c1_stocks, c2_stocks):
 # ============================================================
 # CONVICTION SCORE (Engine C — growth + quality weighted)
 # ============================================================
-def calc_conviction(stock):
+def calc_conviction(stock, analysis=None):
     score = 0
     if stock.get("source") == "Double":
-        score += 3
+        score += 2
     else:
         score += 1
     pio = stock.get("piotroski", 0)
     if pio >= 9: score += 2
     elif pio >= 8: score += 1
     roe = stock.get("roe", 0)
-    if roe > 25: score += 2
+    if roe > 25: score += 1
     elif roe > 15: score += 1
     # D/E low = strong balance sheet
     de = stock.get("de", 99)
-    if de < 0.3: score += 2
+    if de < 0.3: score += 1
     elif de < 0.7: score += 1
     # Profit growth
     profit_qoq = stock.get("profit_qoq", 0)
     profit_yoy = stock.get("profit_yoy", 0)
     profit_val = profit_qoq if profit_qoq != 0 else profit_yoy
-    if profit_val > 30: score += 2
-    elif profit_val > 10: score += 1
-    # Entry timing
-    ltp = stock.get("ltp", 0)
-    sma = stock.get("sma200", 0)
-    if sma > 0 and ltp > 0:
-        pct = (ltp - sma) / sma * 100
-        if pct < 10: score += 1
+    if profit_val > 30: score += 1
+    # --- NEW: 52W range (buying cheap = high conviction for C) ---
+    if analysis:
+        pct_52w = analysis.get("pct_52w", 50)
+        if pct_52w < 40:
+            score += 2
+        elif pct_52w < 60:
+            score += 1
+        # 90D trend (recovering = good for long-term hold)
+        chg_90 = analysis.get("change_90d", 0)
+        if chg_90 > 10:
+            score += 1
     return min(score, 10)
 
 # ============================================================
@@ -266,7 +288,7 @@ def render_position(stock_name, entry, qty, peak, current_price, de_val, peg_val
 # ============================================================
 # QUALIFIER CARD (Engine C)
 # ============================================================
-def render_qualifier(stock, source_label, source_color, is_holding, live_price=None):
+def render_qualifier(stock, source_label, source_color, is_holding, live_price=None, analysis=None):
     status_label = "HOLDING" if is_holding else "NEW"
     status_color = "#38bdf8" if is_holding else "#22c55e"
     ltp = stock.get('ltp', 0)
@@ -282,7 +304,7 @@ def render_qualifier(stock, source_label, source_color, is_holding, live_price=N
     if mcap >= 100000: mcap_str = f"₹{mcap/100000:.0f}L Cr"
     elif mcap >= 1000: mcap_str = f"₹{mcap/1000:.0f}K Cr"
     else: mcap_str = f"₹{mcap:,.0f} Cr"
-    conv = calc_conviction(stock)
+    conv = calc_conviction(stock, analysis)
     if conv >= 8: conv_color = "#22c55e"
     elif conv >= 5: conv_color = "#fbbf24"
     else: conv_color = "#94a3b8"
@@ -357,8 +379,30 @@ def render_qualifier(stock, source_label, source_color, is_holding, live_price=N
         f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
         f"<div style='color:#64748b;'>{profit_label}: <span style='color:{prof_color};'>{prof_sign}{profit_display:.1f}%</span></div>"
         f"</div>"
-        f"</div>"
     )
+
+    # Analysis row (Volume, 52W, 60D, 90D)
+    if analysis:
+        vol = analysis.get("vol_ratio", 0)
+        vol_color = "#22c55e" if vol >= 2.0 else "#fbbf24" if vol >= 1.5 else "#94a3b8"
+        pct_52 = analysis.get("pct_52w", 50)
+        c52_color = "#22c55e" if pct_52 < 40 else "#f59e0b" if pct_52 > 80 else "#94a3b8"
+        chg60 = analysis.get("change_60d", 0)
+        c60_sign = "+" if chg60 >= 0 else ""
+        c60_color = "#22c55e" if chg60 > 0 else "#ef4444" if chg60 < 0 else "#94a3b8"
+        chg90 = analysis.get("change_90d", 0)
+        c90_sign = "+" if chg90 >= 0 else ""
+        c90_color = "#22c55e" if chg90 > 0 else "#ef4444" if chg90 < 0 else "#94a3b8"
+        card_html += (
+            f"<div style='display:flex;justify-content:space-between;margin-top:4px;"
+            f"padding-top:4px;border-top:1px solid #293548;font-size:11px;'>"
+            f"<div style='color:#64748b;'>Vol: <span style='color:{vol_color};font-weight:600;'>{vol:.1f}x</span></div>"
+            f"<div style='color:#64748b;'>52W: <span style='color:{c52_color};font-weight:600;'>{pct_52:.0f}%</span></div>"
+            f"<div style='color:#64748b;'>60D: <span style='color:{c60_color};font-weight:600;'>{c60_sign}{chg60:.1f}%</span></div>"
+            f"<div style='color:#64748b;'>90D: <span style='color:{c90_color};font-weight:600;'>{c90_sign}{chg90:.1f}%</span></div>"
+            f"</div>")
+
+    card_html += "</div>"
     st.markdown(card_html, unsafe_allow_html=True)
 
 # ============================================================
@@ -392,6 +436,7 @@ def show_engine_c():
 
     # --- LIVE PRICES ---
     live_prices = load_stock_prices()
+    stock_analysis = load_stock_analysis()
 
     # --- ACTIVE POSITIONS ---
     st.markdown("<div class='section-title'>Engine C — Active Positions</div>", unsafe_allow_html=True)
@@ -672,7 +717,11 @@ def show_engine_c():
                 except:
                     pass
 
-            render_qualifier(stock, source_label, source_color, is_holding, live_price=_wl_live_price)
+            # Look up analysis data
+            _wl_analysis = stock_analysis.get(stock.get("ticker", ""), None)
+
+            render_qualifier(stock, source_label, source_color, is_holding,
+                           live_price=_wl_live_price, analysis=_wl_analysis)
 
             if not is_holding and gate_status == "ACTIVE":
                 ticker_key = stock.get("ticker", "")
