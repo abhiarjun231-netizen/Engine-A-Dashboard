@@ -5,3 +5,4 @@ requests
 pandas
 smartapi-python
 pyotp
+openpyxl
