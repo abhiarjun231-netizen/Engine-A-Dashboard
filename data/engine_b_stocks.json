@@ -8,12 +8,6 @@
       "peak": 592.3
     },
     {
-      "stock": "Indus Towers",
-      "ticker": "INDUSTOWER",
-      "qty": 11,
-      "entry": 441.0
-    },
-    {
       "stock": "National Aluminium",
       "ticker": "NATIONALUM",
       "qty": 12,
@@ -884,5 +878,21 @@
       "action": "REVIEW"
     }
   ],
-  "_c_watchlist_date": "2026-04-20 03:44"
+  "_c_watchlist_date": "2026-04-20 03:44",
+  "engine_b_closed": [
+    {
+      "stock": "Indus Towers",
+      "ticker": "INDUSTOWER",
+      "entry": 441.0,
+      "exit_price": 408.7,
+      "qty": 11,
+      "buy_date": "",
+      "sell_date": "2026-04-20",
+      "holding_days": 0,
+      "realized_pnl": -355.3,
+      "realized_pct": -7.32,
+      "exit_reason": "Stop Hit (-7%)",
+      "result": "LOSS"
+    }
+  ]
 }
