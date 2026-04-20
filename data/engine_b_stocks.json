@@ -141,6 +141,17 @@
       "buy_date": "2026-04-20",
       "de": 0.24,
       "peg": 0.57
+    },
+    {
+      "stock": "Kwality Pharma",
+      "ticker": "nan",
+      "entry": 1664.3,
+      "qty": 3,
+      "peak": 1664.3,
+      "source": "Double",
+      "buy_date": "2026-04-20",
+      "de": 0.43,
+      "peg": 0.34
     }
   ],
   "_token_cache": {
@@ -820,7 +831,7 @@
       "peg": 0.34,
       "profit_yoy": 67.44,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Sumeet Industries",
