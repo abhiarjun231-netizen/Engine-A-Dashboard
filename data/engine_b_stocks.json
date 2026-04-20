@@ -1,13 +1,6 @@
 {
   "engine_b": [
     {
-      "stock": "National Aluminium",
-      "ticker": "NATIONALUM",
-      "qty": 12,
-      "entry": 400.0,
-      "peak": 438.75
-    },
-    {
       "stock": "Engineers India",
       "ticker": "ENGINERSIN",
       "qty": 24,
@@ -898,6 +891,20 @@
       "holding_days": 0,
       "realized_pnl": 250.4,
       "realized_pct": 5.6,
+      "exit_reason": "Manual Exit",
+      "result": "WIN"
+    },
+    {
+      "stock": "National Aluminium",
+      "ticker": "NATIONALUM",
+      "entry": 400.0,
+      "exit_price": 426.65,
+      "qty": 12,
+      "buy_date": "",
+      "sell_date": "2026-04-20",
+      "holding_days": 0,
+      "realized_pnl": 319.8,
+      "realized_pct": 6.66,
       "exit_reason": "Manual Exit",
       "result": "WIN"
     }
