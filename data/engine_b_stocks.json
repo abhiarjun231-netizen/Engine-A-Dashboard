@@ -1,15 +1,6 @@
 {
   "engine_b": [
     {
-      "stock": "Vedanta",
-      "ticker": "VEDL",
-      "entry": 787.5,
-      "qty": 1,
-      "peak": 787.5,
-      "source": "B1",
-      "buy_date": "2026-04-19"
-    },
-    {
       "stock": "Force Motors",
       "ticker": "FORCEMOT",
       "entry": 22378.0,
@@ -921,6 +912,20 @@
       "realized_pct": 10.93,
       "exit_reason": "Manual Exit",
       "result": "WIN"
+    },
+    {
+      "stock": "Vedanta",
+      "ticker": "VEDL",
+      "entry": 787.5,
+      "exit_price": 771.0,
+      "qty": 1,
+      "buy_date": "2026-04-19",
+      "sell_date": "2026-04-20",
+      "holding_days": 1,
+      "realized_pnl": -16.5,
+      "realized_pct": -2.1,
+      "exit_reason": "Manual Exit",
+      "result": "LOSS"
     }
   ]
 }
