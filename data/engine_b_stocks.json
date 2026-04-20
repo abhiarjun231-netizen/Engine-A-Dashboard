@@ -35,6 +35,15 @@
       "peak": 508.9,
       "source": "Double",
       "buy_date": "2026-04-20"
+    },
+    {
+      "stock": "Pix Transmissions",
+      "ticker": "PIXTRANS",
+      "entry": 1523.3,
+      "qty": 4,
+      "peak": 1523.3,
+      "source": "Double",
+      "buy_date": "2026-04-20"
     }
   ],
   "engine_c": [],
@@ -581,7 +590,7 @@
       "rev_qoq": 8.96,
       "profit_qoq": 49.78,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Jammu & Kashmir Bank",
