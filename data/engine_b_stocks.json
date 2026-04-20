@@ -207,6 +207,17 @@
       "buy_date": "2026-04-20",
       "de": 0.67,
       "peg": 0.46
+    },
+    {
+      "stock": "Multi Commodity Exchange",
+      "ticker": "MCX",
+      "entry": 2859.1,
+      "qty": 5,
+      "peak": 2859.1,
+      "source": "C1",
+      "buy_date": "2026-04-20",
+      "de": 0.0,
+      "peg": 0.94
     }
   ],
   "_token_cache": {
@@ -1095,7 +1106,7 @@
       "peg": 0.94,
       "profit_yoy": 573.85,
       "source": "C1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "National Aluminium",
