@@ -440,7 +440,7 @@ def show_engine_b():
         total_pnl = 0
         all_have_prices = True
 
-        for p in positions:
+        for idx, p in enumerate(positions):
             entry = p.get("entry", 0)
             qty = p.get("qty", 0)
             stop = round(entry * 0.93, 2)
@@ -467,7 +467,7 @@ def show_engine_b():
             ticker_key = p.get("ticker", "")
             with st.expander(f"Sell {p['stock']}?", expanded=False):
                 exit_reasons = ["Stop Hit (-7%)", "Trailing Stop", "Filter Break", "Manual Exit"]
-                reason = st.selectbox("Exit Reason", exit_reasons, key=f"reason_{ticker_key}")
+                reason = st.selectbox("Exit Reason", exit_reasons, key=f"reason_{ticker_key}_{idx}")
                 if current_price != "" and current_price is not None:
                     try:
                         cp = float(current_price)
@@ -484,7 +484,7 @@ def show_engine_b():
                         cp = entry
                 else:
                     cp = entry
-                if st.button(f"Confirm Sell {p['stock']}", key=f"sell_{ticker_key}"):
+                if st.button(f"Confirm Sell {p['stock']}", key=f"sell_{ticker_key}_{idx}"):
                     token = get_github_token()
                     if not token:
                         st.error("GitHub token not found.")

@@ -411,7 +411,7 @@ def show_engine_c():
         total_pnl = 0
         all_have_prices = True
 
-        for p in positions:
+        for idx, p in enumerate(positions):
             entry = p.get("entry", 0)
             qty = p.get("qty", 0)
             peak = p.get("peak", entry)
@@ -441,7 +441,7 @@ def show_engine_c():
                               "PEG Breach (>2.5)", "D/E Breach (>1.5)",
                               "ROE Collapse (<10%)", "Price Review (-25%)",
                               "Hard Stop (-40%)", "Manual Exit"]
-                reason = st.selectbox("Exit Reason", exit_reasons, key=f"c_reason_{ticker_key}")
+                reason = st.selectbox("Exit Reason", exit_reasons, key=f"c_reason_{ticker_key}_{idx}")
                 if current_price != "" and current_price is not None:
                     try:
                         cp = float(current_price)
@@ -456,7 +456,7 @@ def show_engine_c():
                         cp = entry
                 else:
                     cp = entry
-                if st.button(f"Confirm Sell {p['stock']}", key=f"c_sell_{ticker_key}"):
+                if st.button(f"Confirm Sell {p['stock']}", key=f"c_sell_{ticker_key}_{idx}"):
                     token = get_github_token()
                     if token:
                         file_data, sha = get_file_from_github(token)
