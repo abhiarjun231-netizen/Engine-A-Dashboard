@@ -9,6 +9,7 @@ Reads:
 
 Writes:
   - data/engine_a_score.csv    (score + components + allocation)
+  - data/score_history.csv     (append-only score history for charts)
 
 Scoring logic mirrors Master_System_v2 Excel "Engine A Dashboard" sheet.
 Every function cites the Excel cell whose formula it implements.
@@ -20,7 +21,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 print("=" * 50)
-print("ENGINE A - SCORING ENGINE v1")
+print("ENGINE A - SCORING ENGINE v1.1")
 print("=" * 50)
 
 # ============================================================
@@ -28,7 +29,6 @@ print("=" * 50)
 # ============================================================
 
 def load_live_prices():
-    """Load Indian indices from live_prices.csv into a dict {symbol: price}."""
     out = {}
     path = Path("data/live_prices.csv")
     if not path.exists():
@@ -41,7 +41,6 @@ def load_live_prices():
     return out
 
 def load_global_prices():
-    """Load global metrics from global_prices.csv into a dict {symbol: price}."""
     out = {}
     path = Path("data/global_prices.csv")
     if not path.exists():
@@ -54,7 +53,6 @@ def load_global_prices():
     return out
 
 def load_history():
-    """Load historical prices grouped by symbol as sorted list of (date, close)."""
     out = {}
     path = Path("data/historical_prices.csv")
     if not path.exists():
@@ -63,13 +61,11 @@ def load_history():
     with open(path, "r", newline="") as f:
         for row in csv.DictReader(f):
             out.setdefault(row["symbol"], []).append((row["date"], float(row["close"])))
-    # Sort each symbol's series by date ascending
     for sym in out:
         out[sym].sort(key=lambda x: x[0])
     return out
 
 def load_manual_inputs():
-    """Load manual inputs JSON and return a flat dict {key: value}."""
     path = Path("manual_inputs.json")
     if not path.exists():
         print("ERROR: manual_inputs.json missing")
@@ -98,15 +94,12 @@ print(f"Manual inputs:  {len(manual)} fields")
 # ============================================================
 
 def compute_sma(series, window):
-    """Simple moving average of the last `window` closes. Returns None if not enough data."""
     if len(series) < window:
         return None
     closes = [c for _, c in series[-window:]]
     return sum(closes) / window
 
 def compute_sma_at(series, window, offset_from_end):
-    """SMA computed at a point `offset_from_end` bars before the last bar.
-    Used to compute last week's DMA for trend direction."""
     if len(series) < window + offset_from_end:
         return None
     end_idx = len(series) - offset_from_end
@@ -114,13 +107,11 @@ def compute_sma_at(series, window, offset_from_end):
     return sum(closes) / window
 
 def get_price_n_bars_ago(series, n_bars):
-    """Return the close n_bars ago. For 4-week direction use n_bars ~= 20 (trading days)."""
     if len(series) <= n_bars:
         return None
     return series[-1 - n_bars][1]
 
 def classify_direction(current, past, flat_threshold_pct=0.5):
-    """Classify direction as Rising / Stable / Falling with a small flat band."""
     if current is None or past is None or past == 0:
         return "Stable"
     change_pct = (current - past) / past * 100
@@ -131,7 +122,6 @@ def classify_direction(current, past, flat_threshold_pct=0.5):
     return "Stable"
 
 def classify_dma_direction(current_dma, last_week_dma):
-    """DMA direction classification: Rising / Flat / Falling."""
     if current_dma is None or last_week_dma is None:
         return "Flat"
     if current_dma > last_week_dma:
@@ -141,7 +131,6 @@ def classify_dma_direction(current_dma, last_week_dma):
     return "Flat"
 
 def classify_inr_direction(current, past):
-    """INR: lower USD/INR = rupee strengthening. Inverted direction logic."""
     if current is None or past is None or past == 0:
         return "Stable"
     change_pct = (current - past) / past * 100
@@ -153,18 +142,12 @@ def classify_inr_direction(current, past):
 
 print("\n--- COMPUTING DERIVED VALUES ---")
 
-# Nifty 200-DMA (current)
 nifty_series = hist.get("Nifty 50", [])
 nifty_200dma = compute_sma(nifty_series, 200)
-
-# Nifty 200-DMA (5 trading days ago ~ last week)
 nifty_200dma_lastwk = compute_sma_at(nifty_series, 200, 5)
 dma_direction = classify_dma_direction(nifty_200dma, nifty_200dma_lastwk)
-
-# Nifty close (from live)
 nifty_close = live.get("Nifty 50")
 
-# % vs 200-DMA
 pct_vs_dma = None
 if nifty_close is not None and nifty_200dma is not None and nifty_200dma > 0:
     pct_vs_dma = round((nifty_close - nifty_200dma) / nifty_200dma * 100, 1)
@@ -175,7 +158,6 @@ print(f"200-DMA last week:    {nifty_200dma_lastwk:.2f}" if nifty_200dma_lastwk 
 print(f"DMA direction:        {dma_direction}")
 print(f"% vs 200-DMA:         {pct_vs_dma}")
 
-# 4-week directions (global)
 us10y_series   = hist.get("US 10Y Yield", [])
 inr_series     = hist.get("INR/USD", [])
 crude_series   = hist.get("Brent Crude", [])
@@ -197,11 +179,10 @@ print(f"INR:   {inr_today} (4wk ago {inr_4wk}) -> {inr_dir}")
 print(f"Crude: {crude_today} (4wk ago {crude_4wk}) -> {crude_dir}")
 
 # ============================================================
-# STEP 3: COMPONENT SCORING FUNCTIONS (mirror Excel formulas)
+# STEP 3: COMPONENT SCORING FUNCTIONS
 # ============================================================
 
 def score_valuation(pe):
-    """Excel E9: IF(PE<18,15, PE<20,12, PE<22,9, PE<24,4, PE<26,2, else 0)"""
     if pe is None: return 0
     if pe < 18: return 15
     if pe < 20: return 12
@@ -211,7 +192,6 @@ def score_valuation(pe):
     return 0
 
 def score_trend(pct_vs_dma, dma_dir):
-    """Excel E16: complex nested IF on % vs DMA with direction modifier."""
     if pct_vs_dma is None: return 0
     if pct_vs_dma > 10:
         return 15 if dma_dir == "Rising" else 13
@@ -226,7 +206,6 @@ def score_trend(pct_vs_dma, dma_dir):
     return 0
 
 def score_breadth(pct):
-    """Excel E20: IF(br>70,12, >60,10, >50,8, >40,6, >30,4, >20,2, else 0)"""
     if pct is None: return 0
     if pct > 70: return 12
     if pct > 60: return 10
@@ -237,7 +216,6 @@ def score_breadth(pct):
     return 0
 
 def score_volatility(vix):
-    """Excel E24: IF(vix<12,10, <15,8, <18,6, <22,4, <30,2, else 0)"""
     if vix is None: return 0
     if vix < 12: return 10
     if vix < 15: return 8
@@ -247,10 +225,6 @@ def score_volatility(vix):
     return 0
 
 def score_flows(fii, dii):
-    """Excel E30: MIN(12, fii_score + dii_score)
-    FII score tiers: >5k:6, >0:5, >-5k:4, >-10k:2, >-20k:1, else 0
-    DII score tiers: >15k:6, >10k:5, >5k:4, >0:3, >-5k:1, else 0
-    """
     if fii is None or dii is None: return 0
     if   fii >  5000:  f = 6
     elif fii >     0:  f = 5
@@ -267,12 +241,6 @@ def score_flows(fii, dii):
     return min(12, f + d)
 
 def score_macro(rbi, cpi, pmi, yield_inverted):
-    """Excel E37: MAX(0, rbi + cpi + pmi - yield_penalty)
-    RBI: Acc-Cut:4, Acc-Paused:3, Neutral:2, Tight-Paused:1, Tight-Hiking:0
-    CPI: <4.5:4, <5.7:3, <7:2, <8.5:1, else 0
-    PMI: >55:4, >52:3, >50:2, >48:1, else 0
-    Yield inverted: -2
-    """
     rbi_map = {
         "Accommodative-Cutting": 4,
         "Accommodative-Paused": 3,
@@ -297,13 +265,6 @@ def score_macro(rbi, cpi, pmi, yield_inverted):
     return max(0, r + c + p - y)
 
 def score_global(us10y, us10y_dir, dxy, gvix, inr_dir):
-    """Excel E46: MIN(12, us10y_score + dxy_score + gvix_score + inr_score)
-    US10Y: Falling&<4:3, Falling&>=4:2, Stable:2, Rising&<5:1, else 0
-    DXY:   <82:3, <92:3, <100:2, <106:1, else 0
-    GVIX:  <15:3, <20:2, <25:2, <30:1, else 0
-    INR:   Strengthening:3, Stable:2, Weakening:1, else 0
-    """
-    # US10Y
     if us10y is None:
         u = 0
     elif us10y_dir == "Falling" and us10y < 4: u = 3
@@ -311,21 +272,18 @@ def score_global(us10y, us10y_dir, dxy, gvix, inr_dir):
     elif us10y_dir == "Stable":                 u = 2
     elif us10y_dir == "Rising"  and us10y < 5:  u = 1
     else:                                        u = 0
-    # DXY
     if   dxy is None: d = 0
     elif dxy < 82:    d = 3
     elif dxy < 92:    d = 3
     elif dxy < 100:   d = 2
     elif dxy < 106:   d = 1
     else:             d = 0
-    # Global VIX
     if   gvix is None: g = 0
     elif gvix < 15:    g = 3
     elif gvix < 20:    g = 2
     elif gvix < 25:    g = 2
     elif gvix < 30:    g = 1
     else:              g = 0
-    # INR direction
     if   inr_dir == "Strengthening": i = 3
     elif inr_dir == "Stable":        i = 2
     elif inr_dir == "Weakening":     i = 1
@@ -333,7 +291,6 @@ def score_global(us10y, us10y_dir, dxy, gvix, inr_dir):
     return min(12, u + d + g + i)
 
 def score_crude(brent):
-    """Excel E51: IF(<50,12, <60,10, <70,8, <80,6, <90,4, <100,2, else 0)"""
     if brent is None: return 0
     if brent < 50:  return 12
     if brent < 60:  return 10
@@ -376,19 +333,16 @@ print(f"\nRAW SCORE: {raw_score} / 100")
 # STEP 4: SAFETY OVERRIDES
 # ============================================================
 
-# Red Flag: Excel C60 - trend<=3 AND vol<=2 AND (flows<=3 OR fii<-15000)
 fii_val = manual.get("fii_30day_net_cr") or 0
 red_flag = (s_trend <= 3 and s_vol <= 2 and (s_flow <= 3 or fii_val < -15000))
 
-# PE Bubble: Excel C61 - PE > 26
 pe_val = manual.get("nifty_pe") or 0
 pe_bubble = pe_val > 26
 
 print(f"\nRed Flag:   {'YES - equity capped 25%' if red_flag else 'NO'}")
 print(f"PE Bubble:  {'YES - equity capped 70%' if pe_bubble else 'NO'}")
 
-# Market condition label (Excel C65, using raw score since no prior-week smoothing yet)
-smoothed = raw_score  # First-week behavior; score history will enable smoothing later
+smoothed = raw_score
 if   smoothed <= 20: condition = "TERRIBLE"
 elif smoothed <= 30: condition = "WEAK"
 elif smoothed <= 40: condition = "BELOW AVG"
@@ -402,7 +356,6 @@ print(f"\nMarket Condition: {condition}")
 # STEP 5: ALLOCATION
 # ============================================================
 
-# Base equity % from score bands (Excel C70 inner IF)
 if   smoothed <= 20: base_eq = 10
 elif smoothed <= 30: base_eq = 25
 elif smoothed <= 40: base_eq = 40
@@ -410,14 +363,12 @@ elif smoothed <= 52: base_eq = 55
 elif smoothed <= 62: base_eq = 70
 else:                base_eq = 85
 
-# Apply overrides
 equity_pct = base_eq
 if red_flag:
     equity_pct = min(25, equity_pct)
 if pe_bubble:
     equity_pct = min(70, equity_pct)
 
-# Engine B : Engine C split of equity
 if   smoothed <= 20: eng_b_of_eq = 30
 elif smoothed <= 30: eng_b_of_eq = 35
 elif smoothed <= 40: eng_b_of_eq = 40
@@ -427,7 +378,6 @@ else:                eng_b_of_eq = 50
 engine_b_pct = round(equity_pct * eng_b_of_eq / 100)
 engine_c_pct = equity_pct - engine_b_pct
 
-# Gold % from score bands (Excel C74)
 if red_flag:
     gold_pct = 25
 elif smoothed <= 20: gold_pct = 25
@@ -439,7 +389,6 @@ else:                gold_pct = 5
 
 debt_pct = 100 - equity_pct - gold_pct
 
-# Duration signal (Excel E73)
 rbi_val = manual.get("rbi_stance", "")
 yield_inv = manual.get("yield_curve_inverted", "No")
 if rbi_val in ("Accommodative-Cutting", "Accommodative-Paused") and yield_inv == "No":
@@ -449,7 +398,6 @@ elif rbi_val == "Neutral":
 else:
     duration = "SHORT/CASH"
 
-# Gold signal (Excel E74)
 gvix_val  = glob.get("Global VIX") or 0
 brent_val = crude_today or 0
 if gvix_val > 25 or brent_val > 100 or inr_dir == "Weakening":
@@ -466,7 +414,7 @@ print(f"Gold:   {gold_pct}%  ({gold_signal})")
 print(f"Total:  {equity_pct + debt_pct + gold_pct}%")
 
 # ============================================================
-# STEP 6: WRITE OUTPUT
+# STEP 6: WRITE OUTPUT (latest score)
 # ============================================================
 
 out_row = {
@@ -503,7 +451,36 @@ with open("data/engine_a_score.csv", "w", newline="") as f:
     writer.writeheader()
     writer.writerow(out_row)
 
+print("\nWritten to data/engine_a_score.csv")
+
+# ============================================================
+# STEP 7: APPEND TO SCORE HISTORY (NEW in v1.1)
+# ============================================================
+
+HISTORY_FILE = "data/score_history.csv"
+history_path = Path(HISTORY_FILE)
+write_header = not history_path.exists()
+
+history_row = {
+    "date": datetime.now().strftime("%Y-%m-%d"),
+    "score": raw_score,
+    "condition": condition,
+    "equity_pct": equity_pct,
+    "debt_pct": debt_pct,
+    "gold_pct": gold_pct,
+    "nifty": nifty_close or "",
+    "vix": live.get("India VIX", ""),
+    "red_flag": "YES" if red_flag else "NO",
+}
+
+with open(HISTORY_FILE, "a", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=list(history_row.keys()))
+    if write_header:
+        writer.writeheader()
+    writer.writerow(history_row)
+
+print(f"Score appended to {HISTORY_FILE}")
+
 print("\n" + "=" * 50)
 print(f"ENGINE A SCORE: {raw_score} / 100 — {condition}")
 print("=" * 50)
-print("Written to data/engine_a_score.csv")
