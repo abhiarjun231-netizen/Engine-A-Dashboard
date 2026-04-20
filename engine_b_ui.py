@@ -305,6 +305,45 @@ def calc_conviction(stock, analysis=None):
     return min(score, 10)
 
 # ============================================================
+# DECISION MATRIX — Engine B (Short-Term, 7% Stop)
+# ============================================================
+def get_decision_b(stock, analysis):
+    """Returns (label, color) based on Engine B decision matrix."""
+    ltp = stock.get('ltp', 0)
+    sma200 = stock.get('sma200', 0)
+    dma_pct = ((ltp - sma200) / sma200 * 100) if sma200 > 0 and ltp > 0 else 0
+    pio = stock.get('piotroski', 0)
+    source = stock.get('source', '')
+    is_double = source == "Double"
+
+    if not analysis:
+        return "PENDING", "#64748b"
+
+    vol = analysis.get("vol_ratio", 0)
+    pct_52w = analysis.get("pct_52w", 50)
+    chg_60d = analysis.get("change_60d", 0)
+    chg_90d = analysis.get("change_90d", 0)
+
+    # AVOID checks first
+    if (vol < 0.3 and chg_60d < -5) or pct_52w < 30 or dma_pct > 50:
+        return "AVOID", "#ef4444"
+
+    # WAIT checks
+    if vol < 0.5 or chg_60d < 0 or dma_pct > 40:
+        return "WAIT", "#f59e0b"
+
+    # STRONG BUY
+    if ((is_double or pio >= 9) and vol >= 1.5 and
+            pct_52w > 60 and chg_60d > 5 and dma_pct < 25):
+        return "STRONG BUY", "#22c55e"
+
+    # GOOD BUY
+    if vol >= 1.0 and chg_60d > 0 and dma_pct < 30:
+        return "GOOD BUY", "#38bdf8"
+
+    return "WAIT", "#f59e0b"
+
+# ============================================================
 # QUALIFIER CARD (from screener upload)
 # ============================================================
 def render_qualifier(stock, source_label, source_color, is_holding, live_price=None, analysis=None):
@@ -383,15 +422,18 @@ def render_qualifier(stock, source_label, source_color, is_holding, live_price=N
             f"<div></div><div></div>"
             f"</div>")
 
+    # Decision matrix
+    decision_label, decision_color = get_decision_b(stock, analysis)
+
     card_html = (
         f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
-        f"border:1px solid #334155;margin-bottom:6px;'>"
+        f"border:1px solid {decision_color}44;margin-bottom:6px;'>"
         f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
         f"<div style='font-size:14px;font-weight:600;color:#e2e8f0;'>{stock['stock']}</div>"
-        f"<div style='display:flex;gap:8px;align-items:center;'>"
+        f"<div style='display:flex;gap:6px;align-items:center;'>"
         f"<span style='font-size:11px;font-weight:700;color:{conv_color};'>{conv}/10</span>"
+        f"<span style='font-size:9px;font-weight:800;color:{decision_color};background:{decision_color}22;padding:2px 6px;border-radius:4px;letter-spacing:0.5px;'>{decision_label}</span>"
         f"<span style='font-size:10px;font-weight:700;color:{source_color};background:{source_color}22;padding:2px 6px;border-radius:4px;'>{source_label}</span>"
-        f"<span style='font-size:10px;font-weight:700;color:{status_color};background:{status_color}22;padding:2px 6px;border-radius:4px;'>{status_label}</span>"
         f"</div>"
         f"</div>"
         f"{price_row}"

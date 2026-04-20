@@ -286,6 +286,48 @@ def render_position(stock_name, entry, qty, peak, current_price, de_val, peg_val
     st.markdown(card_html, unsafe_allow_html=True)
 
 # ============================================================
+# DECISION MATRIX — Engine C (Long-Term, Fundamentals-First)
+# ============================================================
+def get_decision_c(stock, analysis):
+    """Returns (label, color) based on Engine C decision matrix."""
+    pio = stock.get('piotroski', 0)
+    de = stock.get('de', 99)
+    source = stock.get('source', '')
+    is_double = source == "Double"
+    profit_qoq = stock.get('profit_qoq', 0)
+    profit_yoy = stock.get('profit_yoy', 0)
+    profit_val = profit_qoq if profit_qoq != 0 else profit_yoy
+
+    if not analysis:
+        return "PENDING", "#64748b"
+
+    vol = analysis.get("vol_ratio", 0)
+    pct_52w = analysis.get("pct_52w", 50)
+    chg_60d = analysis.get("change_60d", 0)
+    chg_90d = analysis.get("change_90d", 0)
+
+    # AVOID checks first
+    if pio <= 6 or profit_val < -10 or de > 1.5:
+        return "AVOID", "#ef4444"
+    if chg_90d < -30 and chg_60d < -15:
+        return "AVOID", "#ef4444"
+
+    # WAIT checks
+    if (pct_52w > 85 and vol < 0.5) or chg_90d < -20:
+        return "WAIT", "#f59e0b"
+
+    # STRONG BUY
+    if ((is_double or pio >= 8) and de < 0.5 and
+            pct_52w < 50 and chg_90d > 0 and profit_val > 15):
+        return "STRONG BUY", "#22c55e"
+
+    # GOOD BUY
+    if pio >= 8 and chg_90d > -10 and de < 1.0:
+        return "GOOD BUY", "#38bdf8"
+
+    return "WAIT", "#f59e0b"
+
+# ============================================================
 # QUALIFIER CARD (Engine C)
 # ============================================================
 def render_qualifier(stock, source_label, source_color, is_holding, live_price=None, analysis=None):
@@ -350,15 +392,18 @@ def render_qualifier(stock, source_label, source_color, is_holding, live_price=N
             f"<div></div><div></div>"
             f"</div>")
 
+    # Decision matrix
+    decision_label, decision_color = get_decision_c(stock, analysis)
+
     card_html = (
         f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
-        f"border:1px solid #334155;margin-bottom:6px;'>"
+        f"border:1px solid {decision_color}44;margin-bottom:6px;'>"
         f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
         f"<div style='font-size:14px;font-weight:600;color:#e2e8f0;'>{stock['stock']}</div>"
-        f"<div style='display:flex;gap:8px;align-items:center;'>"
+        f"<div style='display:flex;gap:6px;align-items:center;'>"
         f"<span style='font-size:11px;font-weight:700;color:{conv_color};'>{conv}/10</span>"
+        f"<span style='font-size:9px;font-weight:800;color:{decision_color};background:{decision_color}22;padding:2px 6px;border-radius:4px;letter-spacing:0.5px;'>{decision_label}</span>"
         f"<span style='font-size:10px;font-weight:700;color:{source_color};background:{source_color}22;padding:2px 6px;border-radius:4px;'>{source_label}</span>"
-        f"<span style='font-size:10px;font-weight:700;color:{status_color};background:{status_color}22;padding:2px 6px;border-radius:4px;'>{status_label}</span>"
         f"</div>"
         f"</div>"
         f"{price_row}"
