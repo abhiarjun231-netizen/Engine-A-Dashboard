@@ -1,13 +1,6 @@
 {
   "engine_b": [
     {
-      "stock": "Torrent Power",
-      "ticker": "TORNTPOWER",
-      "qty": 3,
-      "entry": 1448.0,
-      "peak": 1630.6
-    },
-    {
       "stock": "Vedanta",
       "ticker": "VEDL",
       "entry": 787.5,
@@ -912,6 +905,20 @@
       "holding_days": 0,
       "realized_pnl": 865.44,
       "realized_pct": 17.5,
+      "exit_reason": "Manual Exit",
+      "result": "WIN"
+    },
+    {
+      "stock": "Torrent Power",
+      "ticker": "TORNTPOWER",
+      "entry": 1448.0,
+      "exit_price": 1606.3,
+      "qty": 3,
+      "buy_date": "",
+      "sell_date": "2026-04-20",
+      "holding_days": 0,
+      "realized_pnl": 474.9,
+      "realized_pct": 10.93,
       "exit_reason": "Manual Exit",
       "result": "WIN"
     }
