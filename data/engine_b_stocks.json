@@ -17,6 +17,15 @@
       "peak": 497.6,
       "source": "Double",
       "buy_date": "2026-04-20"
+    },
+    {
+      "stock": "SRM Contractors",
+      "ticker": "SRM",
+      "entry": 508.9,
+      "qty": 10,
+      "peak": 508.9,
+      "source": "Double",
+      "buy_date": "2026-04-20"
     }
   ],
   "engine_c": [],
@@ -515,7 +524,7 @@
       "rev_qoq": 12.12,
       "profit_qoq": 20.02,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "FIEM Industries",
