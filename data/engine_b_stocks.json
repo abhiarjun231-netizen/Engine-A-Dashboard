@@ -1,13 +1,6 @@
 {
   "engine_b": [
     {
-      "stock": "Engineers India",
-      "ticker": "ENGINERSIN",
-      "qty": 24,
-      "entry": 206.0,
-      "peak": 246.85
-    },
-    {
       "stock": "Torrent Power",
       "ticker": "TORNTPOWER",
       "qty": 3,
@@ -905,6 +898,20 @@
       "holding_days": 0,
       "realized_pnl": 319.8,
       "realized_pct": 6.66,
+      "exit_reason": "Manual Exit",
+      "result": "WIN"
+    },
+    {
+      "stock": "Engineers India",
+      "ticker": "ENGINERSIN",
+      "entry": 206.0,
+      "exit_price": 242.06,
+      "qty": 24,
+      "buy_date": "",
+      "sell_date": "2026-04-20",
+      "holding_days": 0,
+      "realized_pnl": 865.44,
+      "realized_pct": 17.5,
       "exit_reason": "Manual Exit",
       "result": "WIN"
     }
