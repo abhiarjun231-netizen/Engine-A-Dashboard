@@ -1,6 +1,7 @@
 """
-test_angel.py - Engine A Live Data Fetcher v10
-NEW in v10: Updates peak prices in engine_b_stocks.json for trailing stop tracking.
+test_angel.py - Engine A Live Data Fetcher v11
+NEW in v11: Fetches live prices for watchlist stocks (engine_b_watchlist + engine_c_watchlist).
+v10: Updates peak prices in engine_b_stocks.json for trailing stop tracking.
 v9: Fetches LTP even on weekends/holidays (last traded price).
 Only skips historical store on non-market days.
 """
@@ -17,7 +18,7 @@ from pathlib import Path
 from SmartApi import SmartConnect
 
 print("=" * 50)
-print("ENGINE A - LIVE DATA FETCHER v10")
+print("ENGINE A - LIVE DATA FETCHER v11")
 print("=" * 50)
 
 # ============================================================
@@ -94,13 +95,20 @@ def save_engine_b_stocks(data):
 
 def resolve_tokens(stock_data):
     cache = stock_data.get("_token_cache", {})
-    all_stocks = stock_data.get("engine_b", []) + stock_data.get("engine_c", [])
+    # Collect tickers from positions AND watchlists
+    all_stocks = (stock_data.get("engine_b", []) +
+                  stock_data.get("engine_c", []) +
+                  stock_data.get("engine_b_watchlist", []) +
+                  stock_data.get("engine_c_watchlist", []))
     
     need_tokens = []
     for s in all_stocks:
         ticker = s.get("ticker", "")
         if ticker and ticker not in cache:
             need_tokens.append(ticker)
+    
+    # Deduplicate
+    need_tokens = list(set(need_tokens))
     
     if not need_tokens:
         print("All tokens cached - no master download needed")
@@ -243,20 +251,41 @@ with open("data/global_prices.csv", "w", newline="") as f:
 print("Live LTP fetch complete")
 
 # ============================================================
-# PART 2: ENGINE B STOCK PRICES
+# PART 2: ENGINE B/C STOCK PRICES (positions + watchlists)
 # ============================================================
 
-print("\n--- ENGINE B STOCK PRICES ---")
+print("\n--- ENGINE B/C STOCK PRICES ---")
 
 stock_data = load_engine_b_stocks()
 
 if stock_data:
     token_cache = resolve_tokens(stock_data)
     
-    all_stocks = stock_data.get("engine_b", []) + stock_data.get("engine_c", [])
+    # Collect ALL unique tickers: positions + watchlists
+    all_tickers_seen = set()
+    all_stocks_to_fetch = []
+    
+    # Positions first (engine_b + engine_c)
+    for s in stock_data.get("engine_b", []) + stock_data.get("engine_c", []):
+        ticker = s.get("ticker", "")
+        if ticker and ticker not in all_tickers_seen:
+            all_tickers_seen.add(ticker)
+            all_stocks_to_fetch.append(s)
+    
+    # Watchlist stocks (only if not already fetching via positions)
+    for s in stock_data.get("engine_b_watchlist", []) + stock_data.get("engine_c_watchlist", []):
+        ticker = s.get("ticker", "")
+        action = s.get("action", "")
+        if ticker and ticker not in all_tickers_seen and action != "AVOID":
+            all_tickers_seen.add(ticker)
+            all_stocks_to_fetch.append(s)
+    
+    print(f"Fetching prices for {len(all_stocks_to_fetch)} unique stocks "
+          f"(positions + watchlists)")
+    
     stock_results = []
     
-    for s in all_stocks:
+    for s in all_stocks_to_fetch:
         ticker = s.get("ticker", "")
         stock_name = s.get("stock", ticker)
         cached = token_cache.get(ticker, {})
@@ -288,10 +317,10 @@ if stock_data:
         writer.writeheader()
         writer.writerows(stock_results)
     
-    print(f"Engine B prices saved: {len(stock_results)} stocks")
+    print(f"Stock prices saved: {len(stock_results)} stocks")
 
     # ----------------------------------------------------------
-    # PEAK PRICE TRACKER (NEW in v10)
+    # PEAK PRICE TRACKER (v10)
     # Updates peak in engine_b_stocks.json for trailing stop calc
     # ----------------------------------------------------------
     print("\n--- PEAK PRICE TRACKER ---")

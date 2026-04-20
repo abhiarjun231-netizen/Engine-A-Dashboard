@@ -283,7 +283,7 @@ def calc_conviction(stock):
 # ============================================================
 # QUALIFIER CARD (from screener upload)
 # ============================================================
-def render_qualifier(stock, source_label, source_color, is_holding):
+def render_qualifier(stock, source_label, source_color, is_holding, live_price=None):
     status_label = "HOLDING" if is_holding else "NEW"
     status_color = "#38bdf8" if is_holding else "#22c55e"
 
@@ -333,6 +333,32 @@ def render_qualifier(stock, source_label, source_color, is_holding):
     else:
         result_str = ""
 
+    # Live price + Opportunity tracker
+    if live_price is not None and ltp > 0:
+        opp_pct = round((live_price - ltp) / ltp * 100, 2)
+        opp_sign = "+" if opp_pct >= 0 else ""
+        if opp_pct > 0:
+            opp_label = "Opp Lost"
+            opp_color = "#ef4444"
+        elif opp_pct < 0:
+            opp_label = "Opp Gained"
+            opp_color = "#22c55e"
+        else:
+            opp_label = "Flat"
+            opp_color = "#94a3b8"
+        price_row = (
+            f"<div style='display:flex;justify-content:space-between;margin-top:6px;font-size:12px;'>"
+            f"<div style='color:#94a3b8;'>Now: <span style='color:#e2e8f0;font-family:Courier New,monospace;font-weight:600;'>₹{live_price:,.2f}</span></div>"
+            f"<div style='color:#94a3b8;'>Upload: <span style='color:#64748b;font-family:Courier New,monospace;'>₹{ltp:,.2f}</span></div>"
+            f"<div style='color:{opp_color};font-family:Courier New,monospace;font-weight:700;font-size:11px;'>{opp_label}: {opp_sign}{opp_pct}%</div>"
+            f"</div>")
+    else:
+        price_row = (
+            f"<div style='display:flex;justify-content:space-between;margin-top:6px;font-size:12px;'>"
+            f"<div style='color:#94a3b8;'>LTP: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>₹{ltp:,.2f}</span></div>"
+            f"<div></div><div></div>"
+            f"</div>")
+
     card_html = (
         f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
         f"border:1px solid #334155;margin-bottom:6px;'>"
@@ -344,8 +370,8 @@ def render_qualifier(stock, source_label, source_color, is_holding):
         f"<span style='font-size:10px;font-weight:700;color:{status_color};background:{status_color}22;padding:2px 6px;border-radius:4px;'>{status_label}</span>"
         f"</div>"
         f"</div>"
-        f"<div style='display:flex;justify-content:space-between;margin-top:6px;font-size:12px;'>"
-        f"<div style='color:#94a3b8;'>LTP: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>₹{ltp:,.2f}</span></div>"
+        f"{price_row}"
+        f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:12px;'>"
         f"<div style='color:#94a3b8;'>ROE: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>{stock['roe']:.1f}%</span></div>"
         f"<div style='color:#94a3b8;'>PE: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>{stock['pe']:.1f}</span></div>"
         f"<div style='color:#94a3b8;'>Pio: <span style='color:#e2e8f0;font-family:Courier New,monospace;'>{stock['piotroski']}</span></div>"
@@ -700,7 +726,16 @@ def show_engine_b():
                 )
                 continue
 
-            render_qualifier(stock, source_label, source_color, is_holding)
+            # Look up live price for this watchlist stock
+            _wl_live = live_prices.get(stock.get("stock", ""), {})
+            _wl_live_price = None
+            if _wl_live.get("price", "") != "":
+                try:
+                    _wl_live_price = float(_wl_live["price"])
+                except:
+                    pass
+
+            render_qualifier(stock, source_label, source_color, is_holding, live_price=_wl_live_price)
 
             # --- ACTION BUTTONS (only for NEW stocks) ---
             if not is_holding and gate_status == "ACTIVE":
@@ -912,39 +947,6 @@ def show_engine_b():
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             key="download_trade_log"
         )
-
-        # Individual closed trades (most recent first)
-        for t in reversed(closed_trades):
-            pnl = t.get("realized_pnl", 0)
-            pct = t.get("realized_pct", 0)
-            pnl_color = "#22c55e" if pnl >= 0 else "#ef4444"
-            pnl_sign = "+" if pnl >= 0 else ""
-            result_label = t.get("result", "")
-            result_color = "#22c55e" if result_label == "WIN" else "#ef4444"
-
-            closed_html = (
-                f"<div style='background:#1e293b;border-radius:12px;padding:12px 16px;"
-                f"border:1px solid #334155;margin-bottom:6px;'>"
-                f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
-                f"<div style='font-size:14px;font-weight:600;color:#e2e8f0;'>{t.get('stock', '')}</div>"
-                f"<span style='font-size:10px;font-weight:700;color:{result_color};"
-                f"background:{result_color}22;padding:2px 6px;border-radius:4px;'>{result_label}</span>"
-                f"</div>"
-                f"<div style='display:flex;justify-content:space-between;margin-top:6px;font-size:12px;'>"
-                f"<div style='color:#94a3b8;'>Entry: <span style='color:#e2e8f0;"
-                f"font-family:Courier New,monospace;'>₹{t.get('entry', 0):,.0f}</span></div>"
-                f"<div style='color:#94a3b8;'>Exit: <span style='color:#e2e8f0;"
-                f"font-family:Courier New,monospace;'>₹{t.get('exit_price', 0):,.0f}</span></div>"
-                f"<div style='color:{pnl_color};font-family:Courier New,monospace;"
-                f"font-weight:700;'>{pnl_sign}₹{pnl:,.0f} ({pnl_sign}{pct}%)</div>"
-                f"</div>"
-                f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
-                f"<div style='color:#64748b;'>{t.get('buy_date', '')} → {t.get('sell_date', '')}</div>"
-                f"<div style='color:#64748b;'>{t.get('holding_days', 0)}d · {t.get('exit_reason', '')}</div>"
-                f"</div>"
-                f"</div>"
-            )
-            st.markdown(closed_html, unsafe_allow_html=True)
 
     # --- ENGINE C PLACEHOLDER ---
     st.markdown("<div class='section-title'>Engine C — Long-Term Compounders</div>", unsafe_allow_html=True)
