@@ -373,6 +373,125 @@ else:
     print("No Engine B stocks configured")
 
 # ============================================================
+# PART 2.5: STOCK ANALYSIS (Volume, 52W High/Low, 60D/90D Trends)
+# Fetches 365 days of candle data per stock for analysis
+# ============================================================
+
+ANALYSIS_FILE = "data/stock_analysis.csv"
+
+if stock_data and token_cache:
+    print("\n--- STOCK ANALYSIS (Volume, 52W, Trends) ---")
+
+    # Collect all unique tickers from positions + watchlists
+    analysis_tickers = set()
+    ticker_to_name = {}
+    for s in (stock_data.get("engine_b", []) + stock_data.get("engine_c", []) +
+              stock_data.get("engine_b_watchlist", []) + stock_data.get("engine_c_watchlist", [])):
+        ticker = s.get("ticker", "")
+        if ticker and s.get("action", "") != "AVOID":
+            analysis_tickers.add(ticker)
+            ticker_to_name[ticker] = s.get("stock", ticker)
+
+    print(f"Analyzing {len(analysis_tickers)} unique stocks...")
+
+    from_date_analysis = today - timedelta(days=365)
+    analysis_results = []
+
+    for ticker in sorted(analysis_tickers):
+        cached = token_cache.get(ticker, {})
+        a_token = cached.get("token")
+        a_symbol = cached.get("symbol", ticker)
+
+        if not a_token:
+            print(f"  {ticker}: no token - skipping analysis")
+            continue
+
+        try:
+            params = {
+                "exchange": "NSE",
+                "symboltoken": a_token,
+                "interval": "ONE_DAY",
+                "fromdate": from_date_analysis.strftime("%Y-%m-%d 09:15"),
+                "todate": today.strftime("%Y-%m-%d 15:30"),
+            }
+            resp = smart.getCandleData(params)
+
+            if not resp or not resp.get("status"):
+                print(f"  {ticker}: candle API failed")
+                continue
+
+            candles = resp.get("data") or []
+            if len(candles) < 20:
+                print(f"  {ticker}: only {len(candles)} candles - insufficient")
+                continue
+
+            # Extract closes and volumes
+            closes = [float(c[4]) for c in candles]
+            volumes = [float(c[5]) for c in candles]
+
+            current_price = closes[-1]
+
+            # Volume ratio (today vs 20-day average)
+            vol_20d_avg = sum(volumes[-20:]) / 20
+            vol_today = volumes[-1]
+            vol_ratio = round(vol_today / vol_20d_avg, 2) if vol_20d_avg > 0 else 0
+
+            # 52W high/low
+            high_52w = max(closes)
+            low_52w = min(closes)
+            range_52w = high_52w - low_52w
+            pct_52w = round((current_price - low_52w) / range_52w * 100, 1) if range_52w > 0 else 50
+
+            # 60-day change
+            if len(closes) >= 60:
+                close_60d = closes[-60]
+                change_60d = round((current_price - close_60d) / close_60d * 100, 2)
+            else:
+                change_60d = 0
+
+            # 90-day change
+            if len(closes) >= 90:
+                close_90d = closes[-90]
+                change_90d = round((current_price - close_90d) / close_90d * 100, 2)
+            else:
+                change_90d = 0
+
+            analysis_results.append({
+                "ticker": ticker,
+                "stock": ticker_to_name.get(ticker, ticker),
+                "vol_ratio": vol_ratio,
+                "high_52w": round(high_52w, 2),
+                "low_52w": round(low_52w, 2),
+                "pct_52w": pct_52w,
+                "change_60d": change_60d,
+                "change_90d": change_90d,
+                "candles": len(candles),
+            })
+
+            print(f"  {ticker}: Vol {vol_ratio}x | 52W {pct_52w}% | 60D {change_60d:+.1f}% | 90D {change_90d:+.1f}%")
+            time.sleep(0.5)
+
+        except Exception as e:
+            print(f"  {ticker}: analysis error - {e}")
+
+    # Save analysis
+    if analysis_results:
+        with open(ANALYSIS_FILE, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=[
+                "ticker", "stock", "vol_ratio", "high_52w", "low_52w",
+                "pct_52w", "change_60d", "change_90d", "candles"
+            ])
+            writer.writeheader()
+            writer.writerows(analysis_results)
+        print(f"Analysis saved: {len(analysis_results)} stocks")
+    else:
+        print("No analysis data to save")
+
+else:
+    if not stock_data:
+        pass  # Already printed above
+
+# ============================================================
 # PART 3: HISTORICAL PRICE STORE (skip on non-market days)
 # ============================================================
 
