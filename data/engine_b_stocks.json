@@ -152,6 +152,17 @@
       "buy_date": "2026-04-20",
       "de": 0.43,
       "peg": 0.34
+    },
+    {
+      "stock": "Pix Transmissions",
+      "ticker": "PIXTRANS",
+      "entry": 1523.3,
+      "qty": 5,
+      "peak": 1523.3,
+      "source": "Double",
+      "buy_date": "2026-04-20",
+      "de": 0.06,
+      "peg": -4.07
     }
   ],
   "_token_cache": {
@@ -1306,7 +1317,7 @@
       "peg": -4.07,
       "profit_yoy": 36.02,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Avanti Feeds",
