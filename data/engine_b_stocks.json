@@ -185,6 +185,17 @@
       "buy_date": "2026-04-20",
       "de": 0.0,
       "peg": 0.2
+    },
+    {
+      "stock": "Mayur Uniquoters",
+      "ticker": "MAYURUNIQ",
+      "entry": 571.1,
+      "qty": 8,
+      "peak": 571.1,
+      "source": "Double",
+      "buy_date": "2026-04-20",
+      "de": 0.01,
+      "peg": 0.59
     }
   ],
   "_token_cache": {
@@ -1491,7 +1502,7 @@
       "peg": 0.59,
       "profit_yoy": 21.9,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "PTC",
