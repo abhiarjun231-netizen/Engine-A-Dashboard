@@ -133,9 +133,11 @@ def parse_trendlyne_file(uploaded_file):
         col_result = find_column(df, ["Latest Financial Result"])
         col_rev_qoq = find_column(df, ["Revenue QoQ Growth %"])
         col_profit_qoq = find_column(df, ["Net Profit QoQ Growth %"])
-        col_de = find_column(df, ["Debt to Equity", "Debt/Equity", "D/E", "DE Ratio"])
+        col_de = find_column(df, ["Total Debt to Total Equity Ann", "Debt to Equity", "Debt/Equity", "D/E", "DE Ratio"])
         col_peg = find_column(df, ["PEG TTM", "PEG", "PEG Ratio"])
-        col_profit_yoy = find_column(df, ["Profit Growth Annual YoY %", "Profit Growth YoY %", "Profit Growth Annual %"])
+        col_profit_yoy = find_column(df, ["Net Profit Ann  YoY Growth %", "Net Profit Ann YoY Growth %",
+                                          "Net Profit 3Y Growth %", "Profit Growth Annual YoY %",
+                                          "Profit Growth YoY %", "Profit Growth Annual %"])
 
         if not col_stock or not col_ticker:
             st.error("Could not find 'Stock' or 'NSE Code' columns.")
@@ -198,8 +200,10 @@ def calc_conviction(stock):
     elif de < 0.7: score += 1
     # Profit growth
     profit_qoq = stock.get("profit_qoq", 0)
-    if profit_qoq > 30: score += 2
-    elif profit_qoq > 10: score += 1
+    profit_yoy = stock.get("profit_yoy", 0)
+    profit_val = profit_qoq if profit_qoq != 0 else profit_yoy
+    if profit_val > 30: score += 2
+    elif profit_val > 10: score += 1
     # Entry timing
     ltp = stock.get("ltp", 0)
     sma = stock.get("sma200", 0)
@@ -285,10 +289,14 @@ def render_qualifier(stock, source_label, source_color, is_holding):
     sector_str = f" · {sector}" if sector else ""
     rev_qoq = stock.get('rev_qoq', 0)
     profit_qoq = stock.get('profit_qoq', 0)
+    profit_yoy = stock.get('profit_yoy', 0)
+    # Use YoY if QoQ not available
+    profit_display = profit_qoq if profit_qoq != 0 else profit_yoy
+    profit_label = "Profit QoQ" if profit_qoq != 0 else "Profit YoY"
     rev_color = "#22c55e" if rev_qoq > 0 else "#ef4444" if rev_qoq < 0 else "#64748b"
-    prof_color = "#22c55e" if profit_qoq > 0 else "#ef4444" if profit_qoq < 0 else "#64748b"
+    prof_color = "#22c55e" if profit_display > 0 else "#ef4444" if profit_display < 0 else "#64748b"
     rev_sign = "+" if rev_qoq > 0 else ""
-    prof_sign = "+" if profit_qoq > 0 else ""
+    prof_sign = "+" if profit_display > 0 else ""
     result_date = stock.get('result_date', '')[:10] if stock.get('result_date') else ""
     de = stock.get('de', 0)
     peg = stock.get('peg', 0)
@@ -320,8 +328,7 @@ def render_qualifier(stock, source_label, source_color, is_holding):
         f"<div style='color:#64748b;'>Results: <span style='color:#94a3b8;'>{result_date}</span></div>"
         f"</div>"
         f"<div style='display:flex;justify-content:space-between;margin-top:4px;font-size:11px;'>"
-        f"<div style='color:#64748b;'>Rev: <span style='color:{rev_color};'>{rev_sign}{rev_qoq:.1f}%</span>"
-        f" · Profit: <span style='color:{prof_color};'>{prof_sign}{profit_qoq:.1f}%</span></div>"
+        f"<div style='color:#64748b;'>{profit_label}: <span style='color:{prof_color};'>{prof_sign}{profit_display:.1f}%</span></div>"
         f"</div>"
         f"</div>"
     )
