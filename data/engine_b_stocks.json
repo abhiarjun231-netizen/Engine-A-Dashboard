@@ -65,9 +65,169 @@
       "token": "3024",
       "symbol": "JINDALSAW-EQ",
       "name": "JINDALSAW"
+    },
+    "SWARAJENG": {
+      "token": "3384",
+      "symbol": "SWARAJENG-EQ",
+      "name": "SWARAJENG"
+    },
+    "MAWANASUG": {
+      "token": "17022",
+      "symbol": "MAWANASUG-EQ",
+      "name": "MAWANASUG"
+    },
+    "ANTELOPUS": {
+      "token": "13598",
+      "symbol": "ANTELOPUS-EQ",
+      "name": "ANTELOPUS"
+    },
+    "SUMEETINDS": {
+      "token": "20790",
+      "symbol": "SUMEETINDS-EQ",
+      "name": "SUMEETINDS"
+    },
+    "LUMAXIND": {
+      "token": "2018",
+      "symbol": "LUMAXIND-EQ",
+      "name": "LUMAXIND"
+    },
+    "MAYURUNIQ": {
+      "token": "28906",
+      "symbol": "MAYURUNIQ-EQ",
+      "name": "MAYURUNIQ"
+    },
+    "JPOLYINVST": {
+      "token": "31507",
+      "symbol": "JPOLYINVST-EQ",
+      "name": "JPOLYINVST"
+    },
+    "FIEMIND": {
+      "token": "13710",
+      "symbol": "FIEMIND-EQ",
+      "name": "FIEMIND"
+    },
+    "CARRARO": {
+      "token": "28879",
+      "symbol": "CARRARO-EQ",
+      "name": "CARRARO"
+    },
+    "AVANTIFEED": {
+      "token": "7936",
+      "symbol": "AVANTIFEED-EQ",
+      "name": "AVANTIFEED"
+    },
+    "BAJAJCON": {
+      "token": "19531",
+      "symbol": "BAJAJCON-EQ",
+      "name": "BAJAJCON"
+    },
+    "BSE": {
+      "token": "19585",
+      "symbol": "BSE-EQ",
+      "name": "BSE"
+    },
+    "ARROWGREEN": {
+      "token": "9260",
+      "symbol": "ARROWGREEN-EQ",
+      "name": "ARROWGREEN"
+    },
+    "PREMIERENE": {
+      "token": "25049",
+      "symbol": "PREMIERENE-EQ",
+      "name": "PREMIERENE"
+    },
+    "LUMAXTECH": {
+      "token": "14014",
+      "symbol": "LUMAXTECH-EQ",
+      "name": "LUMAXTECH"
+    },
+    "EMCURE": {
+      "token": "24398",
+      "symbol": "EMCURE-EQ",
+      "name": "EMCURE"
+    },
+    "GVT&D": {
+      "token": "16783",
+      "symbol": "GVT&D-EQ",
+      "name": "GVT&D"
+    },
+    "SJS": {
+      "token": "6643",
+      "symbol": "SJS-EQ",
+      "name": "SJS"
+    },
+    "EPL": {
+      "token": "981",
+      "symbol": "EPL-EQ",
+      "name": "EPL"
+    },
+    "INDOTECH": {
+      "token": "13275",
+      "symbol": "INDOTECH-EQ",
+      "name": "INDOTECH"
+    },
+    "PIXTRANS": {
+      "token": "9087",
+      "symbol": "PIXTRANS-EQ",
+      "name": "PIXTRANS"
+    },
+    "TVSHLTD": {
+      "token": "29008",
+      "symbol": "TVSHLTD-EQ",
+      "name": "TVSHLTD"
+    },
+    "TPLPLASTEH": {
+      "token": "9219",
+      "symbol": "TPLPLASTEH-EQ",
+      "name": "TPLPLASTEH"
+    },
+    "GRSE": {
+      "token": "5475",
+      "symbol": "GRSE-EQ",
+      "name": "GRSE"
+    },
+    "GPTINFRA": {
+      "token": "17685",
+      "symbol": "GPTINFRA-EQ",
+      "name": "GPTINFRA"
+    },
+    "PTC": {
+      "token": "11355",
+      "symbol": "PTC-EQ",
+      "name": "PTC"
+    },
+    "SRM": {
+      "token": "23402",
+      "symbol": "SRM-EQ",
+      "name": "SRM"
+    },
+    "GOKULAGRO": {
+      "token": "14480",
+      "symbol": "GOKULAGRO-EQ",
+      "name": "GOKULAGRO"
+    },
+    "POKARNA": {
+      "token": "17651",
+      "symbol": "POKARNA-EQ",
+      "name": "POKARNA"
+    },
+    "HINDCOPPER": {
+      "token": "17939",
+      "symbol": "HINDCOPPER-EQ",
+      "name": "HINDCOPPER"
+    },
+    "MCX": {
+      "token": "31181",
+      "symbol": "MCX-EQ",
+      "name": "MCX"
+    },
+    "DLINKINDIA": {
+      "token": "17851",
+      "symbol": "DLINKINDIA-EQ",
+      "name": "DLINKINDIA"
     }
   },
-  "_last_token_update": "2026-04-19",
+  "_last_token_update": "2026-04-20",
   "engine_b_watchlist": [
     {
       "stock": "Sumeet Industries",
