@@ -143,17 +143,6 @@
       "peg": 0.57
     },
     {
-      "stock": "Kwality Pharma",
-      "ticker": "nan",
-      "entry": 1664.3,
-      "qty": 3,
-      "peak": 1664.3,
-      "source": "Double",
-      "buy_date": "2026-04-20",
-      "de": 0.43,
-      "peg": 0.34
-    },
-    {
       "stock": "Pix Transmissions",
       "ticker": "PIXTRANS",
       "entry": 1523.3,
@@ -1840,6 +1829,22 @@
       "realized_pct": 0.0,
       "exit_reason": "Manual Exit",
       "result": "WIN"
+    }
+  ],
+  "engine_c_closed": [
+    {
+      "stock": "Kwality Pharma",
+      "ticker": "nan",
+      "entry": 1664.3,
+      "exit_price": NaN,
+      "qty": 3,
+      "buy_date": "2026-04-20",
+      "sell_date": "2026-04-20",
+      "holding_days": 0,
+      "realized_pnl": NaN,
+      "realized_pct": NaN,
+      "exit_reason": "Manual Exit",
+      "result": "LOSS"
     }
   ]
 }
