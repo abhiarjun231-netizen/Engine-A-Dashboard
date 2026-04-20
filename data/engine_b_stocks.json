@@ -51,7 +51,7 @@
       "ticker": "J&KBANK",
       "entry": 131.25,
       "qty": 1,
-      "peak": 132.96,
+      "peak": 133.05,
       "source": "B1",
       "buy_date": "2026-04-19"
     },
@@ -60,7 +60,7 @@
       "ticker": "JINDALSAW",
       "entry": 236.28,
       "qty": 1,
-      "peak": 240.21,
+      "peak": 240.85,
       "source": "B1",
       "buy_date": "2026-04-19"
     }
