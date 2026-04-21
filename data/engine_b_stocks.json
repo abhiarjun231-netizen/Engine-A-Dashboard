@@ -8,6 +8,15 @@
       "peak": 30.05,
       "source": "Double",
       "buy_date": "2026-04-21"
+    },
+    {
+      "stock": "Indus Towers",
+      "ticker": "INDUSTOWER",
+      "entry": 405.8,
+      "qty": 50,
+      "peak": 405.8,
+      "source": "Double",
+      "buy_date": "2026-04-21"
     }
   ],
   "engine_c": [],
@@ -154,7 +163,7 @@
       "rev_qoq": -0.51,
       "profit_qoq": -3.45,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "National Aluminium",
