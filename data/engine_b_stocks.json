@@ -192,6 +192,17 @@
       "buy_date": "2026-04-21",
       "de": 0.0,
       "peg": 1.37
+    },
+    {
+      "stock": "Swaraj Engines",
+      "ticker": "SWARAJENG",
+      "entry": 4036.2,
+      "qty": 3,
+      "peak": 4036.2,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.0,
+      "peg": 1.37
     }
   ],
   "engine_b_watchlist": [
