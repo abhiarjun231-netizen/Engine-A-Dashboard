@@ -203,6 +203,17 @@
       "buy_date": "2026-04-21",
       "de": 0.0,
       "peg": 1.37
+    },
+    {
+      "stock": "Indosolar",
+      "ticker": "WAAREEINDO",
+      "entry": 540.85,
+      "qty": 100,
+      "peak": 540.85,
+      "source": "C1",
+      "buy_date": "2026-04-21",
+      "de": 0.0,
+      "peg": 0.03
     }
   ],
   "engine_b_watchlist": [
@@ -727,7 +738,7 @@
       "peg": 0.03,
       "profit_yoy": 350.15,
       "source": "C1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Hindustan Zinc",
