@@ -82,7 +82,19 @@
       "buy_date": "2026-04-21"
     }
   ],
-  "engine_c": [],
+  "engine_c": [
+    {
+      "stock": "National Aluminium",
+      "ticker": "NATIONALUM",
+      "entry": 426.65,
+      "qty": 35,
+      "peak": 426.65,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.01,
+      "peg": 0.28
+    }
+  ],
   "engine_b_watchlist": [
     {
       "stock": "Sumeet Industries",
@@ -833,7 +845,7 @@
       "peg": 0.28,
       "profit_yoy": 164.93,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Force Motors",
