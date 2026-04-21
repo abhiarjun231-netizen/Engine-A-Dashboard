@@ -1,5 +1,15 @@
 {
-  "engine_b": [],
+  "engine_b": [
+    {
+      "stock": "Sumeet Industries",
+      "ticker": "SUMEETINDS",
+      "entry": 30.05,
+      "qty": 300,
+      "peak": 30.05,
+      "source": "Double",
+      "buy_date": "2026-04-21"
+    }
+  ],
   "engine_c": [],
   "engine_b_watchlist": [
     {
@@ -16,7 +26,7 @@
       "rev_qoq": -0.88,
       "profit_qoq": -8.32,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Indosolar",
