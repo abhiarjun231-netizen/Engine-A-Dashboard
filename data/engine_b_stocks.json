@@ -104,6 +104,17 @@
       "buy_date": "2026-04-21",
       "de": 0.01,
       "peg": 0.12
+    },
+    {
+      "stock": "Pokarna",
+      "ticker": "POKARNA",
+      "entry": 908.75,
+      "qty": 15,
+      "peak": 908.75,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.42,
+      "peg": -1.18
     }
   ],
   "engine_b_watchlist": [
@@ -932,7 +943,7 @@
       "peg": -1.18,
       "profit_yoy": 114.68,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Gokul Agro Resources",
