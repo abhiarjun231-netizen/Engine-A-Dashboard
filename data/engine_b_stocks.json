@@ -62,6 +62,15 @@
       "peak": 242.06,
       "source": "Double",
       "buy_date": "2026-04-21"
+    },
+    {
+      "stock": "EPL",
+      "ticker": "EPL",
+      "entry": 236.24,
+      "qty": 20,
+      "peak": 236.24,
+      "source": "Double",
+      "buy_date": "2026-04-21"
     }
   ],
   "engine_c": [],
@@ -512,7 +521,7 @@
       "rev_qoq": -4.74,
       "profit_qoq": -21.67,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Jindal Saw",
