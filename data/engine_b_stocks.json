@@ -148,6 +148,17 @@
       "buy_date": "2026-04-21",
       "de": 0.51,
       "peg": 0.2
+    },
+    {
+      "stock": "PTC",
+      "ticker": "PTC",
+      "entry": 192.16,
+      "qty": 100,
+      "peak": 192.16,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.51,
+      "peg": 0.2
     }
   ],
   "engine_b_watchlist": [
