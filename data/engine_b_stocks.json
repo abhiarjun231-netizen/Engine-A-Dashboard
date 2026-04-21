@@ -137,6 +137,17 @@
       "buy_date": "2026-04-21",
       "de": 0.0,
       "peg": 0.92
+    },
+    {
+      "stock": "PTC",
+      "ticker": "PTC",
+      "entry": 192.16,
+      "qty": 100,
+      "peak": 192.16,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.51,
+      "peg": 0.2
     }
   ],
   "engine_b_watchlist": [
@@ -1307,7 +1318,7 @@
       "peg": 0.2,
       "profit_yoy": 88.78,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Emcure Pharma",
