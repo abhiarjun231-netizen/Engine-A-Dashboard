@@ -115,6 +115,17 @@
       "buy_date": "2026-04-21",
       "de": 0.42,
       "peg": -1.18
+    },
+    {
+      "stock": "FIEM Industries",
+      "ticker": "FIEMIND",
+      "entry": 2250.5,
+      "qty": 8,
+      "peak": 2250.5,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.0,
+      "peg": 0.92
     }
   ],
   "engine_b_watchlist": [
@@ -1057,7 +1068,7 @@
       "peg": 0.92,
       "profit_yoy": 23.67,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Carraro",
