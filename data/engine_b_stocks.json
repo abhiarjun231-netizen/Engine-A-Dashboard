@@ -71,6 +71,15 @@
       "peak": 236.24,
       "source": "Double",
       "buy_date": "2026-04-21"
+    },
+    {
+      "stock": "D-Link",
+      "ticker": "DLINKINDIA",
+      "entry": 454.6,
+      "qty": 50,
+      "peak": 454.6,
+      "source": "B1",
+      "buy_date": "2026-04-21"
     }
   ],
   "engine_c": [],
@@ -345,7 +354,7 @@
       "rev_qoq": 4.94,
       "profit_qoq": 5.19,
       "source": "B1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Engineers India",
