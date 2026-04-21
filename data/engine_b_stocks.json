@@ -236,6 +236,17 @@
       "buy_date": "2026-04-21",
       "de": 0.54,
       "peg": 1.25
+    },
+    {
+      "stock": "Garden Reach Shipbuilders",
+      "ticker": "GRSE",
+      "entry": 2667.8,
+      "qty": 7,
+      "peak": 2667.8,
+      "source": "C1",
+      "buy_date": "2026-04-21",
+      "de": 0.0,
+      "peg": 0.6
     }
   ],
   "engine_b_watchlist": [
@@ -1026,7 +1037,7 @@
       "peg": 0.6,
       "profit_yoy": 47.62,
       "source": "C1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Bajaj Consumer Care",
