@@ -225,6 +225,17 @@
       "buy_date": "2026-04-21",
       "de": 0.67,
       "peg": 0.46
+    },
+    {
+      "stock": "SML Mahindra",
+      "ticker": "SMLMAH",
+      "entry": 4321.6,
+      "qty": 3,
+      "peak": 4321.6,
+      "source": "C1",
+      "buy_date": "2026-04-21",
+      "de": 0.54,
+      "peg": 1.25
     }
   ],
   "engine_b_watchlist": [
@@ -901,7 +912,7 @@
       "peg": 1.25,
       "profit_yoy": 31.29,
       "source": "C1",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Indus Towers",
