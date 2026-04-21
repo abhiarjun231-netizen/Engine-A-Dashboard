@@ -35,6 +35,15 @@
       "peak": 192.16,
       "source": "Double",
       "buy_date": "2026-04-21"
+    },
+    {
+      "stock": "Indo Tech Transformers",
+      "ticker": "INDOTECH",
+      "entry": 1917.9,
+      "qty": 10,
+      "peak": 1917.9,
+      "source": "Double",
+      "buy_date": "2026-04-21"
     }
   ],
   "engine_c": [],
@@ -277,7 +286,7 @@
       "rev_qoq": 7.35,
       "profit_qoq": 0.48,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "Mawana Sugars",
