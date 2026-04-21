@@ -181,6 +181,17 @@
       "buy_date": "2026-04-21",
       "de": 0.24,
       "peg": 0.57
+    },
+    {
+      "stock": "Swaraj Engines",
+      "ticker": "SWARAJENG",
+      "entry": 4036.2,
+      "qty": 3,
+      "peak": 4036.2,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.0,
+      "peg": 1.37
     }
   ],
   "engine_b_watchlist": [
@@ -762,7 +773,7 @@
       "peg": 1.37,
       "profit_yoy": 18.27,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "GE T&D",
