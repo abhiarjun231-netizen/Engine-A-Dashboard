@@ -53,6 +53,15 @@
       "peak": 1917.9,
       "source": "Double",
       "buy_date": "2026-04-21"
+    },
+    {
+      "stock": "Engineers India",
+      "ticker": "ENGINERSIN",
+      "entry": 242.06,
+      "qty": 100,
+      "peak": 242.06,
+      "source": "Double",
+      "buy_date": "2026-04-21"
     }
   ],
   "engine_c": [],
@@ -343,7 +352,7 @@
       "rev_qoq": 31.36,
       "profit_qoq": 315.84,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "SRM Contractors",
