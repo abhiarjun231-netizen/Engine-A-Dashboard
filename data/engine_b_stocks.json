@@ -159,6 +159,17 @@
       "buy_date": "2026-04-21",
       "de": 0.51,
       "peg": 0.2
+    },
+    {
+      "stock": "GPT Infraprojects",
+      "ticker": "GPTINFRA",
+      "entry": 114.24,
+      "qty": 170,
+      "peak": 114.24,
+      "source": "Double",
+      "buy_date": "2026-04-21",
+      "de": 0.24,
+      "peg": 0.57
     }
   ],
   "engine_b_watchlist": [
@@ -1367,7 +1378,7 @@
       "peg": 0.57,
       "profit_yoy": 38.42,
       "source": "Double",
-      "action": "REVIEW"
+      "action": "BOUGHT"
     },
     {
       "stock": "EPL",
