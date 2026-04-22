@@ -211,6 +211,7 @@ date,symbol,close,source
 2026-04-17,Brent Crude,91.69000244140625,yfinance
 2026-04-20,Brent Crude,94.16999816894531,yfinance
 2026-04-21,Brent Crude,94.88999938964844,yfinance
+2026-04-22,Brent Crude,92.7699966430664,yfinance
 2025-06-18,DXY,98.91000366210938,yfinance
 2025-06-20,DXY,98.70999908447266,yfinance
 2025-06-23,DXY,98.41999816894531,yfinance
@@ -423,6 +424,7 @@ date,symbol,close,source
 2026-04-19,DXY,98.3010025024414,yfinance
 2026-04-20,DXY,98.3030014038086,yfinance
 2026-04-21,DXY,98.14700317382812,yfinance
+2026-04-22,DXY,98.38999938964844,yfinance
 2025-06-18,Global VIX,20.139999389648438,yfinance
 2025-06-20,Global VIX,20.6200008392334,yfinance
 2025-06-23,Global VIX,19.829999923706055,yfinance
@@ -853,6 +855,7 @@ date,symbol,close,source
 2026-04-19,INR/USD,92.57499694824219,yfinance
 2026-04-20,INR/USD,92.56400299072266,yfinance
 2026-04-21,INR/USD,93.32499694824219,yfinance
+2026-04-22,INR/USD,93.72000122070312,yfinance
 2025-06-19,India VIX,14.26,AngelOne
 2025-06-20,India VIX,13.67,AngelOne
 2025-06-23,India VIX,14.05,AngelOne
@@ -1059,6 +1062,8 @@ date,symbol,close,source
 2026-04-16,India VIX,18.09,AngelOne
 2026-04-17,India VIX,17.25,AngelOne
 2026-04-20,India VIX,18.05,AngelOne
+2026-04-21,India VIX,17.53,AngelOne
+2026-04-22,India VIX,18.32,AngelOne
 2025-06-19,Nifty 50,24793.25,AngelOne
 2025-06-20,Nifty 50,25112.4,AngelOne
 2025-06-23,Nifty 50,24971.9,AngelOne
@@ -1265,6 +1270,8 @@ date,symbol,close,source
 2026-04-16,Nifty 50,24196.75,AngelOne
 2026-04-17,Nifty 50,24314.3,AngelOne
 2026-04-20,Nifty 50,24288.4,AngelOne
+2026-04-21,Nifty 50,24576.6,AngelOne
+2026-04-22,Nifty 50,24420.95,AngelOne
 2025-06-19,Nifty 500,22763.5,AngelOne
 2025-06-20,Nifty 500,23041.1,AngelOne
 2025-06-23,Nifty 500,23001.5,AngelOne
@@ -1470,6 +1477,7 @@ date,symbol,close,source
 2026-04-15,Nifty 500,22595.55,AngelOne
 2026-04-17,Nifty 500,22836.15,AngelOne
 2026-04-20,Nifty 500,22777.05,AngelOne
+2026-04-22,Nifty 500,22981.95,AngelOne
 2025-06-19,Nifty Midcap 100,57159.95,AngelOne
 2025-06-20,Nifty Midcap 100,57995.5,AngelOne
 2025-06-23,Nifty Midcap 100,58206.8,AngelOne
@@ -1675,6 +1683,7 @@ date,symbol,close,source
 2026-04-15,Nifty Midcap 100,58777.75,AngelOne
 2026-04-17,Nifty Midcap 100,59792.0,AngelOne
 2026-04-20,Nifty Midcap 100,59671.5,AngelOne
+2026-04-22,Nifty Midcap 100,60081.7,AngelOne
 2025-06-19,Nifty Midcap 50,16102.0,AngelOne
 2025-06-20,Nifty Midcap 50,16357.25,AngelOne
 2025-06-23,Nifty Midcap 50,16420.8,AngelOne
@@ -1880,6 +1889,7 @@ date,symbol,close,source
 2026-04-15,Nifty Midcap 50,16699.4,AngelOne
 2026-04-17,Nifty Midcap 50,16980.3,AngelOne
 2026-04-20,Nifty Midcap 50,16962.25,AngelOne
+2026-04-22,Nifty Midcap 50,17046.3,AngelOne
 2025-06-18,US 10Y Yield,4.396999835968018,yfinance
 2025-06-20,US 10Y Yield,4.375,yfinance
 2025-06-23,US 10Y Yield,4.320000171661377,yfinance
