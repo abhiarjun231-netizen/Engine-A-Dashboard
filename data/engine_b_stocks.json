@@ -41,7 +41,7 @@
       "ticker": "INDOTECH",
       "entry": 1917.9,
       "qty": 10,
-      "peak": 2329.1,
+      "peak": 2394.7,
       "source": "Double",
       "buy_date": "2026-04-21"
     },
@@ -50,7 +50,7 @@
       "ticker": "INDOTECH",
       "entry": 1917.9,
       "qty": 10,
-      "peak": 2329.1,
+      "peak": 2394.7,
       "source": "Double",
       "buy_date": "2026-04-21"
     },
@@ -88,7 +88,7 @@
       "ticker": "NATIONALUM",
       "entry": 426.65,
       "qty": 35,
-      "peak": 439.8,
+      "peak": 440.75,
       "source": "Double",
       "buy_date": "2026-04-21",
       "de": 0.01,
