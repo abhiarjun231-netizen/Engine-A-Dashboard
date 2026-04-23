@@ -41,7 +41,7 @@
       "ticker": "INDOTECH",
       "entry": 1917.9,
       "qty": 10,
-      "peak": 2245.8,
+      "peak": 2329.1,
       "source": "Double",
       "buy_date": "2026-04-21"
     },
@@ -50,7 +50,7 @@
       "ticker": "INDOTECH",
       "entry": 1917.9,
       "qty": 10,
-      "peak": 2245.8,
+      "peak": 2329.1,
       "source": "Double",
       "buy_date": "2026-04-21"
     },
@@ -88,7 +88,7 @@
       "ticker": "NATIONALUM",
       "entry": 426.65,
       "qty": 35,
-      "peak": 435.95,
+      "peak": 439.8,
       "source": "Double",
       "buy_date": "2026-04-21",
       "de": 0.01,
@@ -242,7 +242,7 @@
       "ticker": "GRSE",
       "entry": 2667.8,
       "qty": 7,
-      "peak": 2817.8,
+      "peak": 2830.0,
       "source": "C1",
       "buy_date": "2026-04-21",
       "de": 0.0,
@@ -253,7 +253,7 @@
       "ticker": "GRSE",
       "entry": 2667.8,
       "qty": 7,
-      "peak": 2817.8,
+      "peak": 2830.0,
       "source": "C1",
       "buy_date": "2026-04-21",
       "de": 0.0,
@@ -1767,5 +1767,5 @@
       "name": "PTC"
     }
   },
-  "_last_token_update": "2026-04-22"
+  "_last_token_update": "2026-04-23"
 }
