@@ -52,6 +52,8 @@ SCORE_FILE  = Path("data/engine_a_score.csv")
 LIVE_FILE   = Path("data/live_prices.csv")
 GLOBAL_FILE = Path("data/global_prices.csv")
 MANUAL_FILE = Path("manual_inputs.json")
+STOCKS_FILE = Path("data/engine_b_stocks.json")
+PRICES_FILE = Path("data/engine_b_prices.csv")
 
 def load_latest_score():
     if not SCORE_FILE.exists(): return None
@@ -72,6 +74,23 @@ def load_manual_full():
     if not MANUAL_FILE.exists(): return {}
     with open(MANUAL_FILE, "r") as f:
         return json.load(f)
+
+def load_stocks_data():
+    if not STOCKS_FILE.exists(): return {}
+    with open(STOCKS_FILE, "r") as f:
+        return json.load(f)
+
+def load_stock_prices():
+    if not PRICES_FILE.exists(): return {}
+    df = pd.read_csv(PRICES_FILE)
+    result = {}
+    for _, row in df.iterrows():
+        ticker = row.get("ticker", "")
+        price = row.get("price", "")
+        if ticker and price != "" and pd.notna(price):
+            try: result[ticker] = float(price)
+            except: pass
+    return result
 
 # ============================================================
 # HELPERS (colors adjusted for white background)
@@ -114,6 +133,8 @@ def show_engine_a():
     score = load_latest_score()
     live = load_live()
     glob = load_global()
+    stocks_data = load_stocks_data()
+    stock_prices = load_stock_prices()
     manual = {k: v.get("value") for k, v in manual_full.items() if not k.startswith("_")}
 
     if score is None:
@@ -203,6 +224,286 @@ def show_engine_a():
         "</div>",
         unsafe_allow_html=True
     )
+
+    # ============================================================
+    # CAPITAL DEPLOYMENT
+    # ============================================================
+    total_capital = float(stocks_data.get("_capital", 100000))
+
+    # Calculate allocation amounts in rupees
+    eq_amount = round(total_capital * eq / 100)
+    eb_amount = round(total_capital * eb / 100)
+    ec_amount = round(total_capital * ec / 100)
+    debt_amount = round(total_capital * debt / 100)
+    gold_amount = round(total_capital * gold / 100)
+
+    # Calculate deployed from active positions
+    b_invested = 0; b_current = 0
+    for s in stocks_data.get("engine_b", []):
+        try:
+            entry = float(s.get("entry", 0))
+            qty = int(s.get("qty", 0))
+            b_invested += entry * qty
+            ticker = s.get("ticker", "")
+            cur_price = stock_prices.get(ticker, entry)
+            b_current += cur_price * qty
+        except: pass
+
+    c_invested = 0; c_current = 0
+    for s in stocks_data.get("engine_c", []):
+        try:
+            entry = float(s.get("entry", 0))
+            qty = int(s.get("qty", 0))
+            c_invested += entry * qty
+            ticker = s.get("ticker", "")
+            cur_price = stock_prices.get(ticker, entry)
+            c_current += cur_price * qty
+        except: pass
+
+    total_invested = b_invested + c_invested
+    total_current = b_current + c_current
+    total_pnl = total_current - total_invested
+    pnl_pct = (total_pnl / total_invested * 100) if total_invested > 0 else 0
+    pnl_color = "#16a34a" if total_pnl >= 0 else "#dc2626"
+    pnl_sign = "+" if total_pnl >= 0 else ""
+
+    b_available = max(0, eb_amount - b_invested)
+    c_available = max(0, ec_amount - c_invested)
+
+    st.markdown("<div class='section-title'>Capital Deployment</div>", unsafe_allow_html=True)
+
+    # Total capital hero
+    st.markdown(
+        "<div class='data-card' style='text-align:center;padding:20px;'>"
+        "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;"
+        "letter-spacing:2px;font-weight:600;margin-bottom:6px;'>Total Capital</div>"
+        f"<div style='font-size:32px;font-weight:800;color:#1e293b;"
+        f"font-family:DM Sans,sans-serif;'>₹{total_capital:,.0f}</div>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+    # Allocation breakdown in rupees
+    alloc_html = (
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine B (Short-Term)</div>"
+        f"<div class='data-value' style='color:#16a34a'>₹{eb_amount:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine C (Long-Term)</div>"
+        f"<div class='data-value' style='color:#16a34a'>₹{ec_amount:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Debt</div>"
+        f"<div class='data-value' style='color:#2563eb'>₹{debt_amount:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Gold</div>"
+        f"<div class='data-value' style='color:#d97706'>₹{gold_amount:,}</div>"
+        "</div>"
+    )
+    st.markdown(f"<div class='data-card'>{alloc_html}</div>", unsafe_allow_html=True)
+
+    # Portfolio status
+    if total_invested > 0:
+        status_html = (
+            "<div class='data-row'>"
+            "<div class='data-label'>Total Invested</div>"
+            f"<div class='data-value'>₹{total_invested:,.0f}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            "<div class='data-label'>Current Value</div>"
+            f"<div class='data-value'>₹{total_current:,.0f}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            "<div class='data-label'>P&L</div>"
+            f"<div class='data-value' style='color:{pnl_color}'>"
+            f"{pnl_sign}₹{abs(total_pnl):,.0f} ({pnl_sign}{pnl_pct:.1f}%)</div>"
+            "</div>"
+            "<div class='data-row'>"
+            "<div class='data-label'>Cash Available</div>"
+            f"<div class='data-value'>₹{total_capital - total_invested:,.0f}</div>"
+            "</div>"
+        )
+        st.markdown(f"<div class='data-card'>{status_html}</div>", unsafe_allow_html=True)
+
+    # Deployment status per engine
+    deploy_html = (
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine B — Deployed</div>"
+        f"<div class='data-value'>₹{b_invested:,.0f} / ₹{eb_amount:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine B — Available</div>"
+        f"<div class='data-value' style='color:#16a34a'>₹{b_available:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine C — Deployed</div>"
+        f"<div class='data-value'>₹{c_invested:,.0f} / ₹{ec_amount:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine C — Available</div>"
+        f"<div class='data-value' style='color:#16a34a'>₹{c_available:,}</div>"
+        "</div>"
+    )
+    st.markdown(f"<div class='data-card'>{deploy_html}</div>", unsafe_allow_html=True)
+
+    # ============================================================
+    # TAX ESTIMATE (India Budget 2024 rates)
+    # STCG (< 12 months): 20%  |  LTCG (>= 12 months): 12.5%
+    # LTCG exemption: ₹1,25,000 per financial year
+    # ============================================================
+    today_date = datetime.now().date()
+
+    # Classify REALIZED gains from closed trades
+    realized_stcg = 0; realized_ltcg = 0
+    stcg_trades = 0; ltcg_trades = 0
+
+    for trade in stocks_data.get("engine_b_closed", []) + stocks_data.get("engine_c_closed", []):
+        try:
+            pnl = float(trade.get("pnl", 0))
+            buy_date_str = trade.get("buy_date", "")
+            sell_date_str = trade.get("exit_date", trade.get("sell_date", ""))
+            if buy_date_str and sell_date_str:
+                buy_dt = datetime.strptime(buy_date_str, "%Y-%m-%d").date()
+                sell_dt = datetime.strptime(sell_date_str, "%Y-%m-%d").date()
+                holding_days = (sell_dt - buy_dt).days
+            else:
+                holding_days = 0
+
+            if holding_days >= 365:
+                realized_ltcg += pnl
+                ltcg_trades += 1
+            else:
+                realized_stcg += pnl
+                stcg_trades += 1
+        except: pass
+
+    # Classify UNREALIZED gains from active positions
+    unrealized_stcg = 0; unrealized_ltcg = 0
+    stcg_positions = 0; ltcg_positions = 0
+
+    for s in stocks_data.get("engine_b", []) + stocks_data.get("engine_c", []):
+        try:
+            entry = float(s.get("entry", 0))
+            qty = int(s.get("qty", 0))
+            ticker = s.get("ticker", "")
+            cur_price = stock_prices.get(ticker, entry)
+            unrealized_pnl = (cur_price - entry) * qty
+
+            buy_date_str = s.get("buy_date", "")
+            if buy_date_str:
+                buy_dt = datetime.strptime(buy_date_str, "%Y-%m-%d").date()
+                holding_days = (today_date - buy_dt).days
+            else:
+                holding_days = 0
+
+            if holding_days >= 365:
+                unrealized_ltcg += unrealized_pnl
+                ltcg_positions += 1
+            else:
+                unrealized_stcg += unrealized_pnl
+                stcg_positions += 1
+        except: pass
+
+    # Tax calculations
+    stcg_tax = max(0, realized_stcg * 0.20)
+    ltcg_taxable = max(0, realized_ltcg - 125000)
+    ltcg_tax = ltcg_taxable * 0.125
+    total_tax = stcg_tax + ltcg_tax
+    total_realized = realized_stcg + realized_ltcg
+    post_tax_pnl = total_realized - total_tax
+
+    has_realized = (realized_stcg != 0 or realized_ltcg != 0)
+    has_unrealized = (unrealized_stcg != 0 or unrealized_ltcg != 0)
+    has_positions = len(stocks_data.get("engine_b", [])) + len(stocks_data.get("engine_c", [])) > 0
+    has_closed = len(stocks_data.get("engine_b_closed", [])) + len(stocks_data.get("engine_c_closed", [])) > 0
+
+    st.markdown("<div class='section-title'>Tax Estimate (FY 2026-27)</div>", unsafe_allow_html=True)
+
+    # Tax rates reference
+    st.markdown(
+        "<div class='data-card' style='padding:14px 18px;'>"
+        "<div class='data-row'>"
+        "<div class='data-label'>STCG Rate (< 12 months)</div>"
+        "<div class='data-value' style='color:#d97706'>20%</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>LTCG Rate (≥ 12 months)</div>"
+        "<div class='data-value' style='color:#2563eb'>12.5%</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>LTCG Exemption</div>"
+        "<div class='data-value'>₹1,25,000 / year</div>"
+        "</div>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+    if has_realized or has_closed:
+        # Realized tax breakdown
+        r_stcg_color = "#16a34a" if realized_stcg >= 0 else "#dc2626"
+        r_ltcg_color = "#16a34a" if realized_ltcg >= 0 else "#dc2626"
+        r_stcg_sign = "+" if realized_stcg >= 0 else ""
+        r_ltcg_sign = "+" if realized_ltcg >= 0 else ""
+        post_color = "#16a34a" if post_tax_pnl >= 0 else "#dc2626"
+        post_sign = "+" if post_tax_pnl >= 0 else ""
+
+        tax_html = (
+            "<div class='data-row'>"
+            f"<div class='data-label'>Realized STCG ({stcg_trades} trades)</div>"
+            f"<div class='data-value' style='color:{r_stcg_color}'>"
+            f"{r_stcg_sign}₹{abs(realized_stcg):,.0f}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            f"<div class='data-label'>Realized LTCG ({ltcg_trades} trades)</div>"
+            f"<div class='data-value' style='color:{r_ltcg_color}'>"
+            f"{r_ltcg_sign}₹{abs(realized_ltcg):,.0f}</div>"
+            "</div>"
+            "<div class='data-row' style='border-top:2px solid #e2e8f0;margin-top:4px;padding-top:12px;'>"
+            "<div class='data-label'>Estimated STCG Tax (20%)</div>"
+            f"<div class='data-value' style='color:#dc2626'>₹{stcg_tax:,.0f}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            "<div class='data-label'>Estimated LTCG Tax (12.5%)</div>"
+            f"<div class='data-value' style='color:#dc2626'>₹{ltcg_tax:,.0f}</div>"
+            "</div>"
+            "<div class='data-row' style='border-top:2px solid #e2e8f0;margin-top:4px;padding-top:12px;'>"
+            "<div class='data-label' style='font-weight:700;color:#1e293b;'>Post-Tax P&L</div>"
+            f"<div class='data-value' style='color:{post_color};font-size:15px;'>"
+            f"{post_sign}₹{abs(post_tax_pnl):,.0f}</div>"
+            "</div>"
+        )
+        st.markdown(f"<div class='data-card'>{tax_html}</div>", unsafe_allow_html=True)
+
+    if has_positions:
+        # Unrealized classification
+        u_stcg_color = "#16a34a" if unrealized_stcg >= 0 else "#dc2626"
+        u_ltcg_color = "#16a34a" if unrealized_ltcg >= 0 else "#dc2626"
+        u_stcg_sign = "+" if unrealized_stcg >= 0 else ""
+        u_ltcg_sign = "+" if unrealized_ltcg >= 0 else ""
+
+        unr_html = (
+            "<div class='data-row'>"
+            f"<div class='data-label'>Unrealized STCG ({stcg_positions} pos)</div>"
+            f"<div class='data-value' style='color:{u_stcg_color}'>"
+            f"{u_stcg_sign}₹{abs(unrealized_stcg):,.0f}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            f"<div class='data-label'>Unrealized LTCG ({ltcg_positions} pos)</div>"
+            f"<div class='data-value' style='color:{u_ltcg_color}'>"
+            f"{u_ltcg_sign}₹{abs(unrealized_ltcg):,.0f}</div>"
+            "</div>"
+        )
+        st.markdown(f"<div class='data-card'>{unr_html}</div>", unsafe_allow_html=True)
+
+    if not has_realized and not has_positions and not has_closed:
+        st.markdown(
+            "<div class='data-card' style='text-align:center;padding:20px;color:#94a3b8;'>"
+            "No trades yet. Tax estimates will appear once you start trading."
+            "</div>",
+            unsafe_allow_html=True
+        )
 
     # COMPONENT BREAKDOWN
     st.markdown("<div class='section-title'>Component Breakdown</div>", unsafe_allow_html=True)
