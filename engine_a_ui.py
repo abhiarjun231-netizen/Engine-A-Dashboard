@@ -1,7 +1,7 @@
 """
 engine_a_ui.py - All Engine A display logic
 Called by App.py via show_engine_a()
-Updated for White Theme v5.0
+White Theme v5.1 — 5 improvements added
 """
 
 import streamlit as st
@@ -10,7 +10,7 @@ import json
 import base64
 import requests
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, date
 
 # ============================================================
 # GITHUB CONFIG
@@ -20,6 +20,9 @@ GITHUB_REPO = "Engine-A-Dashboard"
 GITHUB_BRANCH = "main"
 MANUAL_FILE_PATH = "manual_inputs.json"
 WORKFLOW_FILE = "test.yml"
+
+# PAT expiry date (update when renewed)
+PAT_EXPIRY = date(2026, 5, 15)
 
 def get_github_token():
     try:
@@ -48,12 +51,14 @@ def trigger_workflow():
 # ============================================================
 # DATA LOADERS
 # ============================================================
-SCORE_FILE  = Path("data/engine_a_score.csv")
-LIVE_FILE   = Path("data/live_prices.csv")
-GLOBAL_FILE = Path("data/global_prices.csv")
-MANUAL_FILE = Path("manual_inputs.json")
-STOCKS_FILE = Path("data/engine_b_stocks.json")
-PRICES_FILE = Path("data/engine_b_prices.csv")
+SCORE_FILE    = Path("data/engine_a_score.csv")
+LIVE_FILE     = Path("data/live_prices.csv")
+GLOBAL_FILE   = Path("data/global_prices.csv")
+MANUAL_FILE   = Path("manual_inputs.json")
+STOCKS_FILE   = Path("data/engine_b_stocks.json")
+PRICES_FILE   = Path("data/engine_b_prices.csv")
+HISTORY_FILE  = Path("data/score_history.csv")
+HIST_PRICE    = Path("data/historical_prices.csv")
 
 def load_latest_score():
     if not SCORE_FILE.exists(): return None
@@ -92,8 +97,45 @@ def load_stock_prices():
             except: pass
     return result
 
+def load_score_history():
+    if not HISTORY_FILE.exists(): return pd.DataFrame()
+    try:
+        df = pd.read_csv(HISTORY_FILE)
+        if "timestamp" in df.columns and "raw_score" in df.columns:
+            df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+            df = df.dropna(subset=["timestamp", "raw_score"])
+            df = df.sort_values("timestamp")
+            return df
+    except: pass
+    return pd.DataFrame()
+
+def load_200dma():
+    if not HIST_PRICE.exists(): return None
+    try:
+        df = pd.read_csv(HIST_PRICE)
+        nifty_col = None
+        for col in df.columns:
+            if "nifty" in col.lower() and "50" in col:
+                nifty_col = col
+                break
+        if nifty_col is None:
+            for col in df.columns:
+                if col.lower() not in ("date", "timestamp"):
+                    nifty_col = col
+                    break
+        if nifty_col is None: return None
+        vals = pd.to_numeric(df[nifty_col], errors="coerce").dropna()
+        if len(vals) >= 200:
+            dma = vals.tail(200).mean()
+            return round(dma, 2)
+        elif len(vals) > 0:
+            dma = vals.mean()
+            return round(dma, 2)
+    except: pass
+    return None
+
 # ============================================================
-# HELPERS (colors adjusted for white background)
+# HELPERS
 # ============================================================
 def condition_color(c):
     return {
@@ -135,27 +177,98 @@ def show_engine_a():
     glob = load_global()
     stocks_data = load_stocks_data()
     stock_prices = load_stock_prices()
+    score_history = load_score_history()
+    dma_200 = load_200dma()
     manual = {k: v.get("value") for k, v in manual_full.items() if not k.startswith("_")}
 
     if score is None:
         st.error("No score data yet. Trigger the workflow to generate the first score.")
         return
 
+    today = date.today()
+
+    # ============================================================
+    # IMPROVEMENT 5: PAT EXPIRY WARNING
+    # ============================================================
+    days_to_expiry = (PAT_EXPIRY - today).days
+    if days_to_expiry <= 0:
+        st.markdown(
+            "<div style='background:#fef2f2;border:1px solid #fecaca;border-radius:12px;"
+            "padding:14px 18px;margin-bottom:12px;'>"
+            "<span style='font-size:16px;margin-right:8px;'>&#9888;</span>"
+            "<span style='color:#dc2626;font-weight:600;font-size:13px;'>"
+            "GitHub PAT has EXPIRED. Dashboard cannot save or refresh. "
+            "Renew now: GitHub → Settings → Developer settings → Fine-grained tokens → Regenerate."
+            "</span></div>",
+            unsafe_allow_html=True
+        )
+    elif days_to_expiry <= 7:
+        st.markdown(
+            f"<div style='background:#fffbeb;border:1px solid #fde68a;border-radius:12px;"
+            f"padding:14px 18px;margin-bottom:12px;'>"
+            f"<span style='font-size:16px;margin-right:8px;'>&#9888;</span>"
+            f"<span style='color:#d97706;font-weight:600;font-size:13px;'>"
+            f"GitHub PAT expires in {days_to_expiry} day{'s' if days_to_expiry != 1 else ''}. "
+            f"Renew soon: GitHub → Settings → Developer settings → Fine-grained tokens → Regenerate."
+            f"</span></div>",
+            unsafe_allow_html=True
+        )
+
+    # ============================================================
+    # IMPROVEMENT 4: SUNDAY REMINDER
+    # ============================================================
+    if today.weekday() == 6:  # Sunday
+        st.markdown(
+            "<div style='background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;"
+            "padding:14px 18px;margin-bottom:12px;'>"
+            "<span style='font-size:16px;margin-right:8px;'>&#128197;</span>"
+            "<span style='color:#16a34a;font-weight:600;font-size:13px;'>"
+            "It's Sunday — time for your weekly scoring review. "
+            "Update manual inputs (FII, DII, Breadth) from Trendlyne, then Save &amp; Rescore."
+            "</span></div>",
+            unsafe_allow_html=True
+        )
+
     # HEADER
     st.markdown("<div class='score-title'>Engine A — Market Strength</div>", unsafe_allow_html=True)
 
-    # HERO
+    # ============================================================
+    # IMPROVEMENT 2: SCORE CHANGE INDICATOR
+    # ============================================================
     sc = score["raw_score"]; cond = score["market_condition"]; ts = score["timestamp"]
     try:
         ts_pretty = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").strftime("%d %b %Y, %I:%M %p")
     except: ts_pretty = ts
 
+    # Calculate change from previous score
+    change_html = ""
+    if not score_history.empty and len(score_history) >= 2:
+        prev_score = int(score_history.iloc[-2]["raw_score"])
+        change = sc - prev_score
+        if change > 0:
+            change_html = (
+                f"<div style='font-size:14px;color:#16a34a;font-weight:700;"
+                f"margin-top:6px;'>&#9650; +{change} from previous</div>"
+            )
+        elif change < 0:
+            change_html = (
+                f"<div style='font-size:14px;color:#dc2626;font-weight:700;"
+                f"margin-top:6px;'>&#9660; {change} from previous</div>"
+            )
+        else:
+            change_html = (
+                "<div style='font-size:14px;color:#94a3b8;font-weight:600;"
+                "margin-top:6px;'>&#8212; No change from previous</div>"
+            )
+
+    # HERO CARD
     st.markdown(
         "<div class='score-card'>"
         "<div class='score-title'>Current Score</div>"
         f"<div class='score-number' style='color:{score_color(sc)}'>{sc}</div>"
         "<div class='score-denominator'>/ 100</div>"
         f"<div class='score-condition' style='color:{condition_color(cond)}'>{cond}</div>"
+        f"{change_html}"
         f"<div class='score-timestamp'>Last updated: {ts_pretty}</div>"
         "</div>",
         unsafe_allow_html=True
@@ -171,6 +284,53 @@ def show_engine_a():
             st.balloons()
         else:
             st.error(f"{msg}")
+
+    # ============================================================
+    # IMPROVEMENT 3: NIFTY vs 200 DMA GAP
+    # ============================================================
+    nifty_price = live.get("Nifty 50")
+    if nifty_price and dma_200:
+        try:
+            nifty_val = float(nifty_price)
+            gap_pct = ((nifty_val - dma_200) / dma_200) * 100
+            gap_color = "#16a34a" if gap_pct >= 0 else "#dc2626"
+            gap_sign = "+" if gap_pct >= 0 else ""
+            above_below = "Above" if gap_pct >= 0 else "Below"
+            dma_direction = str(score.get("dma_direction", ""))
+            dir_badge = ""
+            if dma_direction:
+                dir_color = "#16a34a" if dma_direction == "Rising" else "#dc2626"
+                dir_badge = (
+                    f"<span style='background:{dir_color};color:white;font-size:10px;"
+                    f"padding:3px 8px;border-radius:6px;font-weight:600;"
+                    f"margin-left:8px;'>{dma_direction}</span>"
+                )
+            st.markdown(
+                "<div class='data-card' style='padding:16px 18px;'>"
+                "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'>"
+                "<div style='font-size:12px;color:#94a3b8;text-transform:uppercase;"
+                "letter-spacing:1.5px;font-weight:600;'>Nifty vs 200 DMA</div>"
+                f"<div style='font-size:13px;font-weight:700;color:{gap_color};'>"
+                f"{gap_sign}{gap_pct:.1f}% {above_below}{dir_badge}</div>"
+                "</div>"
+                "<div style='display:flex;justify-content:space-between;'>"
+                "<div>"
+                "<div style='font-size:11px;color:#94a3b8;'>Nifty 50</div>"
+                f"<div style='font-size:18px;font-weight:800;color:#1e293b;'>{nifty_val:,.0f}</div>"
+                "</div>"
+                "<div style='text-align:right;'>"
+                "<div style='font-size:11px;color:#94a3b8;'>200 DMA</div>"
+                f"<div style='font-size:18px;font-weight:800;color:#64748b;'>{dma_200:,.0f}</div>"
+                "</div>"
+                "</div>"
+                "<div style='height:6px;background:#e2e8f0;border-radius:4px;margin-top:10px;overflow:hidden;'>"
+                f"<div style='height:100%;width:{min(100, max(5, 50 + gap_pct * 2))}%;"
+                f"background:{gap_color};border-radius:4px;transition:width 0.5s ease;'></div>"
+                "</div>"
+                "</div>",
+                unsafe_allow_html=True
+            )
+        except: pass
 
     # ALLOCATION
     eq = int(score["equity_pct"]); eb = int(score["engine_b_pct"]); ec = int(score["engine_c_pct"])
@@ -230,14 +390,12 @@ def show_engine_a():
     # ============================================================
     total_capital = float(stocks_data.get("_capital", 100000))
 
-    # Calculate allocation amounts in rupees
     eq_amount = round(total_capital * eq / 100)
     eb_amount = round(total_capital * eb / 100)
     ec_amount = round(total_capital * ec / 100)
     debt_amount = round(total_capital * debt / 100)
     gold_amount = round(total_capital * gold / 100)
 
-    # Calculate deployed from active positions
     b_invested = 0; b_current = 0
     for s in stocks_data.get("engine_b", []):
         try:
@@ -396,13 +554,10 @@ def show_engine_a():
     st.markdown(f"<div class='data-card'>{deploy_html}</div>", unsafe_allow_html=True)
 
     # ============================================================
-    # TAX ESTIMATE (India Budget 2024 rates)
-    # STCG (< 12 months): 20%  |  LTCG (>= 12 months): 12.5%
-    # LTCG exemption: ₹1,25,000 per financial year
+    # TAX ESTIMATE
     # ============================================================
     today_date = datetime.now().date()
 
-    # Classify REALIZED gains from closed trades
     realized_stcg = 0; realized_ltcg = 0
     stcg_trades = 0; ltcg_trades = 0
 
@@ -417,7 +572,6 @@ def show_engine_a():
                 holding_days = (sell_dt - buy_dt).days
             else:
                 holding_days = 0
-
             if holding_days >= 365:
                 realized_ltcg += pnl
                 ltcg_trades += 1
@@ -426,7 +580,6 @@ def show_engine_a():
                 stcg_trades += 1
         except: pass
 
-    # Classify UNREALIZED gains from active positions
     unrealized_stcg = 0; unrealized_ltcg = 0
     stcg_positions = 0; ltcg_positions = 0
 
@@ -437,14 +590,12 @@ def show_engine_a():
             ticker = s.get("ticker", "")
             cur_price = stock_prices.get(ticker, entry)
             unrealized_pnl = (cur_price - entry) * qty
-
             buy_date_str = s.get("buy_date", "")
             if buy_date_str:
                 buy_dt = datetime.strptime(buy_date_str, "%Y-%m-%d").date()
                 holding_days = (today_date - buy_dt).days
             else:
                 holding_days = 0
-
             if holding_days >= 365:
                 unrealized_ltcg += unrealized_pnl
                 ltcg_positions += 1
@@ -453,7 +604,6 @@ def show_engine_a():
                 stcg_positions += 1
         except: pass
 
-    # Tax calculations
     stcg_tax = max(0, realized_stcg * 0.20)
     ltcg_taxable = max(0, realized_ltcg - 125000)
     ltcg_tax = ltcg_taxable * 0.125
@@ -468,7 +618,6 @@ def show_engine_a():
 
     st.markdown("<div class='section-title'>Tax Estimate (FY 2026-27)</div>", unsafe_allow_html=True)
 
-    # Tax rates reference
     st.markdown(
         "<div class='data-card' style='padding:14px 18px;'>"
         "<div class='data-row'>"
@@ -488,7 +637,6 @@ def show_engine_a():
     )
 
     if has_realized or has_closed:
-        # Realized tax breakdown
         r_stcg_color = "#16a34a" if realized_stcg >= 0 else "#dc2626"
         r_ltcg_color = "#16a34a" if realized_ltcg >= 0 else "#dc2626"
         r_stcg_sign = "+" if realized_stcg >= 0 else ""
@@ -524,7 +672,6 @@ def show_engine_a():
         st.markdown(f"<div class='data-card'>{tax_html}</div>", unsafe_allow_html=True)
 
     if has_positions:
-        # Unrealized classification
         u_stcg_color = "#16a34a" if unrealized_stcg >= 0 else "#dc2626"
         u_ltcg_color = "#16a34a" if unrealized_ltcg >= 0 else "#dc2626"
         u_stcg_sign = "+" if unrealized_stcg >= 0 else ""
@@ -548,6 +695,120 @@ def show_engine_a():
         st.markdown(
             "<div class='data-card' style='text-align:center;padding:20px;color:#94a3b8;'>"
             "No trades yet. Tax estimates will appear once you start trading."
+            "</div>",
+            unsafe_allow_html=True
+        )
+
+    # ============================================================
+    # IMPROVEMENT 1: SCORE HISTORY CHART
+    # ============================================================
+    st.markdown("<div class='section-title'>Score History</div>", unsafe_allow_html=True)
+
+    if not score_history.empty and len(score_history) >= 2:
+        chart_df = score_history[["timestamp", "raw_score"]].copy()
+        chart_df = chart_df.rename(columns={"timestamp": "Date", "raw_score": "Score"})
+        chart_df["Date"] = chart_df["Date"].dt.strftime("%d %b")
+        chart_df["Score"] = chart_df["Score"].astype(int)
+
+        # Show last 12 data points max for clean mobile view
+        chart_df = chart_df.tail(12)
+
+        # Build score band colors inline
+        scores = chart_df["Score"].tolist()
+        dates = chart_df["Date"].tolist()
+
+        # SVG sparkline chart
+        n = len(scores)
+        min_s = max(0, min(scores) - 10)
+        max_s = min(100, max(scores) + 10)
+        range_s = max_s - min_s if max_s != min_s else 1
+        w = 320; h = 120; pad = 20
+
+        points = []
+        for i, s in enumerate(scores):
+            x = pad + i * ((w - 2 * pad) / max(1, n - 1))
+            y = h - pad - ((s - min_s) / range_s) * (h - 2 * pad)
+            points.append((x, y, s, dates[i]))
+
+        polyline = " ".join([f"{p[0]:.1f},{p[1]:.1f}" for p in points])
+
+        # Color-coded score bands background
+        svg = f"<svg viewBox='0 0 {w} {h}' style='width:100%;height:auto;'>"
+        # Score band guides
+        for band_val in [30, 52]:
+            band_y = h - pad - ((band_val - min_s) / range_s) * (h - 2 * pad)
+            if pad < band_y < h - pad:
+                svg += (f"<line x1='{pad}' y1='{band_y:.1f}' x2='{w-pad}' y2='{band_y:.1f}' "
+                        f"stroke='#e2e8f0' stroke-width='1' stroke-dasharray='4,4'/>")
+                label = "WEAK" if band_val == 30 else "NEUTRAL"
+                svg += (f"<text x='{w-pad+4}' y='{band_y+4:.1f}' fill='#94a3b8' "
+                        f"font-size='8' font-family='DM Sans'>{label}</text>")
+
+        # Line
+        svg += (f"<polyline fill='none' stroke='#3b82f6' stroke-width='2.5' "
+                f"stroke-linecap='round' stroke-linejoin='round' points='{polyline}'/>")
+
+        # Gradient fill under line
+        fill_points = polyline + f" {points[-1][0]:.1f},{h-pad} {points[0][0]:.1f},{h-pad}"
+        svg += (f"<defs><linearGradient id='sg' x1='0' y1='0' x2='0' y2='1'>"
+                f"<stop offset='0%' stop-color='#3b82f6' stop-opacity='0.15'/>"
+                f"<stop offset='100%' stop-color='#3b82f6' stop-opacity='0.02'/>"
+                f"</linearGradient></defs>")
+        svg += f"<polygon fill='url(#sg)' points='{fill_points}'/>"
+
+        # Dots + labels
+        for i, (x, y, s, d) in enumerate(points):
+            color = score_color(s)
+            svg += f"<circle cx='{x:.1f}' cy='{y:.1f}' r='4' fill='{color}' stroke='white' stroke-width='2'/>"
+            # Show value on first, last, and every 3rd point
+            if i == 0 or i == len(points) - 1 or i % 3 == 0:
+                svg += (f"<text x='{x:.1f}' y='{y-10:.1f}' text-anchor='middle' "
+                        f"fill='{color}' font-size='10' font-weight='700' font-family='DM Sans'>{s}</text>")
+                svg += (f"<text x='{x:.1f}' y='{h-4:.1f}' text-anchor='middle' "
+                        f"fill='#94a3b8' font-size='8' font-family='DM Sans'>{d}</text>")
+
+        svg += "</svg>"
+
+        st.markdown(
+            f"<div class='data-card' style='padding:16px 12px;'>{svg}</div>",
+            unsafe_allow_html=True
+        )
+
+        # Quick stats row
+        latest = scores[-1]
+        oldest = scores[0]
+        high = max(scores)
+        low = min(scores)
+        avg = sum(scores) / len(scores)
+        total_change = latest - oldest
+        tc_color = "#16a34a" if total_change >= 0 else "#dc2626"
+        tc_sign = "+" if total_change >= 0 else ""
+
+        stats_html = (
+            "<div class='data-row'>"
+            "<div class='data-label'>Period High</div>"
+            f"<div class='data-value' style='color:#16a34a'>{high}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            "<div class='data-label'>Period Low</div>"
+            f"<div class='data-value' style='color:#dc2626'>{low}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            "<div class='data-label'>Average</div>"
+            f"<div class='data-value'>{avg:.0f}</div>"
+            "</div>"
+            "<div class='data-row'>"
+            "<div class='data-label'>Total Change</div>"
+            f"<div class='data-value' style='color:{tc_color}'>{tc_sign}{total_change}</div>"
+            "</div>"
+        )
+        st.markdown(f"<div class='data-card'>{stats_html}</div>", unsafe_allow_html=True)
+
+    else:
+        st.markdown(
+            "<div class='data-card' style='text-align:center;padding:20px;color:#94a3b8;'>"
+            "Score history chart will appear after 2+ data points are logged. "
+            "Each cron run appends to score_history.csv."
             "</div>",
             unsafe_allow_html=True
         )
