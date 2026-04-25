@@ -1,218 +1,98 @@
 """
-App.py - Dashboard Router v3.2
-Zerodha Kite-inspired dark theme
-Tabs: Engine A | Engine B | Engine C
+App.py - Investment Dashboard Router v4.0
+Safe imports: Engine A always loads even if B/C have issues.
 """
-
 import streamlit as st
-from engine_a_ui import show_engine_a
-from engine_b_ui import show_engine_b
-from engine_c_ui import show_engine_c
 
-# ============================================================
-# PAGE CONFIG
-# ============================================================
-st.set_page_config(
-    page_title="Investment Dashboard",
-    page_icon="🎯",
-    layout="centered",
-    initial_sidebar_state="collapsed",
-)
+st.set_page_config(page_title="Investment Dashboard", layout="wide", initial_sidebar_state="collapsed")
 
-# ============================================================
-# ZERODHA-INSPIRED DARK THEME
-# ============================================================
+# --- SHARED CSS (Zerodha-inspired dark theme) ---
 st.markdown("""
 <style>
-    /* === HIDE STREAMLIT DEFAULTS === */
-    #MainMenu { visibility: hidden; }
-    header { visibility: hidden; height: 0px; }
-    footer { visibility: hidden; }
-    .block-container { padding-top: 1rem; padding-bottom: 2rem; }
-
-    /* === DARK BASE (Zerodha dark blue-grey) === */
-    .stApp { background-color: #1b1b2d; }
-
-    /* === SCORE HERO CARD === */
-    .score-card {
-        background: #25253d; border-radius: 16px; padding: 28px 16px;
-        text-align: center; margin-bottom: 16px; border: 1px solid #35355a;
-    }
-    .score-number {
-        font-size: 76px; font-weight: 900; line-height: 1; margin: 8px 0;
-        font-family: 'Courier New', monospace;
-    }
-    .score-denominator { font-size: 16px; color: #6b6b8a; margin-top: -6px; }
-    .score-condition {
-        font-size: 20px; font-weight: 800; letter-spacing: 4px;
-        margin-top: 12px; text-transform: uppercase;
-    }
-    .score-title {
-        font-size: 11px; color: #6b6b8a; text-transform: uppercase;
-        letter-spacing: 2px; margin-bottom: 4px; font-weight: 600;
-    }
-    .score-timestamp { font-size: 11px; color: #4a4a6a; margin-top: 8px; }
-
-    /* === ALLOCATION TILES === */
-    .alloc-tile {
-        background: #25253d; border-radius: 12px; padding: 14px 8px;
-        text-align: center; border: 1px solid #35355a; height: 100%;
-    }
-    .alloc-label {
-        font-size: 10px; color: #6b6b8a; text-transform: uppercase;
-        letter-spacing: 1.5px; margin-bottom: 4px; font-weight: 600;
-    }
-    .alloc-pct {
-        font-size: 34px; font-weight: 900;
-        font-family: 'Courier New', monospace; margin: 4px 0;
-    }
-    .alloc-sub { font-size: 11px; color: #8888a8; line-height: 1.3; }
-
-    /* === SAFETY BADGES === */
-    .safety-row { display: flex; gap: 8px; margin-top: 12px; }
-    .safety-badge {
-        flex: 1; background: #25253d; border-radius: 10px; padding: 10px;
-        text-align: center; font-size: 12px; border: 1px solid #35355a;
-    }
-    .safety-badge .label {
-        color: #6b6b8a; font-size: 9px; text-transform: uppercase;
-        letter-spacing: 1.5px; font-weight: 600;
-    }
-    .safety-badge .value { font-weight: 800; margin-top: 4px; font-size: 14px; }
-
-    /* === SECTION TITLES === */
-    .section-title {
-        font-size: 10px; color: #5555778; text-transform: uppercase;
-        letter-spacing: 2.5px; margin: 24px 0 8px 0; font-weight: 700;
-    }
-
-    /* === DATA CARDS === */
-    .data-card {
-        background: #25253d; border-radius: 12px; padding: 4px 0;
-        border: 1px solid #35355a; margin-bottom: 4px;
-    }
-    .data-row {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 10px 14px; border-bottom: 1px solid #2e2e4a; font-size: 14px;
-    }
-    .data-row:last-child { border-bottom: none; }
-    .data-label { color: #8888a8; }
-    .data-value {
-        font-family: 'Courier New', monospace; font-weight: 700;
-        color: #e0e0f0; font-size: 14px;
-    }
-
-    /* === INPUTS === */
-    .input-card-label { font-size: 13px; font-weight: 600; color: #e0e0f0; margin-top: 8px; }
-    .input-card-current { font-size: 11px; color: #6b6b8a; margin-bottom: 4px; }
-
-    /* === COLORS (Zerodha palette) === */
-    .ok    { color: #4caf50; }
-    .warn  { color: #ff9800; }
-    .bad   { color: #ff5252; }
-    .blue  { color: #387ed1; }
-    .gold  { color: #ffc107; }
-
-    /* === TABS (VISIBLE + ZERODHA STYLE) === */
+    .stApp { background-color: #0f172a; }
+    [data-testid="stHeader"] { background-color: #0f172a; }
+    [data-testid="stToolbar"] { display: none; }
     .stTabs [data-baseweb="tab-list"] {
         gap: 0px;
-        background: #25253d;
-        border-radius: 10px;
+        background-color: #1e293b;
+        border-radius: 12px;
         padding: 4px;
-        border: 1px solid #35355a;
-        margin-bottom: 14px;
     }
     .stTabs [data-baseweb="tab"] {
         border-radius: 8px;
-        color: #6b6b8a;
-        font-weight: 700;
+        color: #94a3b8;
+        font-weight: 600;
         font-size: 14px;
-        padding: 10px 0;
-        flex: 1;
-        text-align: center;
+        padding: 8px 16px;
     }
     .stTabs [aria-selected="true"] {
-        background: #387ed1;
-        color: #ffffff;
+        background-color: #334155;
+        color: #e2e8f0;
     }
-    .stTabs [data-baseweb="tab-highlight"] { display: none; }
-    .stTabs [data-baseweb="tab-border"] { display: none; }
-
-    /* === BUTTONS (Zerodha green) === */
+    .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin: 24px 0 12px 0;
+    }
+    div[data-testid="stExpander"] {
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+    }
     .stButton > button {
-        border: 1px solid #35355a;
-        color: #8888a8;
+        background-color: #334155;
+        color: #e2e8f0;
+        border: 1px solid #475569;
+        border-radius: 8px;
         font-weight: 600;
-        border-radius: 8px;
-        background: #25253d;
     }
-    .stButton > button:hover {
-        background: #2e2e4a;
-        border-color: #387ed1;
-        color: #e0e0f0;
-    }
-    .stButton > button[kind="primary"] {
-        background: #387ed1;
-        color: #fff; border: none; font-weight: 700;
-    }
-    .stButton > button[kind="primary"]:hover {
-        background: #2d6db8;
-    }
-
-    /* === EXPANDERS === */
-    details {
-        background: #20203a;
-        border: 1px solid #35355a;
-        border-radius: 8px;
-    }
-    details summary { color: #8888a8; font-weight: 600; }
-
-    /* === FORM INPUTS === */
-    .stNumberInput input, .stTextInput input {
-        background: #1b1b2d;
-        border: 1px solid #35355a;
-        color: #e0e0f0;
-        border-radius: 6px;
-    }
-    .stSelectbox > div > div {
-        background: #1b1b2d;
-        border-color: #35355a;
-    }
-
-    /* === FILE UPLOADER === */
-    [data-testid="stFileUploader"] {
-        background: #20203a;
-        border-radius: 8px;
-        border: 1px solid #35355a;
-    }
-
-    /* === SCROLLBAR === */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #1b1b2d; }
-    ::-webkit-scrollbar-thumb { background: #35355a; border-radius: 2px; }
-
-    /* === FOOTER === */
-    .footer-text {
-        text-align: center; margin-top: 28px;
-        color: #35355a; font-size: 10px;
-        letter-spacing: 2px; text-transform: uppercase;
-    }
+    footer { display: none; }
 </style>
 """, unsafe_allow_html=True)
 
-# ============================================================
-# TABS
-# ============================================================
+# --- SAFE IMPORTS ---
+from engine_a_ui import show_engine_a
+
+try:
+    from engine_b_ui import show_engine_b
+    engine_b_ok = True
+except Exception as e:
+    engine_b_ok = False
+    engine_b_error = str(e)
+
+try:
+    from engine_c_ui import show_engine_c
+    engine_c_ok = True
+except Exception as e:
+    engine_c_ok = False
+    engine_c_error = str(e)
+
+# --- TABS ---
 tab1, tab2, tab3 = st.tabs(["Engine A", "Engine B", "Engine C"])
 
 with tab1:
     show_engine_a()
 
 with tab2:
-    show_engine_b()
+    if engine_b_ok:
+        show_engine_b()
+    else:
+        st.error(f"Engine B failed to load: {engine_b_error}")
 
 with tab3:
-    show_engine_c()
+    if engine_c_ok:
+        show_engine_c()
+    else:
+        st.error(f"Engine C failed to load: {engine_c_error}")
 
-# FOOTER
-st.markdown("<div class='footer-text'>Investment Dashboard v3.2 · Systematic · Emotion-Free</div>", unsafe_allow_html=True)
+# --- FOOTER ---
+st.markdown(
+    "<div style='text-align:center;color:#475569;font-size:11px;"
+    "margin-top:40px;padding:16px;letter-spacing:1px;'>"
+    "INVESTMENT DASHBOARD V4.0 · EMOTION-FREE SYSTEMATIC INVESTING"
+    "</div>",
+    unsafe_allow_html=True
+)
