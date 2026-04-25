@@ -272,7 +272,7 @@ def show_engine_a():
 
     st.markdown("<div class='section-title'>Capital Deployment</div>", unsafe_allow_html=True)
 
-    # Total capital hero
+    # Total capital hero + edit
     st.markdown(
         "<div class='data-card' style='text-align:center;padding:20px;'>"
         "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;"
@@ -282,6 +282,53 @@ def show_engine_a():
         "</div>",
         unsafe_allow_html=True
     )
+
+    with st.expander("Edit Capital", expanded=False):
+        new_capital = st.number_input(
+            "Total Capital (₹)",
+            value=total_capital,
+            min_value=0.0,
+            step=10000.0,
+            format="%.0f",
+            key="edit_capital",
+            label_visibility="collapsed",
+        )
+        if st.button("Save Capital", type="primary", use_container_width=True, key="save_capital"):
+            token = get_github_token()
+            if not token:
+                st.error("GITHUB_TOKEN not configured.")
+            else:
+                with st.spinner("Saving..."):
+                    try:
+                        stocks_path = "data/engine_b_stocks.json"
+                        api_url = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/contents/{stocks_path}"
+                        headers = {
+                            "Authorization": f"Bearer {token}",
+                            "Accept": "application/vnd.github+json",
+                            "X-GitHub-Api-Version": "2022-11-28",
+                        }
+                        get_resp = requests.get(api_url, headers=headers, params={"ref": GITHUB_BRANCH}, timeout=15)
+                        if get_resp.status_code != 200:
+                            st.error(f"Failed to read file: {get_resp.status_code}")
+                        else:
+                            cur_sha = get_resp.json().get("sha")
+                            file_content = base64.b64decode(get_resp.json()["content"]).decode("utf-8")
+                            file_data = json.loads(file_content)
+                            file_data["_capital"] = int(new_capital)
+                            new_content = json.dumps(file_data, indent=2, ensure_ascii=False)
+                            put_body = {
+                                "message": f"Update capital to {int(new_capital)}",
+                                "content": base64.b64encode(new_content.encode("utf-8")).decode("ascii"),
+                                "sha": cur_sha,
+                                "branch": GITHUB_BRANCH,
+                            }
+                            put_resp = requests.put(api_url, headers=headers, json=put_body, timeout=15)
+                            if put_resp.status_code in (200, 201):
+                                st.success(f"Capital updated to ₹{int(new_capital):,}. Refresh to see changes.")
+                            else:
+                                st.error(f"Save failed: {put_resp.status_code}")
+                    except Exception as e:
+                        st.error(f"Error: {e}")
 
     # Allocation breakdown in rupees
     alloc_html = (
