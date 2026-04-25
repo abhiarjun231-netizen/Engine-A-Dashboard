@@ -1,6 +1,7 @@
 """
 engine_a_ui.py - All Engine A display logic
 Called by App.py via show_engine_a()
+Updated for White Theme v5.0
 """
 
 import streamlit as st
@@ -73,24 +74,24 @@ def load_manual_full():
         return json.load(f)
 
 # ============================================================
-# HELPERS
+# HELPERS (colors adjusted for white background)
 # ============================================================
 def condition_color(c):
     return {
-        "TERRIBLE": "#ef4444", "WEAK": "#f59e0b", "BELOW AVG": "#f59e0b",
-        "NEUTRAL": "#38bdf8", "GOOD": "#22c55e", "EXCELLENT": "#22c55e",
-    }.get(c, "#94a3b8")
+        "TERRIBLE": "#dc2626", "WEAK": "#d97706", "BELOW AVG": "#d97706",
+        "NEUTRAL": "#2563eb", "GOOD": "#16a34a", "EXCELLENT": "#16a34a",
+    }.get(c, "#64748b")
 
 def score_color(s):
-    if s <= 30: return "#ef4444"
-    if s <= 40: return "#f59e0b"
-    if s <= 52: return "#38bdf8"
-    return "#22c55e"
+    if s <= 30: return "#dc2626"
+    if s <= 40: return "#d97706"
+    if s <= 52: return "#2563eb"
+    return "#16a34a"
 
 def bar_color(pct):
     if pct < 0.30: return "#ef4444"
     if pct < 0.55: return "#f59e0b"
-    if pct < 0.75: return "#38bdf8"
+    if pct < 0.75: return "#3b82f6"
     return "#22c55e"
 
 def fmt_num(n, decimals=2):
@@ -128,15 +129,16 @@ def show_engine_a():
         ts_pretty = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").strftime("%d %b %Y, %I:%M %p")
     except: ts_pretty = ts
 
-    st.markdown(f"""
-<div class='score-card'>
-    <div class='score-title'>Current Score</div>
-    <div class='score-number' style='color:{score_color(sc)}'>{sc}</div>
-    <div class='score-denominator'>/ 100</div>
-    <div class='score-condition' style='color:{condition_color(cond)}'>{cond}</div>
-    <div class='score-timestamp'>Last updated: {ts_pretty}</div>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='score-card'>"
+        "<div class='score-title'>Current Score</div>"
+        f"<div class='score-number' style='color:{score_color(sc)}'>{sc}</div>"
+        "<div class='score-denominator'>/ 100</div>"
+        f"<div class='score-condition' style='color:{condition_color(cond)}'>{cond}</div>"
+        f"<div class='score-timestamp'>Last updated: {ts_pretty}</div>"
+        "</div>",
+        unsafe_allow_html=True
+    )
 
     # REFRESH NOW
     if st.button("Refresh Now", type="primary", use_container_width=True, key="refresh_a",
@@ -157,17 +159,50 @@ def show_engine_a():
     st.markdown("<div class='section-title'>Suggested Allocation</div>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown(f"<div class='alloc-tile'><div class='alloc-label'>Equity</div><div class='alloc-pct' style='color:#22c55e'>{eq}%</div><div class='alloc-sub'>B: {eb}%<br>C: {ec}%</div></div>", unsafe_allow_html=True)
+        st.markdown(
+            "<div class='alloc-tile'>"
+            "<div class='alloc-label'>Equity</div>"
+            f"<div class='alloc-pct' style='color:#16a34a'>{eq}%</div>"
+            f"<div class='alloc-sub'>B: {eb}%<br>C: {ec}%</div>"
+            "</div>",
+            unsafe_allow_html=True
+        )
     with c2:
-        st.markdown(f"<div class='alloc-tile'><div class='alloc-label'>Debt</div><div class='alloc-pct' style='color:#38bdf8'>{debt}%</div><div class='alloc-sub'>{dur}</div></div>", unsafe_allow_html=True)
+        st.markdown(
+            "<div class='alloc-tile'>"
+            "<div class='alloc-label'>Debt</div>"
+            f"<div class='alloc-pct' style='color:#2563eb'>{debt}%</div>"
+            f"<div class='alloc-sub'>{dur}</div>"
+            "</div>",
+            unsafe_allow_html=True
+        )
     with c3:
-        st.markdown(f"<div class='alloc-tile'><div class='alloc-label'>Gold</div><div class='alloc-pct' style='color:#fbbf24'>{gold}%</div><div class='alloc-sub'>{gsig}</div></div>", unsafe_allow_html=True)
+        st.markdown(
+            "<div class='alloc-tile'>"
+            "<div class='alloc-label'>Gold</div>"
+            f"<div class='alloc-pct' style='color:#d97706'>{gold}%</div>"
+            f"<div class='alloc-sub'>{gsig}</div>"
+            "</div>",
+            unsafe_allow_html=True
+        )
 
     # SAFETY
     red_flag = score["red_flag"]; pe_bubble = score["pe_bubble"]
     rf_color = "bad" if red_flag == "YES" else "ok"
     pe_color = "bad" if pe_bubble == "YES" else "ok"
-    st.markdown(f"<div class='safety-row'><div class='safety-badge'><div class='label'>Red Flag</div><div class='value {rf_color}'>{red_flag}</div></div><div class='safety-badge'><div class='label'>PE Bubble</div><div class='value {pe_color}'>{pe_bubble}</div></div></div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='safety-row'>"
+        "<div class='safety-badge'>"
+        "<div class='label'>Red Flag</div>"
+        f"<div class='value {rf_color}'>{red_flag}</div>"
+        "</div>"
+        "<div class='safety-badge'>"
+        "<div class='label'>PE Bubble</div>"
+        f"<div class='value {pe_color}'>{pe_bubble}</div>"
+        "</div>"
+        "</div>",
+        unsafe_allow_html=True
+    )
 
     # COMPONENT BREAKDOWN
     st.markdown("<div class='section-title'>Component Breakdown</div>", unsafe_allow_html=True)
@@ -188,10 +223,11 @@ def show_engine_a():
         color = bar_color(pct)
         rows_html += (
             f"<div class='data-row'>"
-            f"<div style='flex:0 0 90px;color:#cbd5e1;'>{label}</div>"
-            f"<div style='flex:1;height:10px;background:#0f172a;border-radius:6px;overflow:hidden;margin:0 10px;'>"
-            f"<div style='height:100%;width:{bar_w}%;background:{color};border-radius:6px;'></div></div>"
-            f"<div style='flex:0 0 60px;text-align:right;font-family:Courier New,monospace;font-weight:700;color:{color}'>{val} / {mx}</div>"
+            f"<div style='flex:0 0 90px;color:#64748b;font-weight:500;'>{label}</div>"
+            f"<div style='flex:1;height:8px;background:#e2e8f0;border-radius:6px;overflow:hidden;margin:0 10px;'>"
+            f"<div style='height:100%;width:{bar_w}%;background:{color};border-radius:6px;"
+            f"transition:width 0.5s ease;'></div></div>"
+            f"<div style='flex:0 0 60px;text-align:right;font-weight:700;color:{color}'>{val}/{mx}</div>"
             f"</div>"
         )
     st.markdown(f"<div class='data-card'>{rows_html}</div>", unsafe_allow_html=True)
@@ -207,7 +243,12 @@ def show_engine_a():
     ]
     ind_html = ""
     for label, val in indian_rows:
-        ind_html += f"<div class='data-row'><div class='data-label'>{label}</div><div class='data-value'>{fmt_num(val)}</div></div>"
+        ind_html += (
+            f"<div class='data-row'>"
+            f"<div class='data-label'>{label}</div>"
+            f"<div class='data-value'>{fmt_num(val)}</div>"
+            f"</div>"
+        )
     st.markdown(f"<div class='data-card'>{ind_html}</div>", unsafe_allow_html=True)
 
     # GLOBAL
@@ -222,7 +263,12 @@ def show_engine_a():
     glb_html = ""
     for label, val, suffix in global_rows:
         val_str = fmt_num(val) + suffix if val is not None else "—"
-        glb_html += f"<div class='data-row'><div class='data-label'>{label}</div><div class='data-value'>{val_str}</div></div>"
+        glb_html += (
+            f"<div class='data-row'>"
+            f"<div class='data-label'>{label}</div>"
+            f"<div class='data-value'>{val_str}</div>"
+            f"</div>"
+        )
     st.markdown(f"<div class='data-card'>{glb_html}</div>", unsafe_allow_html=True)
 
     # MANUAL INPUTS (display)
@@ -239,7 +285,12 @@ def show_engine_a():
     ]
     man_html = ""
     for label, val in manual_rows:
-        man_html += f"<div class='data-row'><div class='data-label'>{label}</div><div class='data-value'>{val}</div></div>"
+        man_html += (
+            f"<div class='data-row'>"
+            f"<div class='data-label'>{label}</div>"
+            f"<div class='data-value'>{val}</div>"
+            f"</div>"
+        )
     st.markdown(f"<div class='data-card'>{man_html}</div>", unsafe_allow_html=True)
 
     # INPUT UPDATE FORM

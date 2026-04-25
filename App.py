@@ -1,116 +1,138 @@
 """
-App.py - Investment Dashboard Router v4.0
-Full Zerodha-inspired dark theme with all CSS classes for Engine A.
-Safe imports: Engine A always loads even if B/C have issues.
+App.py - Investment Dashboard v5.0
+Premium White Theme · Smooth Buttons · Classy Fintech Design
 """
 import streamlit as st
 
 st.set_page_config(page_title="Investment Dashboard", layout="wide", initial_sidebar_state="collapsed")
 
-# --- COMPLETE CSS (Zerodha-inspired dark theme) ---
+# --- PREMIUM WHITE THEME CSS ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
     /* === BASE === */
-    .stApp { background-color: #0f172a; }
-    [data-testid="stHeader"] { background-color: #0f172a; }
+    .stApp {
+        background-color: #f8fafc;
+        font-family: 'DM Sans', sans-serif;
+    }
+    [data-testid="stHeader"] { background-color: #f8fafc; }
     [data-testid="stToolbar"] { display: none; }
     footer { display: none; }
 
     /* === TABS === */
     .stTabs [data-baseweb="tab-list"] {
         gap: 0px;
-        background-color: #1e293b;
-        border-radius: 12px;
-        padding: 4px;
+        background-color: #ffffff;
+        border-radius: 14px;
+        padding: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        border: 1px solid #e2e8f0;
     }
     .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
+        border-radius: 10px;
         color: #94a3b8;
         font-weight: 600;
         font-size: 14px;
-        padding: 8px 16px;
+        padding: 10px 20px;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s ease;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #334155;
-        color: #e2e8f0;
+        background-color: #1e293b;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(30,41,59,0.25);
     }
 
     /* === SCORE CARD === */
     .score-card {
-        background: #1e293b;
-        border-radius: 16px;
-        padding: 32px 16px;
-        border: 1px solid #334155;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 36px 20px;
+        border: 1px solid #e2e8f0;
         text-align: center;
         margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
     }
     .score-title {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         margin-bottom: 8px;
+        font-family: 'DM Sans', sans-serif;
     }
     .score-number {
-        font-size: 72px;
+        font-size: 76px;
         font-weight: 800;
         line-height: 1;
-        margin: 8px 0;
-        font-family: 'SF Mono', 'Courier New', monospace;
+        margin: 12px 0;
+        font-family: 'DM Sans', sans-serif;
     }
     .score-denominator {
         font-size: 18px;
-        color: #64748b;
-        margin-bottom: 8px;
+        color: #94a3b8;
+        margin-bottom: 10px;
+        font-weight: 500;
     }
     .score-condition {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 700;
-        letter-spacing: 3px;
+        letter-spacing: 4px;
         text-transform: uppercase;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
     .score-timestamp {
         font-size: 12px;
-        color: #64748b;
+        color: #94a3b8;
+        font-weight: 500;
     }
 
     /* === SECTION TITLE === */
     .section-title {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin: 24px 0 12px 0;
+        letter-spacing: 2px;
+        margin: 28px 0 14px 0;
+        font-family: 'DM Sans', sans-serif;
     }
 
     /* === ALLOCATION TILES === */
     .alloc-tile {
-        background: #1e293b;
-        border-radius: 12px;
-        padding: 16px 8px;
-        border: 1px solid #334155;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px 10px;
+        border: 1px solid #e2e8f0;
         text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .alloc-tile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.07);
     }
     .alloc-label {
-        font-size: 12px;
+        font-size: 11px;
         color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 4px;
+        letter-spacing: 1.5px;
+        margin-bottom: 6px;
+        font-weight: 600;
     }
     .alloc-pct {
-        font-size: 28px;
+        font-size: 30px;
         font-weight: 800;
-        font-family: 'SF Mono', 'Courier New', monospace;
+        font-family: 'DM Sans', sans-serif;
     }
     .alloc-sub {
         font-size: 11px;
-        color: #64748b;
-        margin-top: 4px;
-        line-height: 1.4;
+        color: #94a3b8;
+        margin-top: 6px;
+        line-height: 1.5;
+        font-weight: 500;
     }
 
     /* === SAFETY BADGES === */
@@ -121,21 +143,23 @@ st.markdown("""
     }
     .safety-badge {
         flex: 1;
-        background: #1e293b;
-        border-radius: 10px;
-        padding: 12px;
-        border: 1px solid #334155;
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 14px;
+        border: 1px solid #e2e8f0;
         text-align: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
     }
     .safety-badge .label {
-        font-size: 11px;
+        font-size: 10px;
         color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 4px;
+        letter-spacing: 1.5px;
+        margin-bottom: 6px;
+        font-weight: 600;
     }
     .safety-badge .value.ok {
-        color: #22c55e;
+        color: #10b981;
         font-weight: 700;
         font-size: 14px;
     }
@@ -145,72 +169,133 @@ st.markdown("""
         font-size: 14px;
     }
 
-    /* === DATA CARDS (tables, breakdown) === */
+    /* === DATA CARDS === */
     .data-card {
-        background: #1e293b;
-        border-radius: 12px;
-        padding: 12px 16px;
-        border: 1px solid #334155;
-        margin-bottom: 12px;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 8px 18px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     .data-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #1a2332;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f5f9;
     }
     .data-row:last-child {
         border-bottom: none;
     }
     .data-label {
-        color: #cbd5e1;
+        color: #64748b;
         font-size: 13px;
+        font-weight: 500;
     }
     .data-value {
-        color: #e2e8f0;
-        font-weight: 600;
+        color: #1e293b;
+        font-weight: 700;
         font-size: 13px;
-        font-family: 'SF Mono', 'Courier New', monospace;
+        font-family: 'DM Sans', sans-serif;
     }
 
     /* === INPUT FORM === */
     .input-card-label {
-        color: #e2e8f0;
+        color: #1e293b;
         font-weight: 600;
         font-size: 14px;
-        margin-top: 12px;
+        margin-top: 14px;
     }
     .input-card-current {
-        color: #64748b;
+        color: #94a3b8;
         font-size: 12px;
         margin-bottom: 4px;
+        font-weight: 500;
     }
 
     /* === EXPANDER === */
     div[data-testid="stExpander"] {
-        background-color: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 12px;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    div[data-testid="stExpander"] summary {
+        font-weight: 600;
+        color: #1e293b;
     }
 
-    /* === BUTTONS === */
+    /* === BUTTONS (smooth & classy) === */
     .stButton > button {
-        background-color: #334155;
-        color: #e2e8f0;
-        border: 1px solid #475569;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #f8fafc, #ffffff);
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
         font-weight: 600;
+        font-size: 14px;
+        padding: 10px 20px;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        cursor: pointer;
     }
-    .stButton > button[kind="primary"] {
-        background-color: #ef4444;
-        color: white;
+    .stButton > button:hover {
+        background: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transform: translateY(-1px);
+    }
+    .stButton > button:active {
+        transform: translateY(0px);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    /* Primary button (Refresh, Save) */
+    .stButton > button[kind="primary"],
+    .stButton > button[data-testid="stBaseButton-primary"] {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: #ffffff;
         border: none;
+        box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+    }
+    .stButton > button[kind="primary"]:hover,
+    .stButton > button[data-testid="stBaseButton-primary"]:hover {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        box-shadow: 0 6px 20px rgba(59,130,246,0.45);
+        transform: translateY(-1px);
     }
 
     /* === COLUMNS === */
     [data-testid="stHorizontalBlock"] {
-        gap: 8px;
+        gap: 10px;
+    }
+
+    /* === NUMBER INPUT === */
+    input[type="number"] {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 10px !important;
+        color: #1e293b !important;
+        font-family: 'DM Sans', sans-serif !important;
+    }
+
+    /* === SELECTBOX === */
+    div[data-baseweb="select"] > div {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 10px !important;
+    }
+
+    /* === SPINNER === */
+    .stSpinner > div {
+        border-color: #3b82f6 !important;
+    }
+
+    /* === SUCCESS/ERROR/WARNING BOXES === */
+    div[data-testid="stAlert"] {
+        border-radius: 12px;
+        font-family: 'DM Sans', sans-serif;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -252,9 +337,10 @@ with tab3:
 
 # --- FOOTER ---
 st.markdown(
-    "<div style='text-align:center;color:#475569;font-size:11px;"
-    "margin-top:40px;padding:16px;letter-spacing:1px;'>"
-    "INVESTMENT DASHBOARD V4.0 · EMOTION-FREE SYSTEMATIC INVESTING"
+    "<div style='text-align:center;color:#94a3b8;font-size:11px;"
+    "margin-top:40px;padding:16px;letter-spacing:1.5px;font-weight:500;"
+    "font-family:DM Sans,sans-serif;'>"
+    "INVESTMENT DASHBOARD V5.0 · EMOTION-FREE SYSTEMATIC INVESTING"
     "</div>",
     unsafe_allow_html=True
 )
