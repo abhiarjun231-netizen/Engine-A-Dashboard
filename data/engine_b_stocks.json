@@ -2482,6 +2482,36 @@
       "token": "13710",
       "symbol": "FIEMIND-EQ",
       "name": "FIEMIND"
+    },
+    "CRAFTSMAN": {
+      "token": "2854",
+      "symbol": "CRAFTSMAN-EQ",
+      "name": "CRAFTSMAN"
+    },
+    "SYRMA": {
+      "token": "10793",
+      "symbol": "SYRMA-EQ",
+      "name": "SYRMA"
+    },
+    "WELCORP": {
+      "token": "11821",
+      "symbol": "WELCORP-EQ",
+      "name": "WELCORP"
+    },
+    "LUPIN": {
+      "token": "10440",
+      "symbol": "LUPIN-EQ",
+      "name": "LUPIN"
+    },
+    "VTL": {
+      "token": "2073",
+      "symbol": "VTL-EQ",
+      "name": "VTL"
+    },
+    "ZFCVINDIA": {
+      "token": "16915",
+      "symbol": "ZFCVINDIA-EQ",
+      "name": "ZFCVINDIA"
     }
   },
   "_last_token_update": "2026-04-26"
