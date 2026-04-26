@@ -1,6 +1,7 @@
 """
-test_angel.py - Engine A Live Data Fetcher v11
-NEW in v11: Fetches live prices for watchlist stocks (engine_b_watchlist + engine_c_watchlist).
+test_angel.py - Engine A Live Data Fetcher v12
+NEW in v12: Added Engine D to price fetching, peak tracking, and stock analysis.
+v11: Fetches live prices for watchlist stocks (engine_b_watchlist + engine_c_watchlist).
 v10: Updates peak prices in engine_b_stocks.json for trailing stop tracking.
 v9: Fetches LTP even on weekends/holidays (last traded price).
 Only skips historical store on non-market days.
@@ -18,7 +19,7 @@ from pathlib import Path
 from SmartApi import SmartConnect
 
 print("=" * 50)
-print("ENGINE A - LIVE DATA FETCHER v11")
+print("ENGINE A - LIVE DATA FETCHER v12")
 print("=" * 50)
 
 # ============================================================
@@ -98,8 +99,10 @@ def resolve_tokens(stock_data):
     # Collect tickers from positions AND watchlists
     all_stocks = (stock_data.get("engine_b", []) +
                   stock_data.get("engine_c", []) +
+                  stock_data.get("engine_d", []) +
                   stock_data.get("engine_b_watchlist", []) +
-                  stock_data.get("engine_c_watchlist", []))
+                  stock_data.get("engine_c_watchlist", []) +
+                  stock_data.get("engine_d_watchlist", []))
     
     need_tokens = []
     for s in all_stocks:
@@ -251,10 +254,10 @@ with open("data/global_prices.csv", "w", newline="") as f:
 print("Live LTP fetch complete")
 
 # ============================================================
-# PART 2: ENGINE B/C STOCK PRICES (positions + watchlists)
+# PART 2: ENGINE B/C/D STOCK PRICES (positions + watchlists)
 # ============================================================
 
-print("\n--- ENGINE B/C STOCK PRICES ---")
+print("\n--- ENGINE B/C/D STOCK PRICES ---")
 
 stock_data = load_engine_b_stocks()
 
@@ -265,15 +268,15 @@ if stock_data:
     all_tickers_seen = set()
     all_stocks_to_fetch = []
     
-    # Positions first (engine_b + engine_c)
-    for s in stock_data.get("engine_b", []) + stock_data.get("engine_c", []):
+    # Positions first (engine_b + engine_c + engine_d)
+    for s in stock_data.get("engine_b", []) + stock_data.get("engine_c", []) + stock_data.get("engine_d", []):
         ticker = s.get("ticker", "")
         if ticker and ticker not in all_tickers_seen:
             all_tickers_seen.add(ticker)
             all_stocks_to_fetch.append(s)
     
     # Watchlist stocks (only if not already fetching via positions)
-    for s in stock_data.get("engine_b_watchlist", []) + stock_data.get("engine_c_watchlist", []):
+    for s in stock_data.get("engine_b_watchlist", []) + stock_data.get("engine_c_watchlist", []) + stock_data.get("engine_d_watchlist", []):
         ticker = s.get("ticker", "")
         action = s.get("action", "")
         if ticker and ticker not in all_tickers_seen and action != "AVOID":
@@ -363,6 +366,18 @@ if stock_data:
             print(f"  {s.get('stock', ticker)}: peak {old_peak} -> {current}")
             peaks_updated += 1
 
+    # Update peaks for engine_d positions (same logic)
+    for s in stock_data.get("engine_d", []):
+        ticker = s.get("ticker", "")
+        current = price_lookup.get(ticker)
+        if current is None:
+            continue
+        old_peak = float(s.get("peak", s.get("entry", 0)))
+        if current > old_peak:
+            s["peak"] = round(current, 2)
+            print(f"  {s.get('stock', ticker)}: peak {old_peak} -> {current}")
+            peaks_updated += 1
+
     if peaks_updated > 0:
         save_engine_b_stocks(stock_data)
         print(f"Peaks updated: {peaks_updated} stocks")
@@ -385,8 +400,8 @@ if stock_data and token_cache:
     # Collect all unique tickers from positions + watchlists
     analysis_tickers = set()
     ticker_to_name = {}
-    for s in (stock_data.get("engine_b", []) + stock_data.get("engine_c", []) +
-              stock_data.get("engine_b_watchlist", []) + stock_data.get("engine_c_watchlist", [])):
+    for s in (stock_data.get("engine_b", []) + stock_data.get("engine_c", []) + stock_data.get("engine_d", []) +
+              stock_data.get("engine_b_watchlist", []) + stock_data.get("engine_c_watchlist", []) + stock_data.get("engine_d_watchlist", [])):
         ticker = s.get("ticker", "")
         if ticker and s.get("action", "") != "AVOID":
             analysis_tickers.add(ticker)
