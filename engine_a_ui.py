@@ -333,7 +333,9 @@ def show_engine_a():
         except: pass
 
     # ALLOCATION
-    eq = int(score["equity_pct"]); eb = int(score["engine_b_pct"]); ec = int(score["engine_c_pct"])
+    eq = int(score["equity_pct"])
+    # New 3-engine equity split: B=30%, C=30%, D=40%
+    eb = round(eq * 30 / 100); ec = round(eq * 30 / 100); ed = round(eq * 40 / 100)
     debt = int(score["debt_pct"]); gold = int(score["gold_pct"])
     dur = score["duration_signal"]; gsig = score["gold_signal"]
 
@@ -344,7 +346,7 @@ def show_engine_a():
             "<div class='alloc-tile'>"
             "<div class='alloc-label'>Equity</div>"
             f"<div class='alloc-pct' style='color:#16a34a'>{eq}%</div>"
-            f"<div class='alloc-sub'>B: {eb}%<br>C: {ec}%</div>"
+            f"<div class='alloc-sub'>B: {eb}% · C: {ec}% · D: {ed}%</div>"
             "</div>",
             unsafe_allow_html=True
         )
@@ -393,6 +395,7 @@ def show_engine_a():
     eq_amount = round(total_capital * eq / 100)
     eb_amount = round(total_capital * eb / 100)
     ec_amount = round(total_capital * ec / 100)
+    ed_amount = round(total_capital * ed / 100)
     debt_amount = round(total_capital * debt / 100)
     gold_amount = round(total_capital * gold / 100)
 
@@ -418,8 +421,19 @@ def show_engine_a():
             c_current += cur_price * qty
         except: pass
 
-    total_invested = b_invested + c_invested
-    total_current = b_current + c_current
+    d_invested = 0; d_current = 0
+    for s in stocks_data.get("engine_d", []):
+        try:
+            entry = float(s.get("entry", 0))
+            qty = int(s.get("qty", 0))
+            d_invested += entry * qty
+            ticker = s.get("ticker", "")
+            cur_price = stock_prices.get(ticker, entry)
+            d_current += cur_price * qty
+        except: pass
+
+    total_invested = b_invested + c_invested + d_invested
+    total_current = b_current + c_current + d_current
     total_pnl = total_current - total_invested
     pnl_pct = (total_pnl / total_invested * 100) if total_invested > 0 else 0
     pnl_color = "#16a34a" if total_pnl >= 0 else "#dc2626"
@@ -427,6 +441,7 @@ def show_engine_a():
 
     b_available = max(0, eb_amount - b_invested)
     c_available = max(0, ec_amount - c_invested)
+    d_available = max(0, ed_amount - d_invested)
 
     st.markdown("<div class='section-title'>Capital Deployment</div>", unsafe_allow_html=True)
 
@@ -491,12 +506,16 @@ def show_engine_a():
     # Allocation breakdown in rupees
     alloc_html = (
         "<div class='data-row'>"
-        "<div class='data-label'>Engine B (Short-Term)</div>"
+        "<div class='data-label'>Engine B (Momentum)</div>"
         f"<div class='data-value' style='color:#16a34a'>₹{eb_amount:,}</div>"
         "</div>"
         "<div class='data-row'>"
-        "<div class='data-label'>Engine C (Long-Term)</div>"
+        "<div class='data-label'>Engine C (Value)</div>"
         f"<div class='data-value' style='color:#16a34a'>₹{ec_amount:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine D (Compounder)</div>"
+        f"<div class='data-value' style='color:#16a34a'>₹{ed_amount:,}</div>"
         "</div>"
         "<div class='data-row'>"
         "<div class='data-label'>Debt</div>"
@@ -550,6 +569,14 @@ def show_engine_a():
         "<div class='data-label'>Engine C — Available</div>"
         f"<div class='data-value' style='color:#16a34a'>₹{c_available:,}</div>"
         "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine D — Deployed</div>"
+        f"<div class='data-value'>₹{d_invested:,.0f} / ₹{ed_amount:,}</div>"
+        "</div>"
+        "<div class='data-row'>"
+        "<div class='data-label'>Engine D — Available</div>"
+        f"<div class='data-value' style='color:#16a34a'>₹{d_available:,}</div>"
+        "</div>"
     )
     st.markdown(f"<div class='data-card'>{deploy_html}</div>", unsafe_allow_html=True)
 
@@ -561,7 +588,7 @@ def show_engine_a():
     realized_stcg = 0; realized_ltcg = 0
     stcg_trades = 0; ltcg_trades = 0
 
-    for trade in stocks_data.get("engine_b_closed", []) + stocks_data.get("engine_c_closed", []):
+    for trade in stocks_data.get("engine_b_closed", []) + stocks_data.get("engine_c_closed", []) + stocks_data.get("engine_d_closed", []):
         try:
             pnl = float(trade.get("pnl", 0))
             buy_date_str = trade.get("buy_date", "")
@@ -583,7 +610,7 @@ def show_engine_a():
     unrealized_stcg = 0; unrealized_ltcg = 0
     stcg_positions = 0; ltcg_positions = 0
 
-    for s in stocks_data.get("engine_b", []) + stocks_data.get("engine_c", []):
+    for s in stocks_data.get("engine_b", []) + stocks_data.get("engine_c", []) + stocks_data.get("engine_d", []):
         try:
             entry = float(s.get("entry", 0))
             qty = int(s.get("qty", 0))
@@ -613,8 +640,8 @@ def show_engine_a():
 
     has_realized = (realized_stcg != 0 or realized_ltcg != 0)
     has_unrealized = (unrealized_stcg != 0 or unrealized_ltcg != 0)
-    has_positions = len(stocks_data.get("engine_b", [])) + len(stocks_data.get("engine_c", [])) > 0
-    has_closed = len(stocks_data.get("engine_b_closed", [])) + len(stocks_data.get("engine_c_closed", [])) > 0
+    has_positions = len(stocks_data.get("engine_b", [])) + len(stocks_data.get("engine_c", [])) + len(stocks_data.get("engine_d", [])) > 0
+    has_closed = len(stocks_data.get("engine_b_closed", [])) + len(stocks_data.get("engine_c_closed", [])) + len(stocks_data.get("engine_d_closed", [])) > 0
 
     st.markdown("<div class='section-title'>Tax Estimate (FY 2026-27)</div>", unsafe_allow_html=True)
 
