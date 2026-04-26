@@ -195,6 +195,23 @@ def parse_trendlyne_text(text_content):
     except Exception as e:
         return [], str(e)
 
+def load_screener_from_github(filename):
+    """Load a screener CSV directly from the GitHub repo's data/ folder."""
+    url = (
+        f"https://raw.githubusercontent.com/"
+        f"{GITHUB_OWNER}/{GITHUB_REPO}/{GITHUB_BRANCH}/data/{filename}"
+    )
+    try:
+        resp = requests.get(url, timeout=15)
+        if resp.status_code == 200:
+            return parse_trendlyne_text(resp.text)
+        elif resp.status_code == 404:
+            return [], f"data/{filename} not found in repo. Upload it to GitHub first."
+        else:
+            return [], f"GitHub fetch failed ({resp.status_code})"
+    except requests.RequestException as e:
+        return [], f"Network error: {e}"
+
 # ============================================================
 # FORMATTING HELPERS
 # ============================================================
