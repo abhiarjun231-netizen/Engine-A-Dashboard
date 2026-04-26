@@ -16,6 +16,7 @@ from utils import (
     calculate_trailing_stop_b, get_profit_stage_b,
     mcap_tag, render_mini_bar, render_52w_position,
     sector_summary, overlap_analysis, render_check,
+    smart_signal_b,
 )
 
 MAX_POSITIONS = 10
@@ -282,7 +283,8 @@ def show_engine_b():
                 f"{render_52w_position(cp2, s.get('low_52w'), s.get('high_52w'))}"
                 f"<div style='margin-top:4px;'>{render_stage_badge(vd)}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}"
-                f"{overlap_badges}</div></div>"
+                f"{overlap_badges}</div>"
+                f"{smart_signal_b(s, cv, in_c, in_d)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:

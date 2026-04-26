@@ -17,6 +17,7 @@ from utils import (
     calculate_trailing_stop_c, get_profit_stage_c,
     mcap_tag, render_mini_bar, render_52w_position,
     sector_summary, render_check,
+    smart_signal_c,
 )
 
 MAX_POSITIONS = 15
@@ -340,7 +341,8 @@ def show_engine_c():
                 f"<div style='margin-top:4px;'>"
                 f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
                 f" {render_stage_badge(vd)}"
-                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div></div>"
+                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div>"
+                f"{smart_signal_c(s, vds)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:

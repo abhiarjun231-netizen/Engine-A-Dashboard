@@ -614,3 +614,128 @@ def compound_stars(dns):
     filled = "★" * stars
     empty = "☆" * (5 - stars)
     return f"<span style='color:#f59e0b;font-size:13px;letter-spacing:2px;'>{filled}{empty}</span>"
+
+# ============================================================
+# SMART SIGNAL TEXT GENERATORS
+# ============================================================
+def smart_signal_b(s, cv, in_c, in_d):
+    """Generate one-liner insight for Engine B Momentum card."""
+    signals = []
+    dur = s.get("durability") or 0
+    mom = s.get("momentum") or 0
+    pe = s.get("pe")
+    mcap = s.get("mcap")
+
+    # Strength signals
+    if dur >= 75: signals.append("fortress durability")
+    elif dur >= 55: signals.append("solid durability")
+    if mom >= 70: signals.append("momentum surge")
+    elif mom >= 60: signals.append("steady momentum")
+    if pe and pe < 15: signals.append("cheap PE")
+    elif pe and pe < 25: signals.append("reasonable PE")
+    if in_c and in_d: signals.append("ALL 3 ENGINES")
+    elif in_c: signals.append("also in Value")
+    elif in_d: signals.append("also in Compounder")
+    if mcap and mcap < 5000: signals.append("small-cap alpha")
+
+    # Warning signals
+    warns = []
+    if dur < 50: warns.append("durability fading")
+    if mom < 55: warns.append("momentum cooling")
+    if pe and pe > 40: warns.append("expensive PE")
+
+    if warns:
+        txt = " + ".join(signals[:3]) + " BUT " + " & ".join(warns[:2]) if signals else " & ".join(warns[:2])
+    elif signals:
+        txt = " + ".join(signals[:3])
+    else:
+        txt = "Insufficient data for signal"
+
+    # Conviction label
+    if cv >= 7: label, color = "HIGH CONVICTION", "#059669"
+    elif cv >= 4: label, color = "MONITOR", "#d97706"
+    else: label, color = "WEAK", "#94a3b8"
+
+    return (
+        f"<div style='font-size:10px;font-style:italic;color:#64748b;margin-top:4px;"
+        f"padding:4px 8px;background:#f8fafc;border-radius:6px;border-left:3px solid {color};'>"
+        f"<b style='color:{color};'>{label}:</b> {txt}</div>"
+    )
+
+def smart_signal_c(s, vds):
+    """Generate one-liner insight for Engine C Value card."""
+    signals = []
+    roe = s.get("roe"); pe = s.get("pe"); pio = s.get("piotroski")
+    pg = s.get("profit_growth"); rq = s.get("rev_qoq"); de = s.get("de")
+    is_dbl = s.get("is_double", False)
+
+    if is_dbl: signals.append("double screener")
+    if roe and roe > 25: signals.append("exceptional ROE")
+    elif roe and roe > 20: signals.append("strong ROE")
+    if pe and pe < 12: signals.append("deep discount PE")
+    elif pe and pe < 18: signals.append("attractive PE")
+    if pio and pio >= 8: signals.append("near-perfect Piotroski")
+    if pg and pg > 30: signals.append("profit accelerating")
+    if de is not None and de < 0.3: signals.append("virtually debt-free")
+
+    # Warnings
+    warns = []
+    if rq is not None and rq < -10: warns.append("revenue declining")
+    if pio and pio <= 5: warns.append("weak Piotroski")
+    if de is not None and de > 1: warns.append("high debt")
+
+    if warns:
+        txt = " + ".join(signals[:3]) + " BUT " + " & ".join(warns[:2]) if signals else " & ".join(warns[:2])
+    elif signals:
+        txt = " + ".join(signals[:3])
+    else:
+        txt = "Basic screener pass"
+
+    if vds >= 12: label, color = "DEEP VALUE", "#059669"
+    elif vds >= 8: label, color = "SOLID", "#2563eb"
+    else: label, color = "MODERATE", "#d97706"
+
+    return (
+        f"<div style='font-size:10px;font-style:italic;color:#64748b;margin-top:4px;"
+        f"padding:4px 8px;background:#f8fafc;border-radius:6px;border-left:3px solid {color};'>"
+        f"<b style='color:{color};'>{label}:</b> {txt}</div>"
+    )
+
+def smart_signal_d(s, dns):
+    """Generate one-liner insight for Engine D Compounder card."""
+    signals = []
+    roe = s.get("roe"); pe = s.get("pe"); pio = s.get("piotroski")
+    pg = s.get("profit_growth"); peg = s.get("peg"); de = s.get("de")
+    is_dbl = s.get("is_double", False)
+
+    if is_dbl: signals.append("double screener")
+    if peg is not None and peg <= 0.5: signals.append("PEG extreme value")
+    elif peg is not None and peg <= 1.0: signals.append("PEG undervalued")
+    if pg and pg > 50: signals.append("explosive growth")
+    elif pg and pg > 25: signals.append("strong growth")
+    if roe and roe > 25: signals.append("exceptional ROE")
+    if de is not None and de < 0.3: signals.append("virtually debt-free")
+    if pio and pio >= 8: signals.append("near-perfect Piotroski")
+
+    # Kill shot warnings
+    warns = []
+    if pg is not None and pg < 0: warns.append("growth declining")
+    if de is not None and de > 1.5: warns.append("debt creeping")
+    if peg is not None and peg > 2: warns.append("overpriced vs growth")
+
+    if warns:
+        txt = " + ".join(signals[:3]) + " BUT " + " & ".join(warns[:2]) if signals else " & ".join(warns[:2])
+    elif signals:
+        txt = " + ".join(signals[:3])
+    else:
+        txt = "Basic screener pass"
+
+    if dns >= 16: label, color = "ELITE COMPOUNDER", "#059669"
+    elif dns >= 11: label, color = "STRONG PICK", "#2563eb"
+    else: label, color = "POTENTIAL", "#d97706"
+
+    return (
+        f"<div style='font-size:10px;font-style:italic;color:#64748b;margin-top:4px;"
+        f"padding:4px 8px;background:#f8fafc;border-radius:6px;border-left:3px solid {color};'>"
+        f"<b style='color:{color};'>{label}:</b> {txt}</div>"
+    )
