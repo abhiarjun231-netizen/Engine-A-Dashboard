@@ -156,9 +156,16 @@ except Exception as e:
     engine_e_ok = False
     engine_e_error = str(e)
 
+try:
+    from engine_cmd_ui import show_command_center
+    cmd_ok = True
+except Exception as e:
+    cmd_ok = False
+    cmd_error = str(e)
+
 # --- TABS ---
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "Director", "Momentum", "Value", "Compounder", "Fortress"
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "Director", "Momentum", "Value", "Compounder", "Fortress", "Command"
 ])
 
 with tab1:
@@ -188,12 +195,18 @@ with tab5:
     else:
         st.error(f"Engine E failed to load: {engine_e_error}")
 
+with tab6:
+    if cmd_ok:
+        show_command_center()
+    else:
+        st.error(f"Command Center failed to load: {cmd_error}")
+
 # --- FOOTER ---
 st.markdown(
     "<div style='text-align:center;color:#94a3b8;font-size:11px;"
     "margin-top:40px;padding:16px;letter-spacing:1.5px;font-weight:500;"
     "font-family:DM Sans,sans-serif;'>"
-    "INVESTMENT DASHBOARD V5.0 · 5-ENGINE SYSTEM · EMOTION-FREE SYSTEMATIC INVESTING"
+    "INVESTMENT DASHBOARD V6.0 · 6-ENGINE SYSTEM · EMOTION-FREE SYSTEMATIC INVESTING"
     "</div>",
     unsafe_allow_html=True
 )
