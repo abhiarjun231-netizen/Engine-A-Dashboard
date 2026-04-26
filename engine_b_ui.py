@@ -8,7 +8,7 @@ from datetime import datetime, date
 from utils import (
     load_stocks_json, save_stocks_to_github, load_stock_prices,
     trigger_workflow, parse_trendlyne_csv, parse_trendlyne_text,
-    get_engine_a_score,
+    load_screener_from_github, get_engine_a_score,
     fmt, fmt_pnl, fmt_pct, days_held,
     render_section_title, render_info_card, render_data_card,
     render_stat_row, render_hero_number, render_badge,
@@ -154,31 +154,38 @@ def show_engine_b():
 
     # WATCHLIST
     render_section_title("Screener Watchlist")
-    with st.expander("Upload DVM Screener CSV", expanded=False):
-        st.caption("Trendlyne: Durability > 55 AND Momentum > 59")
-        upload_mode = st.radio("Method", ["Upload File", "Paste CSV Text"], key="bmode", horizontal=True)
-        stks = None
-        err = None
-        if upload_mode == "Upload File":
-            up = st.file_uploader("CSV", type=["csv","xlsx"], key="up_b", label_visibility="collapsed")
-            if up:
-                stks, err = parse_trendlyne_csv(up)
-        else:
-            st.caption("Open CSV in any text viewer → Select All → Copy → Paste below")
-            txt = st.text_area("Paste CSV content", height=120, key="ptxt_b", placeholder="Paste CSV text here...")
-            if txt and txt.strip():
-                stks, err = parse_trendlyne_text(txt)
-        if err:
-            st.error(err)
-        elif stks:
-            for s in stks: s["upload_date"] = date.today().strftime("%Y-%m-%d")
-            st.success(f"Found {len(stks)} stocks")
-            if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_b"):
-                data["engine_b_watchlist"] = stks
-                data["_b_watchlist_date"] = date.today().strftime("%Y-%m-%d")
-                ok,msg = save_stocks_to_github(data, "Update Engine B watchlist")
-                if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
-                else: st.error(msg)
+    st.caption("Trendlyne: Durability > 55 AND Momentum > 59")
+    upload_mode = st.radio("Method", ["Upload File", "GitHub Repo", "Paste CSV"], key="bmode", horizontal=True)
+    stks = None
+    err = None
+    if upload_mode == "Upload File":
+        up = st.file_uploader("Upload DVM Screener CSV", type=["csv","xlsx"], key="up_b")
+        if up:
+            stks, err = parse_trendlyne_csv(up)
+    elif upload_mode == "GitHub Repo":
+        st.markdown(
+            "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
+            "Upload <code>dvm_screener.csv</code> to GitHub repo → "
+            "<code>data</code> folder → then press Load</div>",
+            unsafe_allow_html=True)
+        if st.button("Load dvm_screener.csv", type="primary", use_container_width=True, key="ghb_b"):
+            with st.spinner("Fetching from GitHub..."):
+                stks, err = load_screener_from_github("dvm_screener.csv")
+    else:
+        txt = st.text_area("Paste CSV content", height=120, key="ptxt_b", placeholder="Paste CSV text here...")
+        if txt and txt.strip():
+            stks, err = parse_trendlyne_text(txt)
+    if err:
+        st.error(err)
+    elif stks:
+        for s in stks: s["upload_date"] = date.today().strftime("%Y-%m-%d")
+        st.success(f"Found {len(stks)} stocks")
+        if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_b"):
+            data["engine_b_watchlist"] = stks
+            data["_b_watchlist_date"] = date.today().strftime("%Y-%m-%d")
+            ok,msg = save_stocks_to_github(data, "Update Engine B watchlist")
+            if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
+            else: st.error(msg)
 
     if wl:
         wd = data.get("_b_watchlist_date","")
