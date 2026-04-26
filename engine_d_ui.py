@@ -1,0 +1,378 @@
+"""
+engine_d_ui.py - Engine D: The Compounders
+"Find businesses that print money. Hold them forever."
+Screener 3 (PEG+YoY) + Screener 4 (PE+3Yr)
+"""
+import streamlit as st
+import json
+from datetime import datetime, date
+from utils import (
+    load_stocks_json, save_stocks_to_github, load_stock_prices,
+    trigger_workflow, parse_trendlyne_csv, get_engine_a_score,
+    fmt, fmt_pnl, fmt_pct, days_held,
+    render_section_title, render_info_card, render_data_card,
+    render_stat_row, render_hero_number, render_badge,
+    render_stage_badge, render_engine_gate,
+    calculate_trailing_stop_d, get_profit_stage_d,
+)
+
+MAX_POSITIONS = 15
+MAX_PCT = 10
+
+def dna_score(stock, is_double=False):
+    score = 0
+    p = float(stock.get("piotroski",0) or 0)
+    roe = float(stock.get("roe",0) or 0)
+    de = float(stock.get("de",99) or 99)
+    pg = float(stock.get("profit_growth",0) or 0)
+    peg = float(stock.get("peg",99) or 99)
+    mcap = float(stock.get("mcap",0) or 0)
+    # Earnings (max 6)
+    if pg > 30: score += 3
+    elif pg > 15: score += 2
+    # Quality (max 6)
+    if p >= 9: score += 3
+    elif p >= 8: score += 2
+    if roe > 25: score += 2
+    if de < 0.3: score += 2
+    elif de < 0.5: score += 1
+    # Growth (max 4)
+    if peg < 0.8: score += 2
+    elif peg < 1.2: score += 1
+    if is_double: score += 2
+    # Market (max 4)
+    if mcap > 10000: score += 1
+    if 0 < mcap < 50000: score += 1
+    return min(score, 20)
+
+def show_engine_d():
+    data = load_stocks_json()
+    prices = load_stock_prices()
+    sd = get_engine_a_score()
+    ea = int(sd["raw_score"]) if sd else None
+    pos = data.get("engine_d", [])
+    wl = data.get("engine_d_watchlist", [])
+    closed = data.get("engine_d_closed", [])
+    cap = float(data.get("_capital", 100000))
+    eq_pct = int(sd.get("equity_pct", 55)) if sd else 55
+    d_cap = cap * eq_pct / 100 * 40 / 100
+
+    # HEADER
+    st.markdown(
+        "<div style='text-align:center;margin-bottom:4px;'>"
+        "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;"
+        "letter-spacing:2px;font-weight:600;'>Engine D</div>"
+        "<div style='font-size:20px;font-weight:800;color:#1e293b;"
+        "font-family:DM Sans,sans-serif;'>The Compounders</div>"
+        "<div style='font-size:11px;color:#94a3b8;font-style:italic;'>"
+        "Find businesses that print money. Hold them forever.</div></div>",
+        unsafe_allow_html=True)
+
+    render_engine_gate(ea)
+
+    if st.button("Refresh Data", type="primary", use_container_width=True, key="ref_d"):
+        with st.spinner("Fetching..."):
+            ok, msg = trigger_workflow()
+        st.success(msg) if ok else st.error(msg)
+
+    # SUMMARY
+    render_section_title("Portfolio Summary")
+    ti = sum(float(s.get("entry",0))*int(s.get("qty",0)) for s in pos)
+    tc = sum(prices.get(s.get("ticker",""),float(s.get("entry",0)))*int(s.get("qty",0)) for s in pos)
+    tp = tc - ti
+    ps, pc = fmt_pnl(tp)
+    pp, _ = fmt_pct((tp/ti*100) if ti>0 else 0)
+    c1,c2,c3 = st.columns(3)
+    with c1: render_hero_number("Budget", f"₹{d_cap:,.0f}", "#2563eb")
+    with c2: render_hero_number("Deployed", f"₹{ti:,.0f}", "#1e293b", f"{len(pos)}/{MAX_POSITIONS}")
+    with c3: render_hero_number("P&L", f"₹{ps}", pc, pp)
+
+    # POSITIONS
+    render_section_title(f"Active Positions ({len(pos)})")
+    if not pos:
+        render_info_card("No positions. Upload Screener 3/4 CSVs to identify compounders.")
+    else:
+        for i, p in enumerate(pos):
+            tk = p.get("ticker",""); nm = p.get("name",tk)
+            en = float(p.get("entry",0)); qt = int(p.get("qty",0))
+            bd = p.get("buy_date",""); pk = float(p.get("peak",en))
+            dns = int(p.get("dna_score",0) or 0)
+            is_imm = p.get("is_immortal", False)
+            is_leg = p.get("is_legendary", False)
+
+            cp = prices.get(tk, en)
+            if cp > pk: pk = cp; data["engine_d"][i]["peak"] = pk
+            pnl = (cp-en)*qt; pnlp = ((cp-en)/en*100) if en>0 else 0
+            hd = days_held(bd)
+
+            stg = get_profit_stage_d(pnlp, hd, is_imm, is_leg)
+            stp = calculate_trailing_stop_d(en, pk, pnlp, is_imm)
+            sd2 = ((cp-stp)/cp*100) if cp>0 else 0
+
+            # Incubation check
+            in_incubation = hd <= 90
+            incub_days_left = max(0, 90 - hd)
+
+            # LTCG eligibility
+            is_ltcg = hd >= 365
+            tax_badge = "LTCG" if is_ltcg else "STCG"
+            tax_color = "#16a34a" if is_ltcg else "#d97706"
+
+            # Tax-aware harvest signals
+            harvest_signal = ""
+            if is_ltcg:
+                if pnlp >= 150: harvest_signal = "BOOK 10% MORE"
+                elif pnlp >= 100: harvest_signal = "BOOK 20% MORE"
+                elif pnlp >= 50: harvest_signal = "BOOK 20%"
+
+            # Check IMMORTAL eligibility
+            can_immortal = hd >= 365 and pnlp >= 30 and not is_imm
+            can_legendary = hd >= 730 and pnlp >= 100 and is_imm and not is_leg
+
+            ps2,pc2 = fmt_pnl(pnl); pp2,_ = fmt_pct(pnlp)
+
+            # Border color
+            if is_leg: bc = "#f59e0b"
+            elif is_imm: bc = "#fbbf24"
+            elif in_incubation: bc = "#818cf8"
+            elif pnlp >= 0: bc = "#16a34a"
+            else: bc = "#dc2626"
+
+            # Build card
+            card_top = (
+                f"<div class='data-card' style='border-left:4px solid {bc};'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;'>"
+                f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
+                f"<div>{render_stage_badge(stg)}</div></div>"
+            )
+
+            if in_incubation:
+                card_top += (
+                    f"<div style='background:#e0e7ff;border-radius:8px;padding:10px;margin-bottom:8px;"
+                    f"text-align:center;font-size:12px;color:#4338ca;font-weight:600;'>"
+                    f"INCUBATION — {incub_days_left} days remaining. Short-term price is noise."
+                    f"</div>"
+                )
+
+            card_body = (
+                f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
+                f"<div style='font-size:12px;color:#64748b;'>₹{en:,.0f} → ₹{cp:,.0f}</div>"
+                f"<div style='font-size:13px;font-weight:700;color:{pc2};'>{pp2} (₹{ps2})</div></div>"
+                f"<div style='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:10px;color:#94a3b8;'>"
+                f"<span>Qty: {qt}</span><span>Days: {hd}</span>"
+                f"<span>Stop: ₹{stp:,.0f} ({sd2:.1f}%)</span>"
+                f"<span>DNA: {dns}/20</span>"
+                f"<span style='color:{tax_color};font-weight:600;'>{tax_badge}</span></div>"
+            )
+
+            if harvest_signal:
+                card_body += (
+                    f"<div style='margin-top:4px;'>"
+                    f"{render_badge(harvest_signal, '#d1fae5', '#059669')}</div>"
+                )
+
+            card_html = card_top + card_body + "</div>"
+            st.markdown(card_html, unsafe_allow_html=True)
+
+            with st.expander(f"Manage {nm}", expanded=False):
+                # IMMORTAL / LEGENDARY promotion
+                if can_immortal:
+                    st.markdown("**Eligible for IMMORTAL status** (12mo+, 4Q growth, +30%)")
+                    if st.button(f"Promote to IMMORTAL", key=f"imm_{i}"):
+                        data["engine_d"][i]["is_immortal"] = True
+                        ok,msg = save_stocks_to_github(data, f"{nm} promoted to IMMORTAL")
+                        if ok: st.success(f"{nm} is now IMMORTAL!"); st.rerun()
+
+                if can_legendary:
+                    st.markdown("**Eligible for LEGENDARY status** (24mo+, 8Q growth, +100%)")
+                    if st.button(f"Promote to LEGENDARY", key=f"leg_{i}"):
+                        data["engine_d"][i]["is_legendary"] = True
+                        ok,msg = save_stocks_to_github(data, f"{nm} promoted to LEGENDARY")
+                        if ok: st.success(f"{nm} is now LEGENDARY!"); st.rerun()
+
+                # INTENSIFY (add to position)
+                if hd >= 180 and pnlp > 0 and not in_incubation:
+                    st.markdown("**INTENSIFY eligible** — Business proving itself. Add to position?")
+                    add_qty = st.number_input("Add shares", value=0, min_value=0, key=f"aq_{i}")
+                    add_price = st.number_input("At price ₹", value=float(cp), key=f"ap_{i}", format="%.2f")
+                    if add_qty > 0 and st.button(f"Add {add_qty} shares", key=f"add_{i}"):
+                        old_cost = en * qt
+                        add_cost = add_price * add_qty
+                        new_qty = qt + add_qty
+                        new_avg = (old_cost + add_cost) / new_qty
+                        data["engine_d"][i]["entry"] = round(new_avg, 2)
+                        data["engine_d"][i]["qty"] = new_qty
+                        ok,msg = save_stocks_to_github(data, f"Intensify {nm} +{add_qty}")
+                        if ok: st.success(f"Added {add_qty} at ₹{add_price:,.0f}. New avg: ₹{new_avg:,.0f}"); st.rerun()
+
+                # Sell
+                if not in_incubation or pnlp <= -10:
+                    er = ["Fundamental Break (Piotroski)","Fundamental Break (ROE)",
+                          "D/E Breach","Growth Stalled (ETS=0 2Q)","Trailing Stop",
+                          "Tax-Aware Harvest","Engine A Gate","Manual"]
+                    r = st.selectbox("Exit reason", er, key=f"sr_d_{i}")
+                    pct_sell = st.selectbox("% to sell", [100, 75, 50, 25, 20, 10], key=f"pct_d_{i}")
+                    sell_qty = max(1, int(qt * pct_sell / 100))
+                    sell_pnl = (cp - en) * sell_qty
+                    sp_s, sp_c = fmt_pnl(sell_pnl)
+                    st.markdown(f"Selling {sell_qty} of {qt} shares. P&L: <span style='color:{sp_c}'>₹{sp_s}</span>",
+                               unsafe_allow_html=True)
+
+                    if st.button(f"Confirm Sell", type="primary", use_container_width=True, key=f"sd_{i}"):
+                        data["engine_d_closed"].append({
+                            "name":nm,"ticker":tk,"entry":en,"exit_price":cp,
+                            "qty":sell_qty,"pnl":round(sell_pnl,2),
+                            "pnl_pct":round(pnlp,1),"buy_date":bd,
+                            "exit_date":date.today().strftime("%Y-%m-%d"),
+                            "days_held":hd,"exit_reason":r,
+                            "partial": pct_sell < 100,
+                            "tax_type":"LTCG" if is_ltcg else "STCG"})
+                        if sell_qty >= qt:
+                            data["engine_d"].pop(i)
+                        else:
+                            data["engine_d"][i]["qty"] = qt - sell_qty
+                        ok,msg = save_stocks_to_github(data, f"Sell {sell_qty} {nm} Engine D")
+                        if ok: st.success(f"Sold {sell_qty} {nm}"); st.rerun()
+                        else: st.error(msg)
+                elif in_incubation:
+                    st.info(f"Sell disabled during incubation ({incub_days_left} days left). "
+                           f"Hard stop at ₹{stp:,.0f} still active.")
+
+    # POSITION SIZER
+    render_section_title("Position Sizer")
+    with st.expander("Calculate", expanded=False):
+        av = d_cap - ti; mx = d_cap * MAX_PCT / 100
+        st.markdown(f"**Available:** ₹{av:,.0f} | **Max/stock:** ₹{mx:,.0f}")
+        pr = st.number_input("Price ₹", value=100.0, key="ps_d", min_value=1.0, format="%.2f")
+        if pr>0:
+            mq = int(min(av,mx)/pr)
+            st.markdown(f"**Suggested:** {mq} shares = ₹{mq*pr:,.0f}")
+
+    # WATCHLIST
+    render_section_title("Screener Watchlist")
+    with st.expander("Upload Screener CSVs", expanded=False):
+        st.caption("Screener 3: ROE>15, PEG<=1.5, >200DMA, Pio>6, D/E<1, PG YoY>15%")
+        st.caption("Screener 4: ROE>15, PE<25, >200DMA, Pio>6, D/E<1, PG 3Yr>15%")
+        up1 = st.file_uploader("Screener 3 CSV", type=["csv","xlsx"], key="up_d1")
+        up2 = st.file_uploader("Screener 4 CSV", type=["csv","xlsx"], key="up_d2")
+        all_stocks = []
+        s3_tickers = set(); s4_tickers = set()
+        if up1:
+            st1, err = parse_trendlyne_csv(up1)
+            if err: st.error(err)
+            else:
+                s3_tickers = set(s.get("ticker","") for s in st1)
+                for s in st1: s["screener"] = "S3"
+                all_stocks.extend(st1)
+        if up2:
+            st2, err = parse_trendlyne_csv(up2)
+            if err: st.error(err)
+            else:
+                s4_tickers = set(s.get("ticker","") for s in st2)
+                for s in st2: s["screener"] = "S4"
+                all_stocks.extend(st2)
+
+        if all_stocks:
+            seen = {}
+            for s in all_stocks:
+                tk = s.get("ticker","")
+                if tk in seen:
+                    seen[tk]["screener"] = "DOUBLE"
+                else:
+                    is_dbl = tk in s3_tickers and tk in s4_tickers
+                    if is_dbl: s["screener"] = "DOUBLE"
+                    seen[tk] = s
+
+            deduped = list(seen.values())
+            for s in deduped:
+                s["upload_date"] = date.today().strftime("%Y-%m-%d")
+                s["is_double"] = s.get("screener") == "DOUBLE"
+                s["dns"] = dna_score(s, s.get("is_double", False))
+
+            deduped.sort(key=lambda x: x.get("dns",0), reverse=True)
+            st.success(f"{len(deduped)} stocks ({sum(1 for s in deduped if s.get('is_double'))} doubles)")
+
+            if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_d"):
+                data["engine_d_watchlist"] = deduped
+                data["_d_watchlist_date"] = date.today().strftime("%Y-%m-%d")
+                ok,msg = save_stocks_to_github(data, "Update Engine D watchlist")
+                if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
+                else: st.error(msg)
+
+    if wl:
+        wd = data.get("_d_watchlist_date","")
+        doubles = sum(1 for s in wl if s.get("is_double"))
+        st.markdown(f"<div style='font-size:11px;color:#94a3b8;margin-bottom:8px;'>"
+                   f"Uploaded: {wd} · {len(wl)} stocks · {doubles} doubles</div>",
+                   unsafe_allow_html=True)
+        ht = set(s.get("ticker","") for s in pos)
+        for j,s in enumerate(wl):
+            nm=s.get("name",""); tk=s.get("ticker",""); lp=s.get("ltp",0) or 0
+            cp2=prices.get(tk,lp); opp=((cp2-lp)/lp*100) if lp>0 and cp2>0 else 0
+            os2,oc=fmt_pct(opp)
+            dns2=s.get("dns",0)
+            scr=s.get("screener","S3")
+            vd="ELITE" if dns2>=16 else ("STRONG" if dns2>=11 else ("POTENTIAL" if dns2>=7 else "WEAK"))
+            vc="#16a34a" if dns2>=16 else ("#2563eb" if dns2>=11 else ("#d97706" if dns2>=7 else "#94a3b8"))
+            dbl_badge = render_badge("DOUBLE","#dbeafe","#2563eb") if s.get("is_double") else render_badge(scr,"#f1f5f9","#64748b")
+            ah = tk in ht
+            st.markdown(
+                f"<div class='data-card'>"
+                f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
+                f"<div style='font-weight:700;color:#1e293b;font-size:13px;'>{nm}</div>"
+                f"<div style='font-size:12px;font-weight:700;color:{vc};'>DNA: {dns2}/20</div></div>"
+                f"<div style='display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
+                f"<span>₹{cp2:,.0f}</span><span style='color:{oc}'>{os2}</span>"
+                f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
+                f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
+                f"<span>D/E:{fmt(s.get('de'),1)}</span>"
+                f"<span>PEG:{fmt(s.get('peg'),1)}</span></div>"
+                f"<div>{dbl_badge} {render_stage_badge(vd)}"
+                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div></div>",
+                unsafe_allow_html=True)
+            if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
+                with st.expander(f"Buy {nm}", expanded=False):
+                    bp=st.number_input("Price ₹",value=float(cp2),key=f"bp_d_{j}",format="%.2f")
+                    mx2=min(d_cap-ti, d_cap*MAX_PCT/100)
+                    if dns2>=16: sz=10
+                    elif dns2>=11: sz=7
+                    else: sz=4
+                    mx3=min(mx2, d_cap*sz/100)
+                    sq=int(mx3/bp) if bp>0 else 0
+                    bq=st.number_input("Qty",value=sq,min_value=1,key=f"bq_d_{j}")
+                    st.markdown(f"**₹{bp*bq:,.0f}** ({sz}% sizing for DNA {dns2})")
+                    if st.button(f"Confirm Buy",type="primary",use_container_width=True,key=f"cb_d_{j}"):
+                        data["engine_d"].append({
+                            "name":nm,"ticker":tk,"entry":bp,"qty":bq,
+                            "buy_date":date.today().strftime("%Y-%m-%d"),"peak":bp,
+                            "dna_score":dns2,"is_double":s.get("is_double",False),
+                            "is_immortal":False,"is_legendary":False,
+                            "sector":s.get("sector","")})
+                        ok,msg=save_stocks_to_github(data,f"Buy {nm} Engine D")
+                        if ok: st.success(f"Bought {nm}"); trigger_workflow(); st.rerun()
+                        else: st.error(msg)
+        if st.button("Clear Watchlist", key="cwl_d"):
+            data["engine_d_watchlist"]=[]; data["_d_watchlist_date"]=""
+            ok,msg=save_stocks_to_github(data,"Clear Engine D watchlist")
+            if ok: st.success("Cleared"); st.rerun()
+    else:
+        render_info_card("No watchlist. Upload Screener 3/4 CSVs to identify compounders.")
+
+    # TRADE LOG
+    render_section_title("Trade Log")
+    if closed:
+        ws=[t for t in closed if float(t.get("pnl",0))>0]
+        ls=[t for t in closed if float(t.get("pnl",0))<=0]
+        tr=sum(float(t.get("pnl",0)) for t in closed)
+        ts2,tc2=fmt_pnl(tr); wr=(len(ws)/len(closed)*100) if closed else 0
+        ltcg_trades = sum(1 for t in closed if t.get("tax_type")=="LTCG")
+        partials = sum(1 for t in closed if t.get("partial"))
+        render_data_card(
+            render_stat_row("Total Trades",str(len(closed)))+
+            render_stat_row("Win/Loss",f"{len(ws)}/{len(ls)}")+
+            render_stat_row("Win Rate",f"{wr:.0f}%","#16a34a" if wr>=50 else "#dc2626")+
+            render_stat_row("Total P&L",f"₹{ts2}",tc2)+
+            render_stat_row("LTCG Trades",str(ltcg_trades),"#16a34a")+
+            render_stat_row("Partial Bookings",str(partials)))
+    else:
+        render_info_card("No trades yet. Compounders take time.")
