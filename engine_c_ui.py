@@ -181,7 +181,7 @@ def show_engine_c():
     st.caption("S1: ROE>15, PE<25, >200DMA, Pio>6 · S2: + D/E<1, PG>15%")
     st.markdown(
         "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
-        "Upload <code>screener_1.csv</code> + <code>screener_2.csv</code> "
+        "Upload CSVs (names starting with <code>C1</code> + <code>C2</code>) "
         "to GitHub → <code>data</code> folder → press Load</div>",
         unsafe_allow_html=True)
     all_stocks = []
@@ -193,13 +193,13 @@ def show_engine_c():
         show_paste = st.button("Paste CSV Instead", use_container_width=True, key="paste_toggle_c")
     if load_gh:
         with st.spinner("Fetching from GitHub..."):
-            st1, err1 = load_screener_from_github("screener_1.csv")
+            st1, err1 = load_screener_from_github("C1")
             if err1: st.warning(f"Screener 1: {err1}")
             elif st1:
                 s1_tickers = set(s.get("ticker","") for s in st1)
                 for s in st1: s["screener"] = "S1"
                 all_stocks.extend(st1)
-            st2, err2 = load_screener_from_github("screener_2.csv")
+            st2, err2 = load_screener_from_github("C2")
             if err2: st.warning(f"Screener 2: {err2}")
             elif st2:
                 s2_tickers = set(s.get("ticker","") for s in st2)

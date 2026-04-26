@@ -157,8 +157,8 @@ def show_engine_b():
     st.caption("Trendlyne: Durability > 55 AND Momentum > 59")
     st.markdown(
         "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
-        "Upload <code>dvm_screener.csv</code> to GitHub → "
-        "<code>data</code> folder → press Load</div>",
+        "Upload DVM screener CSV (name starting with <code>Mom</code>) "
+        "to GitHub → <code>data</code> folder → press Load</div>",
         unsafe_allow_html=True)
     stks = None
     err = None
@@ -169,7 +169,7 @@ def show_engine_b():
         show_paste = st.button("Paste CSV Instead", use_container_width=True, key="paste_toggle_b")
     if load_gh:
         with st.spinner("Fetching from GitHub..."):
-            stks, err = load_screener_from_github("dvm_screener.csv")
+            stks, err = load_screener_from_github("Mom")
     if show_paste or st.session_state.get("_show_paste_b"):
         st.session_state["_show_paste_b"] = True
         txt = st.text_area("Paste CSV content", height=120, key="ptxt_b", placeholder="Paste CSV text here...")

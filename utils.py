@@ -195,20 +195,58 @@ def parse_trendlyne_text(text_content):
     except Exception as e:
         return [], str(e)
 
-def load_screener_from_github(filename):
-    """Load a screener CSV directly from the GitHub repo's data/ folder."""
-    url = (
-        f"https://raw.githubusercontent.com/"
-        f"{GITHUB_OWNER}/{GITHUB_REPO}/{GITHUB_BRANCH}/data/{filename}"
+def load_screener_from_github(prefix):
+    """Load a screener CSV from GitHub data/ folder by prefix match.
+    Finds the latest file starting with the given prefix.
+    E.g. prefix='Mom' matches 'Mom 1_April 26, 2026.csv'
+    """
+    import urllib.parse
+    token = get_github_token()
+    headers = {"Accept": "application/vnd.github+json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    # List files in data/ folder
+    api_url = (
+        f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}"
+        f"/contents/data?ref={GITHUB_BRANCH}"
     )
     try:
-        resp = requests.get(url, timeout=15)
-        if resp.status_code == 200:
-            return parse_trendlyne_text(resp.text)
-        elif resp.status_code == 404:
-            return [], f"data/{filename} not found in repo. Upload it to GitHub first."
+        resp = requests.get(api_url, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            return [], f"Could not list data/ folder ({resp.status_code})"
+
+        files = resp.json()
+        # Find CSV files matching the prefix
+        matches = [
+            f["name"] for f in files
+            if isinstance(f, dict)
+            and f.get("name", "").lower().startswith(prefix.lower())
+            and f.get("name", "").lower().endswith((".csv", ".xlsx"))
+        ]
+
+        if not matches:
+            return [], f"No file starting with '{prefix}' found in data/ folder."
+
+        # Pick latest (sorted descending — date in name helps)
+        matches.sort(reverse=True)
+        chosen = matches[0]
+
+        # Download the file
+        raw_url = (
+            f"https://raw.githubusercontent.com/"
+            f"{GITHUB_OWNER}/{GITHUB_REPO}/{GITHUB_BRANCH}/data/"
+            f"{urllib.parse.quote(chosen)}"
+        )
+        dl = requests.get(raw_url, timeout=15)
+        if dl.status_code == 200:
+            stocks, err = parse_trendlyne_text(dl.text)
+            if err:
+                return [], err
+            return stocks, None
         else:
-            return [], f"GitHub fetch failed ({resp.status_code})"
+            return [], f"Download failed for {chosen} ({dl.status_code})"
+
     except requests.RequestException as e:
         return [], f"Network error: {e}"
 
