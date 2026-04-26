@@ -258,15 +258,33 @@ def show_engine_d():
         "Upload CSVs (names starting with <code>D1</code> + <code>D2</code>) "
         "to GitHub → <code>data</code> folder → press Load</div>",
         unsafe_allow_html=True)
-    all_stocks = []
-    s3_tickers = set(); s4_tickers = set()
     c1, c2 = st.columns(2)
     with c1:
         load_gh = st.button("Load from GitHub", type="primary", use_container_width=True, key="ghb_d")
     with c2:
         show_paste = st.button("Paste CSV Instead", use_container_width=True, key="paste_toggle_d")
+
+    def _process_d(all_stocks, s3_tickers, s4_tickers):
+        seen = {}
+        for s in all_stocks:
+            tk = s.get("ticker","")
+            if tk in seen:
+                seen[tk]["screener"] = "DOUBLE"
+            else:
+                is_dbl = tk in s3_tickers and tk in s4_tickers
+                if is_dbl: s["screener"] = "DOUBLE"
+                seen[tk] = s
+        deduped = list(seen.values())
+        for s in deduped:
+            s["upload_date"] = date.today().strftime("%Y-%m-%d")
+            s["is_double"] = s.get("screener") == "DOUBLE"
+            s["dns"] = dna_score(s, s.get("is_double", False))
+        deduped.sort(key=lambda x: x.get("dns",0), reverse=True)
+        return deduped
+
     if load_gh:
         with st.spinner("Fetching from GitHub..."):
+            all_stocks = []; s3_tickers = set(); s4_tickers = set()
             st1, err1 = load_screener_from_github("D1")
             if err1: st.warning(f"Screener 3: {err1}")
             elif st1:
@@ -279,10 +297,14 @@ def show_engine_d():
                 s4_tickers = set(s.get("ticker","") for s in st2)
                 for s in st2: s["screener"] = "S4"
                 all_stocks.extend(st2)
+            if all_stocks:
+                st.session_state["_pending_d"] = _process_d(all_stocks, s3_tickers, s4_tickers)
+
     if show_paste or st.session_state.get("_show_paste_d"):
         st.session_state["_show_paste_d"] = True
         txt1 = st.text_area("Screener 3 CSV text", height=100, key="ptxt_d1", placeholder="Paste Screener 3 CSV here...")
         txt2 = st.text_area("Screener 4 CSV text", height=100, key="ptxt_d2", placeholder="Paste Screener 4 CSV here...")
+        all_stocks = []; s3_tickers = set(); s4_tickers = set()
         if txt1 and txt1.strip():
             st1, err = parse_trendlyne_text(txt1)
             if err: st.error(err)
@@ -297,32 +319,20 @@ def show_engine_d():
                 s4_tickers = set(s.get("ticker","") for s in st2)
                 for s in st2: s["screener"] = "S4"
                 all_stocks.extend(st2)
+        if all_stocks:
+            st.session_state["_pending_d"] = _process_d(all_stocks, s3_tickers, s4_tickers)
 
-    if all_stocks:
-        seen = {}
-        for s in all_stocks:
-            tk = s.get("ticker","")
-            if tk in seen:
-                seen[tk]["screener"] = "DOUBLE"
-            else:
-                is_dbl = tk in s3_tickers and tk in s4_tickers
-                if is_dbl: s["screener"] = "DOUBLE"
-                seen[tk] = s
-
-        deduped = list(seen.values())
-        for s in deduped:
-            s["upload_date"] = date.today().strftime("%Y-%m-%d")
-            s["is_double"] = s.get("screener") == "DOUBLE"
-            s["dns"] = dna_score(s, s.get("is_double", False))
-
-        deduped.sort(key=lambda x: x.get("dns",0), reverse=True)
-        st.success(f"{len(deduped)} stocks ({sum(1 for s in deduped if s.get('is_double'))} doubles)")
-
+    pending = st.session_state.get("_pending_d")
+    if pending:
+        doubles = sum(1 for s in pending if s.get("is_double"))
+        st.success(f"Found {len(pending)} stocks ({doubles} doubles) — press Save to confirm")
         if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_d"):
-            data["engine_d_watchlist"] = deduped
+            data["engine_d_watchlist"] = pending
             data["_d_watchlist_date"] = date.today().strftime("%Y-%m-%d")
             ok,msg = save_stocks_to_github(data, "Update Engine D watchlist")
-            if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
+            if ok:
+                st.session_state.pop("_pending_d", None)
+                st.success("Saved!"); trigger_workflow(); st.rerun()
             else: st.error(msg)
 
     if wl:

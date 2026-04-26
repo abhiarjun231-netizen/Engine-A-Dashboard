@@ -160,8 +160,6 @@ def show_engine_b():
         "Upload DVM screener CSV (name starting with <code>Mom</code>) "
         "to GitHub → <code>data</code> folder → press Load</div>",
         unsafe_allow_html=True)
-    stks = None
-    err = None
     c1, c2 = st.columns(2)
     with c1:
         load_gh = st.button("Load from GitHub", type="primary", use_container_width=True, key="ghb_b")
@@ -170,21 +168,30 @@ def show_engine_b():
     if load_gh:
         with st.spinner("Fetching from GitHub..."):
             stks, err = load_screener_from_github("Mom")
+            if err:
+                st.error(err)
+            elif stks:
+                for s in stks: s["upload_date"] = date.today().strftime("%Y-%m-%d")
+                st.session_state["_pending_b"] = stks
     if show_paste or st.session_state.get("_show_paste_b"):
         st.session_state["_show_paste_b"] = True
         txt = st.text_area("Paste CSV content", height=120, key="ptxt_b", placeholder="Paste CSV text here...")
         if txt and txt.strip():
             stks, err = parse_trendlyne_text(txt)
-    if err:
-        st.error(err)
-    elif stks:
-        for s in stks: s["upload_date"] = date.today().strftime("%Y-%m-%d")
-        st.success(f"Found {len(stks)} stocks")
+            if err: st.error(err)
+            elif stks:
+                for s in stks: s["upload_date"] = date.today().strftime("%Y-%m-%d")
+                st.session_state["_pending_b"] = stks
+    pending = st.session_state.get("_pending_b")
+    if pending:
+        st.success(f"Found {len(pending)} stocks — press Save to confirm")
         if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_b"):
-            data["engine_b_watchlist"] = stks
+            data["engine_b_watchlist"] = pending
             data["_b_watchlist_date"] = date.today().strftime("%Y-%m-%d")
             ok,msg = save_stocks_to_github(data, "Update Engine B watchlist")
-            if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
+            if ok:
+                st.session_state.pop("_pending_b", None)
+                st.success("Saved!"); trigger_workflow(); st.rerun()
             else: st.error(msg)
 
     if wl:

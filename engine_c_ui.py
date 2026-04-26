@@ -184,15 +184,33 @@ def show_engine_c():
         "Upload CSVs (names starting with <code>C1</code> + <code>C2</code>) "
         "to GitHub → <code>data</code> folder → press Load</div>",
         unsafe_allow_html=True)
-    all_stocks = []
-    s1_tickers = set(); s2_tickers = set()
     c1, c2 = st.columns(2)
     with c1:
         load_gh = st.button("Load from GitHub", type="primary", use_container_width=True, key="ghb_c")
     with c2:
         show_paste = st.button("Paste CSV Instead", use_container_width=True, key="paste_toggle_c")
+
+    def _process_c(all_stocks, s1_tickers, s2_tickers):
+        seen = {}
+        for s in all_stocks:
+            tk = s.get("ticker","")
+            if tk in seen:
+                seen[tk]["screener"] = "DOUBLE"
+            else:
+                is_dbl = tk in s1_tickers and tk in s2_tickers
+                if is_dbl: s["screener"] = "DOUBLE"
+                seen[tk] = s
+        deduped = list(seen.values())
+        for s in deduped:
+            s["upload_date"] = date.today().strftime("%Y-%m-%d")
+            s["is_double"] = s.get("screener") == "DOUBLE"
+            s["vds"] = value_depth_score(s, s.get("is_double", False))
+        deduped.sort(key=lambda x: x.get("vds",0), reverse=True)
+        return deduped
+
     if load_gh:
         with st.spinner("Fetching from GitHub..."):
+            all_stocks = []; s1_tickers = set(); s2_tickers = set()
             st1, err1 = load_screener_from_github("C1")
             if err1: st.warning(f"Screener 1: {err1}")
             elif st1:
@@ -205,10 +223,14 @@ def show_engine_c():
                 s2_tickers = set(s.get("ticker","") for s in st2)
                 for s in st2: s["screener"] = "S2"
                 all_stocks.extend(st2)
+            if all_stocks:
+                st.session_state["_pending_c"] = _process_c(all_stocks, s1_tickers, s2_tickers)
+
     if show_paste or st.session_state.get("_show_paste_c"):
         st.session_state["_show_paste_c"] = True
         txt1 = st.text_area("Screener 1 CSV text", height=100, key="ptxt_c1", placeholder="Paste Screener 1 CSV here...")
         txt2 = st.text_area("Screener 2 CSV text", height=100, key="ptxt_c2", placeholder="Paste Screener 2 CSV here...")
+        all_stocks = []; s1_tickers = set(); s2_tickers = set()
         if txt1 and txt1.strip():
             st1, err = parse_trendlyne_text(txt1)
             if err: st.error(err)
@@ -223,32 +245,20 @@ def show_engine_c():
                 s2_tickers = set(s.get("ticker","") for s in st2)
                 for s in st2: s["screener"] = "S2"
                 all_stocks.extend(st2)
+        if all_stocks:
+            st.session_state["_pending_c"] = _process_c(all_stocks, s1_tickers, s2_tickers)
 
-    if all_stocks:
-        seen = {}
-        for s in all_stocks:
-            tk = s.get("ticker","")
-            if tk in seen:
-                seen[tk]["screener"] = "DOUBLE"
-            else:
-                is_dbl = tk in s1_tickers and tk in s2_tickers
-                if is_dbl: s["screener"] = "DOUBLE"
-                seen[tk] = s
-
-        deduped = list(seen.values())
-        for s in deduped:
-            s["upload_date"] = date.today().strftime("%Y-%m-%d")
-            s["is_double"] = s.get("screener") == "DOUBLE"
-            s["vds"] = value_depth_score(s, s.get("is_double", False))
-
-        deduped.sort(key=lambda x: x.get("vds",0), reverse=True)
-        st.success(f"{len(deduped)} stocks ({sum(1 for s in deduped if s.get('is_double'))} doubles)")
-
+    pending = st.session_state.get("_pending_c")
+    if pending:
+        doubles = sum(1 for s in pending if s.get("is_double"))
+        st.success(f"Found {len(pending)} stocks ({doubles} doubles) — press Save to confirm")
         if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_c"):
-            data["engine_c_watchlist"] = deduped
+            data["engine_c_watchlist"] = pending
             data["_c_watchlist_date"] = date.today().strftime("%Y-%m-%d")
             ok,msg = save_stocks_to_github(data, "Update Engine C watchlist")
-            if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
+            if ok:
+                st.session_state.pop("_pending_c", None)
+                st.success("Saved!"); trigger_workflow(); st.rerun()
             else: st.error(msg)
 
     if wl:
