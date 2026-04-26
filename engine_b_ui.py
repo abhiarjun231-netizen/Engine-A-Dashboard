@@ -155,23 +155,23 @@ def show_engine_b():
     # WATCHLIST
     render_section_title("Screener Watchlist")
     st.caption("Trendlyne: Durability > 55 AND Momentum > 59")
-    upload_mode = st.radio("Method", ["Upload File", "GitHub Repo", "Paste CSV"], key="bmode", horizontal=True)
+    st.markdown(
+        "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
+        "Upload <code>dvm_screener.csv</code> to GitHub → "
+        "<code>data</code> folder → press Load</div>",
+        unsafe_allow_html=True)
     stks = None
     err = None
-    if upload_mode == "Upload File":
-        up = st.file_uploader("Upload DVM Screener CSV", type=["csv","xlsx"], key="up_b")
-        if up:
-            stks, err = parse_trendlyne_csv(up)
-    elif upload_mode == "GitHub Repo":
-        st.markdown(
-            "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
-            "Upload <code>dvm_screener.csv</code> to GitHub repo → "
-            "<code>data</code> folder → then press Load</div>",
-            unsafe_allow_html=True)
-        if st.button("Load dvm_screener.csv", type="primary", use_container_width=True, key="ghb_b"):
-            with st.spinner("Fetching from GitHub..."):
-                stks, err = load_screener_from_github("dvm_screener.csv")
-    else:
+    c1, c2 = st.columns(2)
+    with c1:
+        load_gh = st.button("Load from GitHub", type="primary", use_container_width=True, key="ghb_b")
+    with c2:
+        show_paste = st.button("Paste CSV Instead", use_container_width=True, key="paste_toggle_b")
+    if load_gh:
+        with st.spinner("Fetching from GitHub..."):
+            stks, err = load_screener_from_github("dvm_screener.csv")
+    if show_paste or st.session_state.get("_show_paste_b"):
+        st.session_state["_show_paste_b"] = True
         txt = st.text_area("Paste CSV content", height=120, key="ptxt_b", placeholder="Paste CSV text here...")
         if txt and txt.strip():
             stks, err = parse_trendlyne_text(txt)

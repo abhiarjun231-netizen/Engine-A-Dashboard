@@ -179,47 +179,34 @@ def show_engine_c():
     # WATCHLIST
     render_section_title("Screener Watchlist")
     st.caption("S1: ROE>15, PE<25, >200DMA, Pio>6 · S2: + D/E<1, PG>15%")
-    upload_mode = st.radio("Method", ["Upload File", "GitHub Repo", "Paste CSV"], key="cmode", horizontal=True)
+    st.markdown(
+        "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
+        "Upload <code>screener_1.csv</code> + <code>screener_2.csv</code> "
+        "to GitHub → <code>data</code> folder → press Load</div>",
+        unsafe_allow_html=True)
     all_stocks = []
     s1_tickers = set(); s2_tickers = set()
-    if upload_mode == "Upload File":
-        up1 = st.file_uploader("Screener 1 CSV", type=["csv","xlsx"], key="up_c1")
-        up2 = st.file_uploader("Screener 2 CSV", type=["csv","xlsx"], key="up_c2")
-        if up1:
-            st1, err = parse_trendlyne_csv(up1)
-            if err: st.error(err)
-            else:
+    c1, c2 = st.columns(2)
+    with c1:
+        load_gh = st.button("Load from GitHub", type="primary", use_container_width=True, key="ghb_c")
+    with c2:
+        show_paste = st.button("Paste CSV Instead", use_container_width=True, key="paste_toggle_c")
+    if load_gh:
+        with st.spinner("Fetching from GitHub..."):
+            st1, err1 = load_screener_from_github("screener_1.csv")
+            if err1: st.warning(f"Screener 1: {err1}")
+            elif st1:
                 s1_tickers = set(s.get("ticker","") for s in st1)
                 for s in st1: s["screener"] = "S1"
                 all_stocks.extend(st1)
-        if up2:
-            st2, err = parse_trendlyne_csv(up2)
-            if err: st.error(err)
-            else:
+            st2, err2 = load_screener_from_github("screener_2.csv")
+            if err2: st.warning(f"Screener 2: {err2}")
+            elif st2:
                 s2_tickers = set(s.get("ticker","") for s in st2)
                 for s in st2: s["screener"] = "S2"
                 all_stocks.extend(st2)
-    elif upload_mode == "GitHub Repo":
-        st.markdown(
-            "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
-            "Upload <code>screener_1.csv</code> + <code>screener_2.csv</code> "
-            "to GitHub repo → <code>data</code> folder → then press Load</div>",
-            unsafe_allow_html=True)
-        if st.button("Load Screener CSVs", type="primary", use_container_width=True, key="ghb_c"):
-            with st.spinner("Fetching from GitHub..."):
-                st1, err1 = load_screener_from_github("screener_1.csv")
-                if err1: st.warning(f"Screener 1: {err1}")
-                elif st1:
-                    s1_tickers = set(s.get("ticker","") for s in st1)
-                    for s in st1: s["screener"] = "S1"
-                    all_stocks.extend(st1)
-                st2, err2 = load_screener_from_github("screener_2.csv")
-                if err2: st.warning(f"Screener 2: {err2}")
-                elif st2:
-                    s2_tickers = set(s.get("ticker","") for s in st2)
-                    for s in st2: s["screener"] = "S2"
-                    all_stocks.extend(st2)
-    else:
+    if show_paste or st.session_state.get("_show_paste_c"):
+        st.session_state["_show_paste_c"] = True
         txt1 = st.text_area("Screener 1 CSV text", height=100, key="ptxt_c1", placeholder="Paste Screener 1 CSV here...")
         txt2 = st.text_area("Screener 2 CSV text", height=100, key="ptxt_c2", placeholder="Paste Screener 2 CSV here...")
         if txt1 and txt1.strip():
