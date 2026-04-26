@@ -375,7 +375,7 @@ def show_engine_d():
                     else: sz=4
                     mx3=min(mx2, d_cap*sz/100)
                     sq=int(mx3/bp) if bp>0 else 0
-                    bq=st.number_input("Qty",value=sq,min_value=1,key=f"bq_d_{j}")
+                    bq=st.number_input("Qty",value=max(sq,1),min_value=1,key=f"bq_d_{j}")
                     st.markdown(f"**₹{bp*bq:,.0f}** ({sz}% sizing for DNA {dns2})")
                     if st.button(f"Confirm Buy",type="primary",use_container_width=True,key=f"cb_d_{j}"):
                         data["engine_d"].append({

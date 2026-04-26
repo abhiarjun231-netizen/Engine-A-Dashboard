@@ -228,7 +228,7 @@ def show_engine_b():
                     bp=st.number_input("Price ₹",value=float(cp2),key=f"bp_b_{j}",format="%.2f")
                     mx2=min(b_cap-ti, b_cap*MAX_PCT/100)
                     sq=int(mx2/bp) if bp>0 else 0
-                    bq=st.number_input("Qty",value=sq,min_value=1,key=f"bq_b_{j}")
+                    bq=st.number_input("Qty",value=max(sq,1),min_value=1,key=f"bq_b_{j}")
                     st.markdown(f"**₹{bp*bq:,.0f}**")
                     if st.button(f"Confirm Buy",type="primary",use_container_width=True,key=f"cb_{j}"):
                         data["engine_b"].append({

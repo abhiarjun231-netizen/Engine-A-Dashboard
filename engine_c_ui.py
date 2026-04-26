@@ -302,7 +302,7 @@ def show_engine_c():
                     else: sz_pct=4
                     mx3=min(mx2, c_cap*sz_pct/100)
                     sq=int(mx3/bp) if bp>0 else 0
-                    bq=st.number_input("Qty",value=sq,min_value=1,key=f"bq_c_{j}")
+                    bq=st.number_input("Qty",value=max(sq,1),min_value=1,key=f"bq_c_{j}")
                     st.markdown(f"**₹{bp*bq:,.0f}** ({sz_pct}% sizing for VDS {vds})")
                     if st.button(f"Confirm Buy",type="primary",use_container_width=True,key=f"cb_c_{j}"):
                         data["engine_c"].append({
