@@ -1,12 +1,16 @@
 {
   "engine_b": [],
   "engine_c": [],
+  "engine_d": [],
   "engine_b_watchlist": [],
   "engine_c_watchlist": [],
+  "engine_d_watchlist": [],
   "engine_b_closed": [],
   "engine_c_closed": [],
-  "_capital": 500000,
-  "_watchlist_date": "",
+  "engine_d_closed": [],
+  "_capital": 100000,
+  "_b_watchlist_date": "",
   "_c_watchlist_date": "",
+  "_d_watchlist_date": "",
   "_token_cache": {}
 }
