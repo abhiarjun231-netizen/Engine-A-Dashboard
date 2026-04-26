@@ -15,6 +15,8 @@ from utils import (
     render_stat_row, render_hero_number, render_badge,
     render_stage_badge, render_engine_gate,
     calculate_trailing_stop_c, get_profit_stage_c,
+    mcap_tag, render_mini_bar, render_52w_position,
+    sector_summary, render_check,
 )
 
 MAX_POSITIONS = 15
@@ -264,33 +266,83 @@ def show_engine_c():
     if wl:
         wd = data.get("_c_watchlist_date","")
         doubles = sum(1 for s in wl if s.get("is_double"))
-        st.markdown(f"<div style='font-size:11px;color:#94a3b8;margin-bottom:8px;'>"
-                   f"Uploaded: {wd} · {len(wl)} stocks · {doubles} doubles</div>",
-                   unsafe_allow_html=True)
         ht = set(s.get("ticker","") for s in pos)
+
+        # INTELLIGENCE SUMMARY
+        gems = [s for s in wl if s.get("vds",0)>=12]
+        solids = [s for s in wl if 8<=s.get("vds",0)<12]
+        mods = [s for s in wl if s.get("vds",0)<8]
+        traps = sum(1 for s in wl if (s.get("rev_qoq") is not None and s.get("rev_qoq",0)<-10))
+
+        st.markdown(
+            "<div class='data-card' style='border-left:4px solid #2563eb;padding:16px 18px;'>"
+            "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;"
+            "font-weight:700;margin-bottom:10px;'>VALUE INTELLIGENCE</div>"
+            f"<div style='display:flex;gap:12px;margin-bottom:10px;'>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#059669;'>{len(gems)}</div><div style='font-size:10px;color:#94a3b8;'>GEMS</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#2563eb;'>{len(solids)}</div><div style='font-size:10px;color:#94a3b8;'>SOLID</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#4338ca;'>{doubles}</div><div style='font-size:10px;color:#94a3b8;'>DOUBLES</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#1e293b;'>{len(wl)}</div><div style='font-size:10px;color:#94a3b8;'>TOTAL</div></div>"
+            f"</div>"
+            f"{'<div style=\"font-size:11px;color:#dc2626;margin-bottom:6px;\">⚠ '+str(traps)+' stocks with revenue decline — check value traps</div>' if traps else ''}"
+            f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
+            f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
+            "</div>",
+            unsafe_allow_html=True)
+
+        # STOCK CARDS
         for j,s in enumerate(wl):
             nm=s.get("name",""); tk=s.get("ticker",""); lp=s.get("ltp",0) or 0
             cp2=prices.get(tk,lp); opp=((cp2-lp)/lp*100) if lp>0 and cp2>0 else 0
             os2,oc=fmt_pct(opp)
             vds=s.get("vds",0)
             scr=s.get("screener","S1")
-            vd="DEEP VALUE GEM" if vds>=12 else ("SOLID VALUE" if vds>=8 else ("MODERATE" if vds>=5 else "THIN"))
+            vd="DEEP VALUE GEM" if vds>=12 else ("SOLID VALUE" if vds>=8 else ("MODERATE VALUE" if vds>=5 else "THIN VALUE"))
             vc="#16a34a" if vds>=12 else ("#2563eb" if vds>=8 else ("#d97706" if vds>=5 else "#94a3b8"))
-            dbl_badge = render_badge("DOUBLE","#dbeafe","#2563eb") if s.get("is_double") else render_badge(scr,"#f1f5f9","#64748b")
             ah = tk in ht
-            st.markdown(
-                f"<div class='data-card'>"
+            mc_label, mc_color = mcap_tag(s.get("mcap"))
+            pg = s.get("profit_growth"); rq = s.get("rev_qoq")
+            prom = s.get("promoter")
+            # Value Trap checks
+            rev_ok = rq is None or rq > -10
+            prom_ok = prom is None or prom > 0
+            trap_html = (
+                f"<div style='display:flex;gap:10px;font-size:10px;margin-top:4px;'>"
+                f"<span>{render_check('Revenue', rev_ok)}</span>"
+                f"<span>{render_check('Promoter', prom_ok)}</span>"
+                f"</div>"
+            )
+
+            card_html = (
+                f"<div class='data-card' style='border-left:4px solid {vc};'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
+                f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
+                f"<div style='font-size:13px;font-weight:800;color:{vc};'>VDS: {vds}/15</div></div>"
                 f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
-                f"<div style='font-weight:700;color:#1e293b;font-size:13px;'>{nm}</div>"
-                f"<div style='font-size:12px;font-weight:700;color:{vc};'>VDS: {vds}/15</div></div>"
-                f"<div style='display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
-                f"<span>₹{cp2:,.0f}</span><span style='color:{oc}'>{os2}</span>"
+                f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
+                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
+                f"<div style='font-size:11px;'>{render_stage_badge(mc_label)}</div></div>"
+                f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
                 f"<span>D/E:{fmt(s.get('de'),1)}</span></div>"
-                f"<div>{dbl_badge} {render_stage_badge(vd)}"
-                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div></div>",
-                unsafe_allow_html=True)
+                f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
+                f"{'<span style=\"color:#16a34a;\">PG:+'+fmt(pg,0)+'%</span>' if pg and pg>0 else ('<span style=\"color:#dc2626;\">PG:'+fmt(pg,0)+'%</span>' if pg else '')}"
+                f"{'<span>Prom:'+fmt(prom,1)+'%</span>' if prom else ''}"
+                f"{'<span style=\"color:#16a34a;\">Rev:+'+fmt(rq,0)+'%</span>' if rq and rq>0 else ('<span style=\"color:#dc2626;\">Rev:'+fmt(rq,0)+'%</span>' if rq else '')}"
+                f"</div>"
+                f"{render_52w_position(cp2, s.get('low_52w'), s.get('high_52w'))}"
+                f"{trap_html}"
+                f"<div style='margin-top:4px;'>"
+                f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
+                f" {render_stage_badge(vd)}"
+                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div></div>"
+            )
+            st.markdown(card_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
                 with st.expander(f"Buy {nm}", expanded=False):
                     pe_in=st.number_input("Current PE",value=float(s.get("pe",0) or 0),key=f"pe_cb_{j}",format="%.1f")

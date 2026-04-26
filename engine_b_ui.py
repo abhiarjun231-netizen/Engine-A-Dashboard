@@ -14,6 +14,8 @@ from utils import (
     render_stat_row, render_hero_number, render_badge,
     render_stage_badge, render_engine_gate,
     calculate_trailing_stop_b, get_profit_stage_b,
+    mcap_tag, render_mini_bar, render_52w_position,
+    sector_summary, overlap_analysis, render_check,
 )
 
 MAX_POSITIONS = 10
@@ -196,30 +198,93 @@ def show_engine_b():
 
     if wl:
         wd = data.get("_b_watchlist_date","")
-        st.markdown(f"<div style='font-size:11px;color:#94a3b8;margin-bottom:8px;'>"
-                   f"Uploaded: {wd} · {len(wl)} stocks</div>", unsafe_allow_html=True)
         ct = set(s.get("ticker","") for s in data.get("engine_c",[])+data.get("engine_c_watchlist",[]))
         dt = set(s.get("ticker","") for s in data.get("engine_d",[])+data.get("engine_d_watchlist",[]))
         ht = set(s.get("ticker","") for s in pos)
+
+        # INTELLIGENCE SUMMARY
+        scores = [(conviction_b(s,ct,dt), s) for s in wl]
+        strike = [x for x in scores if x[0]>=7]
+        stalk = [x for x in scores if 4<=x[0]<7]
+        weak = [x for x in scores if x[0]<4]
+        n_c, n_d, in_all = overlap_analysis(wl, ct, dt)
+        all_names = ", ".join(s.get("name","")[:12] for s in in_all[:3])
+
+        st.markdown(
+            "<div class='data-card' style='border-left:4px solid #3b82f6;padding:16px 18px;'>"
+            "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;"
+            "font-weight:700;margin-bottom:10px;'>MOMENTUM INTELLIGENCE</div>"
+            f"<div style='display:flex;gap:12px;margin-bottom:10px;'>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#059669;'>{len(strike)}</div><div style='font-size:10px;color:#94a3b8;'>STRIKE</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#d97706;'>{len(stalk)}</div><div style='font-size:10px;color:#94a3b8;'>STALK</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#94a3b8;'>{len(weak)}</div><div style='font-size:10px;color:#94a3b8;'>WEAK</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#1e293b;'>{len(wl)}</div><div style='font-size:10px;color:#94a3b8;'>TOTAL</div></div>"
+            f"</div>"
+            f"<div style='font-size:11px;color:#64748b;margin-bottom:6px;'>"
+            f"<b style='color:#4338ca;'>Multi-Engine:</b> {n_c} also in Value · {n_d} also in Compounder"
+            f"{'  ·  <b style=\"color:#b45309;\">ALL 3: '+all_names+'</b>' if in_all else ''}</div>"
+            f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
+            f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
+            "</div>",
+            unsafe_allow_html=True)
+
+        # STOCK CARDS
         for j,s in enumerate(wl):
             nm=s.get("name",""); tk=s.get("ticker",""); lp=s.get("ltp",0) or 0
             cp2=prices.get(tk,lp); opp=((cp2-lp)/lp*100) if lp>0 and cp2>0 else 0
             os2,oc=fmt_pct(opp); cv=conviction_b(s,ct,dt)
-            vd="STRIKE NOW" if cv>=7 else ("STALK MORE" if cv>=4 else "WEAK")
+            vd="STRIKE NOW" if cv>=7 else ("STALK MORE" if cv>=4 else "WEAK SIGNAL")
             cc="#16a34a" if cv>=7 else ("#2563eb" if cv>=4 else "#94a3b8")
             ah = tk in ht
-            st.markdown(
-                f"<div class='data-card'>"
+            dur = s.get("durability"); mom = s.get("momentum")
+            mc_label, mc_color = mcap_tag(s.get("mcap"))
+            sec = s.get("sector","") or ""
+            in_c = tk in ct; in_d = tk in dt
+            overlap_badges = ""
+            if in_c and in_d: overlap_badges = "  " + render_badge("ALL 3 ENGINES", "#fef3c7", "#b45309")
+            elif in_c: overlap_badges = "  " + render_badge("+ VALUE", "#e0e7ff", "#4338ca")
+            elif in_d: overlap_badges = "  " + render_badge("+ COMPOUNDER", "#e0e7ff", "#4338ca")
+
+            card_html = (
+                f"<div class='data-card' style='border-left:4px solid {cc};'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
+                f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
+                f"<div style='font-size:13px;font-weight:800;color:{cc};'>Conv: {cv}/10</div></div>"
                 f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
-                f"<div style='font-weight:700;color:#1e293b;font-size:13px;'>{nm}</div>"
-                f"<div style='font-size:12px;font-weight:700;color:{cc};'>Conv: {cv}/10</div></div>"
-                f"<div style='display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
-                f"<span>₹{cp2:,.0f}</span><span style='color:{oc}'>{os2}</span>"
+                f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
+                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
+                f"<div style='font-size:11px;'>"
+                f"{render_stage_badge(mc_label)}</div></div>"
+            )
+            if dur is not None or mom is not None:
+                d_color = "#16a34a" if dur and dur>55 else ("#d97706" if dur and dur>=45 else "#dc2626")
+                m_color = "#16a34a" if mom and mom>59 else ("#d97706" if mom and mom>=49 else "#dc2626")
+                card_html += (
+                    f"<div style='margin-bottom:6px;'>"
+                    f"<div style='display:flex;gap:8px;align-items:center;margin-bottom:3px;'>"
+                    f"<span style='font-size:10px;color:#94a3b8;min-width:14px;'>D</span>"
+                    f"{render_mini_bar(dur or 0, 100, d_color)}</div>"
+                    f"<div style='display:flex;gap:8px;align-items:center;'>"
+                    f"<span style='font-size:10px;color:#94a3b8;min-width:14px;'>M</span>"
+                    f"{render_mini_bar(mom or 0, 100, m_color)}</div></div>"
+                )
+            card_html += (
+                f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#94a3b8;margin-bottom:4px;'>"
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
-                f"<span>Pio:{fmt(s.get('piotroski'),0)}</span></div>"
-                f"<div>{render_stage_badge(vd)}"
-                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div></div>",
-                unsafe_allow_html=True)
+                f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
+                f"{'<span>Sec:'+sec[:12]+'</span>' if sec else ''}</div>"
+            )
+            card_html += (
+                f"{render_52w_position(cp2, s.get('low_52w'), s.get('high_52w'))}"
+                f"<div style='margin-top:4px;'>{render_stage_badge(vd)}"
+                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}"
+                f"{overlap_badges}</div></div>"
+            )
+            st.markdown(card_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
                 with st.expander(f"Buy {nm}", expanded=False):
                     d_in=st.number_input("Durability",value=0.0,key=f"db_{j}",max_value=100.0)

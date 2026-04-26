@@ -155,6 +155,18 @@ def parse_trendlyne_csv(uploaded_file):
                 col_map["durability"] = c
             elif "momentum" in cl:
                 col_map["momentum"] = c
+            elif "promoter" in cl and "hold" in cl:
+                col_map["promoter"] = c
+            elif "fii" in cl and "hold" in cl:
+                col_map["fii"] = c
+            elif "dii" in cl and "hold" in cl:
+                col_map["dii"] = c
+            elif "52" in cl and "high" in cl:
+                col_map["high_52w"] = c
+            elif "52" in cl and "low" in cl:
+                col_map["low_52w"] = c
+            elif "roce" in cl:
+                col_map["roce"] = c
 
         stocks = []
         for _, row in df.iterrows():
@@ -165,7 +177,7 @@ def parse_trendlyne_csv(uploaded_file):
             if not stock["name"] or not stock["ticker"]:
                 continue
 
-            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200", "durability", "momentum"]:
+            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200", "durability", "momentum", "promoter", "fii", "dii", "high_52w", "low_52w", "roce"]:
                 if key in col_map:
                     try:
                         val = row.get(col_map[key], "")
@@ -359,6 +371,22 @@ def render_stage_badge(stage):
         "RUNNING": ("#dbeafe", "#2563eb"),
         "WATCHING": ("#fed7aa", "#ea580c"),
         "STOP HIT": ("#fecaca", "#dc2626"),
+        # Intelligence badges
+        "STRIKE NOW": ("#d1fae5", "#059669"),
+        "STALK MORE": ("#fef3c7", "#d97706"),
+        "WEAK SIGNAL": ("#f1f5f9", "#94a3b8"),
+        "DEEP VALUE GEM": ("#d1fae5", "#059669"),
+        "SOLID VALUE": ("#dbeafe", "#2563eb"),
+        "MODERATE VALUE": ("#fef3c7", "#d97706"),
+        "THIN VALUE": ("#f1f5f9", "#94a3b8"),
+        "ELITE": ("#d1fae5", "#059669"),
+        "STRONG": ("#dbeafe", "#2563eb"),
+        "POTENTIAL": ("#fef3c7", "#d97706"),
+        "DOUBLE": ("#e0e7ff", "#4338ca"),
+        "LARGE": ("#dbeafe", "#2563eb"),
+        "MID": ("#f3e8ff", "#7c3aed"),
+        "SMALL": ("#fef3c7", "#d97706"),
+        "ALL 3 ENGINES": ("#fef3c7", "#b45309"),
     }
     bg, tc = colors.get(stage, ("#f1f5f9", "#64748b"))
     return render_badge(stage, bg, tc)
@@ -498,3 +526,91 @@ def get_engine_a_score():
         return df.iloc[-1].to_dict()
     except:
         return None
+
+# ============================================================
+# INTELLIGENCE HELPERS
+# ============================================================
+def mcap_tag(mcap):
+    if mcap is None: return "—", "#94a3b8"
+    if mcap >= 20000: return "LARGE", "#2563eb"
+    if mcap >= 5000: return "MID", "#7c3aed"
+    return "SMALL", "#d97706"
+
+def render_mini_bar(value, max_val, color="#3b82f6"):
+    if value is None or max_val <= 0: return ""
+    pct = min(max(value / max_val * 100, 0), 100)
+    return (
+        f"<div style='display:flex;align-items:center;gap:6px;'>"
+        f"<div style='flex:1;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;'>"
+        f"<div style='width:{pct:.0f}%;height:100%;background:{color};border-radius:3px;'></div>"
+        f"</div><span style='font-size:11px;font-weight:700;color:{color};min-width:28px;'>"
+        f"{value:.0f}</span></div>"
+    )
+
+def render_52w_position(price, low, high):
+    if low is None or high is None or high <= low or price is None: return ""
+    pct = (price - low) / (high - low) * 100
+    pct = min(max(pct, 0), 100)
+    pc = "#16a34a" if pct < 40 else ("#d97706" if pct < 75 else "#dc2626")
+    return (
+        f"<div style='font-size:10px;color:#94a3b8;margin-top:4px;'>"
+        f"<div style='display:flex;justify-content:space-between;'>"
+        f"<span>₹{low:,.0f}</span><span style='color:{pc};font-weight:700;'>"
+        f"{pct:.0f}%</span><span>₹{high:,.0f}</span></div>"
+        f"<div style='height:4px;background:#e2e8f0;border-radius:2px;margin-top:2px;'>"
+        f"<div style='width:{pct:.0f}%;height:100%;background:{pc};border-radius:2px;'>"
+        f"</div></div></div>"
+    )
+
+def sector_summary(stocks):
+    sectors = {}
+    for s in stocks:
+        sec = s.get("sector", "") or "Unknown"
+        sectors[sec] = sectors.get(sec, 0) + 1
+    total = len(stocks) or 1
+    sorted_sec = sorted(sectors.items(), key=lambda x: -x[1])
+    html = ""
+    for sec, cnt in sorted_sec[:5]:
+        pct = cnt / total * 100
+        warn = " ⚠" if pct >= 30 else ""
+        bar_w = min(pct * 2.5, 100)
+        bc = "#dc2626" if pct >= 30 else ("#d97706" if pct >= 20 else "#3b82f6")
+        html += (
+            f"<div style='display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:11px;'>"
+            f"<span style='min-width:90px;color:#64748b;'>{sec[:15]}</span>"
+            f"<div style='flex:1;height:5px;background:#e2e8f0;border-radius:3px;'>"
+            f"<div style='width:{bar_w:.0f}%;height:100%;background:{bc};border-radius:3px;'>"
+            f"</div></div>"
+            f"<span style='color:{bc};font-weight:600;min-width:40px;'>{cnt} ({pct:.0f}%){warn}</span>"
+            f"</div>"
+        )
+    return html
+
+def overlap_analysis(watchlist, c_set, d_set):
+    in_c = [s for s in watchlist if s.get("ticker","") in c_set]
+    in_d = [s for s in watchlist if s.get("ticker","") in d_set]
+    in_all = [s for s in watchlist if s.get("ticker","") in c_set and s.get("ticker","") in d_set]
+    return len(in_c), len(in_d), in_all
+
+def render_check(label, passed):
+    icon = "✓" if passed else "✗"
+    color = "#16a34a" if passed else "#dc2626"
+    return f"<span style='color:{color};font-weight:700;'>{icon}</span> <span style='font-size:11px;color:#64748b;'>{label}</span>"
+
+def peg_reading(peg):
+    if peg is None: return "—", "#94a3b8"
+    if peg <= 0.5: return "EXTREME VALUE", "#16a34a"
+    if peg <= 1.0: return "UNDERVALUED", "#059669"
+    if peg <= 1.5: return "FAIR", "#2563eb"
+    return "EXPENSIVE", "#dc2626"
+
+def compound_stars(dns):
+    if dns is None: return ""
+    if dns >= 16: stars = 5
+    elif dns >= 13: stars = 4
+    elif dns >= 10: stars = 3
+    elif dns >= 7: stars = 2
+    else: stars = 1
+    filled = "★" * stars
+    empty = "☆" * (5 - stars)
+    return f"<span style='color:#f59e0b;font-size:13px;letter-spacing:2px;'>{filled}{empty}</span>"

@@ -15,6 +15,8 @@ from utils import (
     render_stat_row, render_hero_number, render_badge,
     render_stage_badge, render_engine_gate,
     calculate_trailing_stop_d, get_profit_stage_d,
+    mcap_tag, render_mini_bar, render_52w_position,
+    sector_summary, render_check, peg_reading, compound_stars,
 )
 
 MAX_POSITIONS = 15
@@ -338,10 +340,36 @@ def show_engine_d():
     if wl:
         wd = data.get("_d_watchlist_date","")
         doubles = sum(1 for s in wl if s.get("is_double"))
-        st.markdown(f"<div style='font-size:11px;color:#94a3b8;margin-bottom:8px;'>"
-                   f"Uploaded: {wd} · {len(wl)} stocks · {doubles} doubles</div>",
-                   unsafe_allow_html=True)
         ht = set(s.get("ticker","") for s in pos)
+
+        # INTELLIGENCE SUMMARY
+        elites = [s for s in wl if s.get("dns",0)>=16]
+        strongs = [s for s in wl if 11<=s.get("dns",0)<16]
+        potentials = [s for s in wl if s.get("dns",0)<11]
+        low_peg = sum(1 for s in wl if s.get("peg") is not None and s.get("peg",99)<=0.5)
+
+        st.markdown(
+            "<div class='data-card' style='border-left:4px solid #059669;padding:16px 18px;'>"
+            "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;"
+            "font-weight:700;margin-bottom:10px;'>COMPOUNDER INTELLIGENCE</div>"
+            f"<div style='display:flex;gap:12px;margin-bottom:10px;'>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#059669;'>{len(elites)}</div><div style='font-size:10px;color:#94a3b8;'>ELITE</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#2563eb;'>{len(strongs)}</div><div style='font-size:10px;color:#94a3b8;'>STRONG</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#4338ca;'>{doubles}</div><div style='font-size:10px;color:#94a3b8;'>DOUBLES</div></div>"
+            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
+            f"color:#1e293b;'>{len(wl)}</div><div style='font-size:10px;color:#94a3b8;'>TOTAL</div></div>"
+            f"</div>"
+            f"<div style='font-size:11px;color:#64748b;margin-bottom:6px;'>"
+            f"<b style='color:#16a34a;'>{low_peg} stocks</b> with PEG ≤ 0.5 (extreme value)</div>"
+            f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
+            f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
+            "</div>",
+            unsafe_allow_html=True)
+
+        # STOCK CARDS
         for j,s in enumerate(wl):
             nm=s.get("name",""); tk=s.get("ticker",""); lp=s.get("ltp",0) or 0
             cp2=prices.get(tk,lp); opp=((cp2-lp)/lp*100) if lp>0 and cp2>0 else 0
@@ -350,22 +378,48 @@ def show_engine_d():
             scr=s.get("screener","S3")
             vd="ELITE" if dns2>=16 else ("STRONG" if dns2>=11 else ("POTENTIAL" if dns2>=7 else "WEAK"))
             vc="#16a34a" if dns2>=16 else ("#2563eb" if dns2>=11 else ("#d97706" if dns2>=7 else "#94a3b8"))
-            dbl_badge = render_badge("DOUBLE","#dbeafe","#2563eb") if s.get("is_double") else render_badge(scr,"#f1f5f9","#64748b")
             ah = tk in ht
-            st.markdown(
-                f"<div class='data-card'>"
+            mc_label, mc_color = mcap_tag(s.get("mcap"))
+            pg = s.get("profit_growth"); peg_val = s.get("peg")
+            peg_txt, peg_col = peg_reading(peg_val)
+            de_val = s.get("de")
+            # Kill Shot checks
+            growth_ok = pg is None or pg > 0
+            debt_ok = de_val is None or de_val < 1.5
+            kill_html = (
+                f"<div style='display:flex;gap:10px;font-size:10px;margin-top:4px;'>"
+                f"<span>{render_check('Growth', growth_ok)}</span>"
+                f"<span>{render_check('Debt', debt_ok)}</span>"
+                f"<span style='color:{peg_col};font-weight:600;'>PEG: {peg_txt}</span>"
+                f"</div>"
+            )
+
+            card_html = (
+                f"<div class='data-card' style='border-left:4px solid {vc};'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;'>"
+                f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
+                f"<div style='font-size:13px;font-weight:800;color:{vc};'>DNA: {dns2}/20</div></div>"
+                f"<div style='text-align:right;margin-bottom:6px;'>{compound_stars(dns2)}</div>"
                 f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
-                f"<div style='font-weight:700;color:#1e293b;font-size:13px;'>{nm}</div>"
-                f"<div style='font-size:12px;font-weight:700;color:{vc};'>DNA: {dns2}/20</div></div>"
-                f"<div style='display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
-                f"<span>₹{cp2:,.0f}</span><span style='color:{oc}'>{os2}</span>"
+                f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
+                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
+                f"<div style='font-size:11px;'>{render_stage_badge(mc_label)}</div></div>"
+                f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
                 f"<span>D/E:{fmt(s.get('de'),1)}</span>"
-                f"<span>PEG:{fmt(s.get('peg'),1)}</span></div>"
-                f"<div>{dbl_badge} {render_stage_badge(vd)}"
-                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div></div>",
-                unsafe_allow_html=True)
+                f"<span>PEG:{fmt(peg_val,1)}</span></div>"
+                f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
+                f"{'<span style=\"color:#16a34a;font-weight:600;\">PG:+'+fmt(pg,0)+'%</span>' if pg and pg>0 else ('<span style=\"color:#dc2626;\">PG:'+fmt(pg,0)+'%</span>' if pg else '')}"
+                f"</div>"
+                f"{render_52w_position(cp2, s.get('low_52w'), s.get('high_52w'))}"
+                f"{kill_html}"
+                f"<div style='margin-top:4px;'>"
+                f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
+                f" {render_stage_badge(vd)}"
+                f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div></div>"
+            )
+            st.markdown(card_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
                 with st.expander(f"Buy {nm}", expanded=False):
                     bp=st.number_input("Price ₹",value=float(cp2),key=f"bp_d_{j}",format="%.2f")
