@@ -463,5 +463,127 @@
   "_b_watchlist_date": "2026-04-26",
   "_c_watchlist_date": "",
   "_d_watchlist_date": "",
-  "_token_cache": {}
+  "_token_cache": {
+    "NYKAA": {
+      "token": "6545",
+      "symbol": "NYKAA-EQ",
+      "name": "NYKAA"
+    },
+    "GALLANTT": {
+      "token": "13337",
+      "symbol": "GALLANTT-EQ",
+      "name": "GALLANTT"
+    },
+    "GESHIP": {
+      "token": "13776",
+      "symbol": "GESHIP-EQ",
+      "name": "GESHIP"
+    },
+    "BSE": {
+      "token": "19585",
+      "symbol": "BSE-EQ",
+      "name": "BSE"
+    },
+    "NATIONALUM": {
+      "token": "6364",
+      "symbol": "NATIONALUM-EQ",
+      "name": "NATIONALUM"
+    },
+    "GMDCLTD": {
+      "token": "5204",
+      "symbol": "GMDCLTD-EQ",
+      "name": "GMDCLTD"
+    },
+    "AIAENG": {
+      "token": "13086",
+      "symbol": "AIAENG-EQ",
+      "name": "AIAENG"
+    },
+    "HINDCOPPER": {
+      "token": "17939",
+      "symbol": "HINDCOPPER-EQ",
+      "name": "HINDCOPPER"
+    },
+    "MCX": {
+      "token": "31181",
+      "symbol": "MCX-EQ",
+      "name": "MCX"
+    },
+    "J&KBANK": {
+      "token": "5633",
+      "symbol": "J&KBANK-EQ",
+      "name": "J&KBANK"
+    },
+    "HEG": {
+      "token": "1336",
+      "symbol": "HEG-EQ",
+      "name": "HEG"
+    },
+    "NAVINFLUOR": {
+      "token": "14672",
+      "symbol": "NAVINFLUOR-EQ",
+      "name": "NAVINFLUOR"
+    },
+    "POWERINDIA": {
+      "token": "18457",
+      "symbol": "POWERINDIA-EQ",
+      "name": "POWERINDIA"
+    },
+    "SCHAEFFLER": {
+      "token": "1011",
+      "symbol": "SCHAEFFLER-EQ",
+      "name": "SCHAEFFLER"
+    },
+    "SCI": {
+      "token": "3048",
+      "symbol": "SCI-EQ",
+      "name": "SCI"
+    },
+    "ENGINERSIN": {
+      "token": "4907",
+      "symbol": "ENGINERSIN-EQ",
+      "name": "ENGINERSIN"
+    },
+    "SAILIFE": {
+      "token": "27839",
+      "symbol": "SAILIFE-EQ",
+      "name": "SAILIFE"
+    },
+    "NLCINDIA": {
+      "token": "8585",
+      "symbol": "NLCINDIA-EQ",
+      "name": "NLCINDIA"
+    },
+    "BHARATFORG": {
+      "token": "422",
+      "symbol": "BHARATFORG-EQ",
+      "name": "BHARATFORG"
+    },
+    "GVT&D": {
+      "token": "16783",
+      "symbol": "GVT&D-EQ",
+      "name": "GVT&D"
+    },
+    "TORNTPOWER": {
+      "token": "13786",
+      "symbol": "TORNTPOWER-EQ",
+      "name": "TORNTPOWER"
+    },
+    "CHENNPETRO": {
+      "token": "2049",
+      "symbol": "CHENNPETRO-EQ",
+      "name": "CHENNPETRO"
+    },
+    "BHEL": {
+      "token": "438",
+      "symbol": "BHEL-EQ",
+      "name": "BHEL"
+    },
+    "ACUTAAS": {
+      "token": "5578",
+      "symbol": "ACUTAAS-EQ",
+      "name": "ACUTAAS"
+    }
+  },
+  "_last_token_update": "2026-04-26"
 }
