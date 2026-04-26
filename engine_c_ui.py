@@ -331,6 +331,55 @@ def show_engine_c():
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
                 f"<span>D/E:{fmt(s.get('de'),1)}</span></div>"
+            )
+            # PE Expansion Room
+            pe_val = s.get("pe")
+            pe_room_html = ""
+            if pe_val and pe_val > 0:
+                pe_ceiling = 25
+                room_pct = ((pe_ceiling - pe_val) / pe_val) * 100
+                if room_pct > 0:
+                    # Ladder milestones
+                    pe_30 = pe_val * 1.30
+                    pe_50 = pe_val * 1.50
+                    pe_80 = pe_val * 1.80
+                    bar_fill = min(max((pe_val / pe_ceiling) * 100, 5), 100)
+                    bar_color = "#16a34a" if pe_val < 15 else ("#2563eb" if pe_val < 20 else "#d97706")
+                    pe_room_html = (
+                        f"<div style='margin-bottom:6px;'>"
+                        f"<div style='display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;'>"
+                        f"<span>PE: {pe_val:.0f}</span>"
+                        f"<span style='color:{bar_color};font-weight:700;'>Room: +{room_pct:.0f}%</span>"
+                        f"<span>Cap: {pe_ceiling}</span></div>"
+                        f"<div style='height:4px;background:#e2e8f0;border-radius:2px;margin-top:2px;'>"
+                        f"<div style='width:{bar_fill:.0f}%;height:100%;background:{bar_color};border-radius:2px;'>"
+                        f"</div></div>"
+                        f"<div style='display:flex;justify-content:space-between;font-size:9px;color:#cbd5e1;margin-top:2px;'>"
+                        f"<span>Book 25%→{pe_30:.0f}</span>"
+                        f"<span>Book 50%→{pe_50:.0f}</span>"
+                        f"<span>Book 75%→{pe_80:.0f}</span></div>"
+                        f"</div>"
+                    )
+                else:
+                    pe_room_html = (
+                        f"<div style='font-size:10px;color:#dc2626;margin-bottom:6px;font-weight:600;'>"
+                        f"⚠ PE at {pe_val:.0f} — already above cap. Limited upside.</div>"
+                    )
+
+            card_html = (
+                f"<div class='data-card' style='border-left:4px solid {vc};'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
+                f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
+                f"<div style='font-size:13px;font-weight:800;color:{vc};'>VDS: {vds}/15</div></div>"
+                f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
+                f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
+                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
+                f"<div style='font-size:11px;'>{render_stage_badge(mc_label)}</div></div>"
+                f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
+                f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
+                f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
+                f"<span>D/E:{fmt(s.get('de'),1)}</span></div>"
+                f"{pe_room_html}"
                 f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
                 f"{'<span style=\"color:#16a34a;\">PG:+'+fmt(pg,0)+'%</span>' if pg and pg>0 else ('<span style=\"color:#dc2626;\">PG:'+fmt(pg,0)+'%</span>' if pg else '')}"
                 f"{'<span>Prom:'+fmt(prom,1)+'%</span>' if prom else ''}"
