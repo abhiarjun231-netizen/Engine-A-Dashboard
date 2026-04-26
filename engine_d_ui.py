@@ -8,7 +8,8 @@ import json
 from datetime import datetime, date
 from utils import (
     load_stocks_json, save_stocks_to_github, load_stock_prices,
-    trigger_workflow, parse_trendlyne_csv, get_engine_a_score,
+    trigger_workflow, parse_trendlyne_csv, parse_trendlyne_text,
+    get_engine_a_score,
     fmt, fmt_pnl, fmt_pct, days_held,
     render_section_title, render_info_card, render_data_card,
     render_stat_row, render_hero_number, render_badge,
@@ -253,24 +254,44 @@ def show_engine_d():
     with st.expander("Upload Screener CSVs", expanded=False):
         st.caption("Screener 3: ROE>15, PEG<=1.5, >200DMA, Pio>6, D/E<1, PG YoY>15%")
         st.caption("Screener 4: ROE>15, PE<25, >200DMA, Pio>6, D/E<1, PG 3Yr>15%")
-        up1 = st.file_uploader("Screener 3 CSV", type=["csv","xlsx"], key="up_d1")
-        up2 = st.file_uploader("Screener 4 CSV", type=["csv","xlsx"], key="up_d2")
+        upload_mode = st.radio("Method", ["Upload File", "Paste CSV Text"], key="dmode", horizontal=True)
         all_stocks = []
         s3_tickers = set(); s4_tickers = set()
-        if up1:
-            st1, err = parse_trendlyne_csv(up1)
-            if err: st.error(err)
-            else:
-                s3_tickers = set(s.get("ticker","") for s in st1)
-                for s in st1: s["screener"] = "S3"
-                all_stocks.extend(st1)
-        if up2:
-            st2, err = parse_trendlyne_csv(up2)
-            if err: st.error(err)
-            else:
-                s4_tickers = set(s.get("ticker","") for s in st2)
-                for s in st2: s["screener"] = "S4"
-                all_stocks.extend(st2)
+        if upload_mode == "Upload File":
+            up1 = st.file_uploader("Screener 3 CSV", type=["csv","xlsx"], key="up_d1")
+            up2 = st.file_uploader("Screener 4 CSV", type=["csv","xlsx"], key="up_d2")
+            if up1:
+                st1, err = parse_trendlyne_csv(up1)
+                if err: st.error(err)
+                else:
+                    s3_tickers = set(s.get("ticker","") for s in st1)
+                    for s in st1: s["screener"] = "S3"
+                    all_stocks.extend(st1)
+            if up2:
+                st2, err = parse_trendlyne_csv(up2)
+                if err: st.error(err)
+                else:
+                    s4_tickers = set(s.get("ticker","") for s in st2)
+                    for s in st2: s["screener"] = "S4"
+                    all_stocks.extend(st2)
+        else:
+            st.caption("Open CSV in text viewer → Select All → Copy → Paste below")
+            txt1 = st.text_area("Screener 3 CSV text", height=100, key="ptxt_d1", placeholder="Paste Screener 3 CSV here...")
+            txt2 = st.text_area("Screener 4 CSV text", height=100, key="ptxt_d2", placeholder="Paste Screener 4 CSV here...")
+            if txt1 and txt1.strip():
+                st1, err = parse_trendlyne_text(txt1)
+                if err: st.error(err)
+                else:
+                    s3_tickers = set(s.get("ticker","") for s in st1)
+                    for s in st1: s["screener"] = "S3"
+                    all_stocks.extend(st1)
+            if txt2 and txt2.strip():
+                st2, err = parse_trendlyne_text(txt2)
+                if err: st.error(err)
+                else:
+                    s4_tickers = set(s.get("ticker","") for s in st2)
+                    for s in st2: s["screener"] = "S4"
+                    all_stocks.extend(st2)
 
         if all_stocks:
             seen = {}

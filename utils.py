@@ -151,6 +151,10 @@ def parse_trendlyne_csv(uploaded_file):
                 col_map["sector"] = c
             elif "day" in cl and "sma200" in cl:
                 col_map["sma200"] = c
+            elif "durability" in cl:
+                col_map["durability"] = c
+            elif "momentum" in cl:
+                col_map["momentum"] = c
 
         stocks = []
         for _, row in df.iterrows():
@@ -161,7 +165,7 @@ def parse_trendlyne_csv(uploaded_file):
             if not stock["name"] or not stock["ticker"]:
                 continue
 
-            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200"]:
+            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200", "durability", "momentum"]:
                 if key in col_map:
                     try:
                         val = row.get(col_map[key], "")
@@ -179,6 +183,15 @@ def parse_trendlyne_csv(uploaded_file):
             stocks.append(stock)
 
         return stocks, None
+    except Exception as e:
+        return [], str(e)
+
+def parse_trendlyne_text(text_content):
+    """Parse pasted CSV text — mobile-friendly alternative to file upload."""
+    try:
+        import io as _io
+        fake_file = _io.BytesIO(text_content.encode("utf-8"))
+        return parse_trendlyne_csv(fake_file)
     except Exception as e:
         return [], str(e)
 
