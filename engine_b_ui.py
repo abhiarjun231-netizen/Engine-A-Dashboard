@@ -16,7 +16,7 @@ from utils import (
     calculate_trailing_stop_b, get_profit_stage_b,
     mcap_tag, render_mini_bar, render_52w_position,
     sector_summary, overlap_analysis, render_check,
-    smart_signal_b,
+    smart_signal_b, momentum_velocity,
 )
 
 MAX_POSITIONS = 10
@@ -189,6 +189,15 @@ def show_engine_b():
     if pending:
         st.success(f"Found {len(pending)} stocks — press Save to confirm")
         if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_b"):
+            # Carry over prev_momentum from old watchlist
+            old_wl = {s.get("ticker",""): s for s in data.get("engine_b_watchlist", [])}
+            for s in pending:
+                tk = s.get("ticker","")
+                if tk in old_wl:
+                    old_m = old_wl[tk].get("momentum")
+                    s["prev_momentum"] = old_m
+                else:
+                    s["prev_momentum"] = s.get("momentum")
             data["engine_b_watchlist"] = pending
             data["_b_watchlist_date"] = date.today().strftime("%Y-%m-%d")
             ok,msg = save_stocks_to_github(data, "Update Engine B watchlist")
@@ -211,6 +220,12 @@ def show_engine_b():
         n_c, n_d, in_all = overlap_analysis(wl, ct, dt)
         all_names = ", ".join(s.get("name","")[:12] for s in in_all[:3])
 
+        # Velocity breakdown
+        acc = sum(1 for s in wl if s.get("momentum") and s.get("prev_momentum") and (s["momentum"]-s["prev_momentum"])>=5)
+        cool = sum(1 for s in wl if s.get("momentum") and s.get("prev_momentum") and -10<=(s["momentum"]-s["prev_momentum"])<0)
+        crash = sum(1 for s in wl if s.get("momentum") and s.get("prev_momentum") and (s["momentum"]-s["prev_momentum"])<-10)
+        has_vel = any(s.get("prev_momentum") is not None and s.get("momentum") is not None and s.get("prev_momentum") != s.get("momentum") for s in wl)
+
         st.markdown(
             "<div class='data-card' style='border-left:4px solid #3b82f6;padding:16px 18px;'>"
             "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;"
@@ -228,6 +243,7 @@ def show_engine_b():
             f"<div style='font-size:11px;color:#64748b;margin-bottom:6px;'>"
             f"<b style='color:#4338ca;'>Multi-Engine:</b> {n_c} also in Value · {n_d} also in Compounder"
             f"{'  ·  <b style=\"color:#b45309;\">ALL 3: '+all_names+'</b>' if in_all else ''}</div>"
+            f"{'<div style=\"font-size:11px;margin-bottom:6px;\"><b style=\"color:#16a34a;\">↑↑ '+str(acc)+' accelerating</b>  <b style=\"color:#d97706;\">↓ '+str(cool)+' cooling</b>  <b style=\"color:#dc2626;\">↓↓↓ '+str(crash)+' crashing</b></div>' if has_vel else '<div style=\"font-size:10px;color:#94a3b8;margin-bottom:6px;\">Velocity: Upload new CSV next week to see momentum changes</div>'}"
             f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
             f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
             "</div>",
@@ -264,6 +280,8 @@ def show_engine_b():
             if dur is not None or mom is not None:
                 d_color = "#16a34a" if dur and dur>55 else ("#d97706" if dur and dur>=45 else "#dc2626")
                 m_color = "#16a34a" if mom and mom>59 else ("#d97706" if mom and mom>=49 else "#dc2626")
+                prev_m = s.get("prev_momentum")
+                vel_html, vel_label, vel_val = momentum_velocity(mom, prev_m)
                 card_html += (
                     f"<div style='margin-bottom:6px;'>"
                     f"<div style='display:flex;gap:8px;align-items:center;margin-bottom:3px;'>"
@@ -271,7 +289,8 @@ def show_engine_b():
                     f"{render_mini_bar(dur or 0, 100, d_color)}</div>"
                     f"<div style='display:flex;gap:8px;align-items:center;'>"
                     f"<span style='font-size:10px;color:#94a3b8;min-width:14px;'>M</span>"
-                    f"{render_mini_bar(mom or 0, 100, m_color)}</div></div>"
+                    f"{render_mini_bar(mom or 0, 100, m_color)}</div>"
+                    f"{vel_html}</div>"
                 )
             card_html += (
                 f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#94a3b8;margin-bottom:4px;'>"

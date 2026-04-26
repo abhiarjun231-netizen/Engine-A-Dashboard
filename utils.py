@@ -618,6 +618,31 @@ def compound_stars(dns):
 # ============================================================
 # SMART SIGNAL TEXT GENERATORS
 # ============================================================
+def momentum_velocity(current_m, prev_m):
+    """Calculate momentum velocity: how fast M score is changing.
+    Returns (arrow_html, label, velocity_value)."""
+    if current_m is None or prev_m is None:
+        return "", "NO DATA", 0
+    vel = current_m - prev_m
+    if vel >= 5:
+        arrow = "↑↑"; label = "ACCELERATING"; color = "#16a34a"
+    elif vel > 0:
+        arrow = "↑"; label = "STEADY"; color = "#2563eb"
+    elif vel >= -5:
+        arrow = "↓"; label = "COOLING"; color = "#d97706"
+    elif vel >= -10:
+        arrow = "↓↓"; label = "DECAYING"; color = "#ea580c"
+    else:
+        arrow = "↓↓↓"; label = "CRASHING"; color = "#dc2626"
+    sign = "+" if vel >= 0 else ""
+    return (
+        f"<div style='display:flex;align-items:center;gap:6px;margin-top:4px;'>"
+        f"<span style='font-size:16px;color:{color};font-weight:800;'>{arrow}</span>"
+        f"<span style='font-size:10px;font-weight:700;color:{color};'>{label}</span>"
+        f"<span style='font-size:10px;color:#94a3b8;'>({sign}{vel:.0f})</span></div>",
+        label, vel
+    )
+
 def smart_signal_b(s, cv, in_c, in_d):
     """Generate one-liner insight for Engine B Momentum card."""
     signals = []
