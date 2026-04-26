@@ -1866,6 +1866,106 @@
       "token": "5578",
       "symbol": "ACUTAAS-EQ",
       "name": "ACUTAAS"
+    },
+    "INDUSTOWER": {
+      "token": "29135",
+      "symbol": "INDUSTOWER-EQ",
+      "name": "INDUSTOWER"
+    },
+    "JAYNECOIND": {
+      "token": "2331",
+      "symbol": "JAYNECOIND-EQ",
+      "name": "JAYNECOIND"
+    },
+    "JPOLYINVST": {
+      "token": "31507",
+      "symbol": "JPOLYINVST-EQ",
+      "name": "JPOLYINVST"
+    },
+    "PTC": {
+      "token": "11355",
+      "symbol": "PTC-EQ",
+      "name": "PTC"
+    },
+    "GOKULAGRO": {
+      "token": "14480",
+      "symbol": "GOKULAGRO-EQ",
+      "name": "GOKULAGRO"
+    },
+    "TVSHLTD": {
+      "token": "29008",
+      "symbol": "TVSHLTD-EQ",
+      "name": "TVSHLTD"
+    },
+    "DLINKINDIA": {
+      "token": "17851",
+      "symbol": "DLINKINDIA-EQ",
+      "name": "DLINKINDIA"
+    },
+    "HINDZINC": {
+      "token": "1424",
+      "symbol": "HINDZINC-EQ",
+      "name": "HINDZINC"
+    },
+    "DYCL": {
+      "token": "10417",
+      "symbol": "DYCL-EQ",
+      "name": "DYCL"
+    },
+    "SUMEETINDS": {
+      "token": "20790",
+      "symbol": "SUMEETINDS-EQ",
+      "name": "SUMEETINDS"
+    },
+    "SRM": {
+      "token": "23402",
+      "symbol": "SRM-EQ",
+      "name": "SRM"
+    },
+    "POKARNA": {
+      "token": "17651",
+      "symbol": "POKARNA-EQ",
+      "name": "POKARNA"
+    },
+    "WEBELSOLAR": {
+      "token": "14602",
+      "symbol": "WEBELSOLAR-EQ",
+      "name": "WEBELSOLAR"
+    },
+    "FORCEMOT": {
+      "token": "11573",
+      "symbol": "FORCEMOT-EQ",
+      "name": "FORCEMOT"
+    },
+    "EPL": {
+      "token": "981",
+      "symbol": "EPL-EQ",
+      "name": "EPL"
+    },
+    "PIXTRANS": {
+      "token": "9087",
+      "symbol": "PIXTRANS-EQ",
+      "name": "PIXTRANS"
+    },
+    "VEDL": {
+      "token": "3063",
+      "symbol": "VEDL-EQ",
+      "name": "VEDL"
+    },
+    "GPTINFRA": {
+      "token": "17685",
+      "symbol": "GPTINFRA-EQ",
+      "name": "GPTINFRA"
+    },
+    "MAYURUNIQ": {
+      "token": "28906",
+      "symbol": "MAYURUNIQ-EQ",
+      "name": "MAYURUNIQ"
+    },
+    "FIEMIND": {
+      "token": "13710",
+      "symbol": "FIEMIND-EQ",
+      "name": "FIEMIND"
     }
   },
   "_last_token_update": "2026-04-26"
