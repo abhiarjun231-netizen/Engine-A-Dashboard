@@ -9,7 +9,7 @@ from datetime import datetime, date
 from utils import (
     load_stocks_json, save_stocks_to_github, load_stock_prices,
     trigger_workflow, parse_trendlyne_csv, parse_trendlyne_text,
-    get_engine_a_score,
+    load_screener_from_github, get_engine_a_score,
     fmt, fmt_pnl, fmt_pct, days_held,
     render_section_title, render_info_card, render_data_card,
     render_stat_row, render_hero_number, render_badge,
@@ -178,75 +178,91 @@ def show_engine_c():
 
     # WATCHLIST
     render_section_title("Screener Watchlist")
-    with st.expander("Upload Screener CSVs", expanded=False):
-        st.caption("Screener 1: ROE>15, PE<25, >200DMA, Piotroski>6")
-        st.caption("Screener 2: + D/E<1, Profit Growth>15%")
-        upload_mode = st.radio("Method", ["Upload File", "Paste CSV Text"], key="cmode", horizontal=True)
-        all_stocks = []
-        s1_tickers = set(); s2_tickers = set()
-        if upload_mode == "Upload File":
-            up1 = st.file_uploader("Screener 1 CSV", type=["csv","xlsx"], key="up_c1")
-            up2 = st.file_uploader("Screener 2 CSV", type=["csv","xlsx"], key="up_c2")
-            if up1:
-                st1, err = parse_trendlyne_csv(up1)
-                if err: st.error(err)
-                else:
+    st.caption("S1: ROE>15, PE<25, >200DMA, Pio>6 · S2: + D/E<1, PG>15%")
+    upload_mode = st.radio("Method", ["Upload File", "GitHub Repo", "Paste CSV"], key="cmode", horizontal=True)
+    all_stocks = []
+    s1_tickers = set(); s2_tickers = set()
+    if upload_mode == "Upload File":
+        up1 = st.file_uploader("Screener 1 CSV", type=["csv","xlsx"], key="up_c1")
+        up2 = st.file_uploader("Screener 2 CSV", type=["csv","xlsx"], key="up_c2")
+        if up1:
+            st1, err = parse_trendlyne_csv(up1)
+            if err: st.error(err)
+            else:
+                s1_tickers = set(s.get("ticker","") for s in st1)
+                for s in st1: s["screener"] = "S1"
+                all_stocks.extend(st1)
+        if up2:
+            st2, err = parse_trendlyne_csv(up2)
+            if err: st.error(err)
+            else:
+                s2_tickers = set(s.get("ticker","") for s in st2)
+                for s in st2: s["screener"] = "S2"
+                all_stocks.extend(st2)
+    elif upload_mode == "GitHub Repo":
+        st.markdown(
+            "<div style='font-size:12px;color:#64748b;line-height:1.6;'>"
+            "Upload <code>screener_1.csv</code> + <code>screener_2.csv</code> "
+            "to GitHub repo → <code>data</code> folder → then press Load</div>",
+            unsafe_allow_html=True)
+        if st.button("Load Screener CSVs", type="primary", use_container_width=True, key="ghb_c"):
+            with st.spinner("Fetching from GitHub..."):
+                st1, err1 = load_screener_from_github("screener_1.csv")
+                if err1: st.warning(f"Screener 1: {err1}")
+                elif st1:
                     s1_tickers = set(s.get("ticker","") for s in st1)
                     for s in st1: s["screener"] = "S1"
                     all_stocks.extend(st1)
-            if up2:
-                st2, err = parse_trendlyne_csv(up2)
-                if err: st.error(err)
-                else:
+                st2, err2 = load_screener_from_github("screener_2.csv")
+                if err2: st.warning(f"Screener 2: {err2}")
+                elif st2:
                     s2_tickers = set(s.get("ticker","") for s in st2)
                     for s in st2: s["screener"] = "S2"
                     all_stocks.extend(st2)
-        else:
-            st.caption("Open CSV in text viewer → Select All → Copy → Paste below")
-            txt1 = st.text_area("Screener 1 CSV text", height=100, key="ptxt_c1", placeholder="Paste Screener 1 CSV here...")
-            txt2 = st.text_area("Screener 2 CSV text", height=100, key="ptxt_c2", placeholder="Paste Screener 2 CSV here...")
-            if txt1 and txt1.strip():
-                st1, err = parse_trendlyne_text(txt1)
-                if err: st.error(err)
-                else:
-                    s1_tickers = set(s.get("ticker","") for s in st1)
-                    for s in st1: s["screener"] = "S1"
-                    all_stocks.extend(st1)
-            if txt2 and txt2.strip():
-                st2, err = parse_trendlyne_text(txt2)
-                if err: st.error(err)
-                else:
-                    s2_tickers = set(s.get("ticker","") for s in st2)
-                    for s in st2: s["screener"] = "S2"
-                    all_stocks.extend(st2)
+    else:
+        txt1 = st.text_area("Screener 1 CSV text", height=100, key="ptxt_c1", placeholder="Paste Screener 1 CSV here...")
+        txt2 = st.text_area("Screener 2 CSV text", height=100, key="ptxt_c2", placeholder="Paste Screener 2 CSV here...")
+        if txt1 and txt1.strip():
+            st1, err = parse_trendlyne_text(txt1)
+            if err: st.error(err)
+            else:
+                s1_tickers = set(s.get("ticker","") for s in st1)
+                for s in st1: s["screener"] = "S1"
+                all_stocks.extend(st1)
+        if txt2 and txt2.strip():
+            st2, err = parse_trendlyne_text(txt2)
+            if err: st.error(err)
+            else:
+                s2_tickers = set(s.get("ticker","") for s in st2)
+                for s in st2: s["screener"] = "S2"
+                all_stocks.extend(st2)
 
-        if all_stocks:
-            # Deduplicate, flag doubles
-            seen = {}
-            for s in all_stocks:
-                tk = s.get("ticker","")
-                if tk in seen:
-                    seen[tk]["screener"] = "DOUBLE"
-                else:
-                    is_dbl = tk in s1_tickers and tk in s2_tickers
-                    if is_dbl: s["screener"] = "DOUBLE"
-                    seen[tk] = s
+    if all_stocks:
+        seen = {}
+        for s in all_stocks:
+            tk = s.get("ticker","")
+            if tk in seen:
+                seen[tk]["screener"] = "DOUBLE"
+            else:
+                is_dbl = tk in s1_tickers and tk in s2_tickers
+                if is_dbl: s["screener"] = "DOUBLE"
+                seen[tk] = s
 
-            deduped = list(seen.values())
-            for s in deduped:
-                s["upload_date"] = date.today().strftime("%Y-%m-%d")
-                s["is_double"] = s.get("screener") == "DOUBLE"
-                s["vds"] = value_depth_score(s, s.get("is_double", False))
+        deduped = list(seen.values())
+        for s in deduped:
+            s["upload_date"] = date.today().strftime("%Y-%m-%d")
+            s["is_double"] = s.get("screener") == "DOUBLE"
+            s["vds"] = value_depth_score(s, s.get("is_double", False))
 
-            deduped.sort(key=lambda x: x.get("vds",0), reverse=True)
-            st.success(f"{len(deduped)} stocks ({sum(1 for s in deduped if s.get('is_double'))} doubles)")
+        deduped.sort(key=lambda x: x.get("vds",0), reverse=True)
+        st.success(f"{len(deduped)} stocks ({sum(1 for s in deduped if s.get('is_double'))} doubles)")
 
-            if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_c"):
-                data["engine_c_watchlist"] = deduped
-                data["_c_watchlist_date"] = date.today().strftime("%Y-%m-%d")
-                ok,msg = save_stocks_to_github(data, "Update Engine C watchlist")
-                if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
-                else: st.error(msg)
+        if st.button("Save Watchlist", type="primary", use_container_width=True, key="swl_c"):
+            data["engine_c_watchlist"] = deduped
+            data["_c_watchlist_date"] = date.today().strftime("%Y-%m-%d")
+            ok,msg = save_stocks_to_github(data, "Update Engine C watchlist")
+            if ok: st.success("Saved!"); trigger_workflow(); st.rerun()
+            else: st.error(msg)
 
     if wl:
         wd = data.get("_c_watchlist_date","")
