@@ -2512,6 +2512,46 @@
       "token": "16915",
       "symbol": "ZFCVINDIA-EQ",
       "name": "ZFCVINDIA"
+    },
+    "MAZDOCK": {
+      "token": "509",
+      "symbol": "MAZDOCK-EQ",
+      "name": "MAZDOCK"
+    },
+    "INDOTECH": {
+      "token": "13275",
+      "symbol": "INDOTECH-EQ",
+      "name": "INDOTECH"
+    },
+    "GRSE": {
+      "token": "5475",
+      "symbol": "GRSE-EQ",
+      "name": "GRSE"
+    },
+    "BAJAJCON": {
+      "token": "19531",
+      "symbol": "BAJAJCON-EQ",
+      "name": "BAJAJCON"
+    },
+    "JINDALSAW": {
+      "token": "3024",
+      "symbol": "JINDALSAW-EQ",
+      "name": "JINDALSAW"
+    },
+    "TIPSMUSIC": {
+      "token": "9117",
+      "symbol": "TIPSMUSIC-EQ",
+      "name": "TIPSMUSIC"
+    },
+    "SMLMAH": {
+      "token": "3387",
+      "symbol": "SMLMAH-EQ",
+      "name": "SMLMAH"
+    },
+    "PREMIERENE": {
+      "token": "25049",
+      "symbol": "PREMIERENE-EQ",
+      "name": "PREMIERENE"
     }
   },
   "_last_token_update": "2026-04-26"
