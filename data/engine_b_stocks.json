@@ -248,6 +248,19 @@
       "value_depth_score": 7,
       "is_double": true,
       "sector": "FMCG"
+    },
+    {
+      "name": "Jayaswal Neco Ind",
+      "ticker": "JAYNECOIND",
+      "entry": 103.41,
+      "qty": 31,
+      "buy_date": "2026-04-27",
+      "peak": 103.41,
+      "entry_pe": 21.54,
+      "current_pe": 21.54,
+      "value_depth_score": 6,
+      "is_double": true,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_d": [],
