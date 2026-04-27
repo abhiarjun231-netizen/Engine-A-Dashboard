@@ -328,6 +328,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Telecom Services"
+    },
+    {
+      "name": "GE Power",
+      "ticker": "GVPIL",
+      "entry": 544.05,
+      "qty": 14,
+      "buy_date": "2026-04-27",
+      "peak": 544.05,
+      "dna_score": 12,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "General Industrials"
     }
   ],
   "engine_b_watchlist": [
