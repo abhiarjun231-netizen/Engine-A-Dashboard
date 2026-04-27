@@ -2919,6 +2919,46 @@
       "token": "383",
       "symbol": "BEL-EQ",
       "name": "BEL"
+    },
+    "SWARAJENG": {
+      "token": "3384",
+      "symbol": "SWARAJENG-EQ",
+      "name": "SWARAJENG"
+    },
+    "LUMAXTECH": {
+      "token": "14014",
+      "symbol": "LUMAXTECH-EQ",
+      "name": "LUMAXTECH"
+    },
+    "ANTELOPUS": {
+      "token": "13598",
+      "symbol": "ANTELOPUS-EQ",
+      "name": "ANTELOPUS"
+    },
+    "V2RETAIL": {
+      "token": "14766",
+      "symbol": "V2RETAIL-EQ",
+      "name": "V2RETAIL"
+    },
+    "SHAILY": {
+      "token": "8727",
+      "symbol": "SHAILY-EQ",
+      "name": "SHAILY"
+    },
+    "AVANTIFEED": {
+      "token": "7936",
+      "symbol": "AVANTIFEED-EQ",
+      "name": "AVANTIFEED"
+    },
+    "LUMAXIND": {
+      "token": "2018",
+      "symbol": "LUMAXIND-EQ",
+      "name": "LUMAXIND"
+    },
+    "CARRARO": {
+      "token": "28879",
+      "symbol": "CARRARO-EQ",
+      "name": "CARRARO"
     }
   },
   "_last_token_update": "2026-04-27"
