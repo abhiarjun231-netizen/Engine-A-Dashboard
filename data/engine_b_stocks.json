@@ -105,6 +105,19 @@
       "value_depth_score": 11,
       "is_double": true,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Indosolar",
+      "ticker": "WAAREEINDO",
+      "entry": 466.85,
+      "qty": 12,
+      "buy_date": "2026-04-27",
+      "peak": 466.85,
+      "entry_pe": 7.88,
+      "current_pe": 7.88,
+      "value_depth_score": 10,
+      "is_double": true,
+      "sector": "Consumer Durables"
     }
   ],
   "engine_d": [],
