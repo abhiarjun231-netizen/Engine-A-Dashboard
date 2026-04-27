@@ -2894,6 +2894,31 @@
       "token": "25049",
       "symbol": "PREMIERENE-EQ",
       "name": "PREMIERENE"
+    },
+    "CUMMINSIND": {
+      "token": "1901",
+      "symbol": "CUMMINSIND-EQ",
+      "name": "CUMMINSIND"
+    },
+    "NTPC": {
+      "token": "11630",
+      "symbol": "NTPC-EQ",
+      "name": "NTPC"
+    },
+    "LT": {
+      "token": "11483",
+      "symbol": "LT-EQ",
+      "name": "LT"
+    },
+    "ADANIPORTS": {
+      "token": "15083",
+      "symbol": "ADANIPORTS-EQ",
+      "name": "ADANIPORTS"
+    },
+    "BEL": {
+      "token": "383",
+      "symbol": "BEL-EQ",
+      "name": "BEL"
     }
   },
   "_last_token_update": "2026-04-27"
