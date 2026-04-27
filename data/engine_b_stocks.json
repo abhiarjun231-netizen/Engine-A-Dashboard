@@ -393,6 +393,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Consumer Durables"
+    },
+    {
+      "name": "PTC",
+      "ticker": "PTC",
+      "entry": 194.29,
+      "qty": 22,
+      "buy_date": "2026-04-27",
+      "peak": 194.29,
+      "dna_score": 10,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Utilities"
     }
   ],
   "engine_b_watchlist": [
