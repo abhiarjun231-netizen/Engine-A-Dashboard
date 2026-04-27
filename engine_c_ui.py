@@ -18,6 +18,7 @@ from utils import (
     mcap_tag, render_mini_bar, render_52w_position,
     sector_summary, render_check,
     smart_signal_c,
+    ai_analyst,
 )
 
 MAX_POSITIONS = 15
@@ -394,6 +395,9 @@ def show_engine_c():
                 f"{smart_signal_c(s, vds)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
+            with st.expander(f"AI Analysis · {nm}", expanded=False):
+                _, _, ai_html = ai_analyst(s, engine="C", engine_score=ea, held=ah)
+                st.markdown(ai_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
                 with st.expander(f"Buy {nm}", expanded=False):
                     pe_in=st.number_input("Current PE",value=float(s.get("pe",0) or 0),key=f"pe_cb_{j}",format="%.1f")

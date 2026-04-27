@@ -12,6 +12,7 @@ from utils import (
     render_stat_row, render_hero_number, render_badge,
     render_stage_badge, sector_summary,
     mcap_tag, smart_signal_b, smart_signal_c, smart_signal_d,
+    ai_analyst, refresh_prices_yfinance,
 )
 
 def show_command_center():
@@ -19,6 +20,19 @@ def show_command_center():
     prices = load_stock_prices()
     ea_data = get_engine_a_score()
     ea = int(ea_data.get("total_score", 0)) if ea_data else None
+
+    # REFRESH BUTTON
+    if st.button("Refresh Live Prices", type="primary", use_container_width=True, key="refresh_cmd"):
+        with st.spinner("Fetching live prices from NSE..."):
+            live, err = refresh_prices_yfinance(data)
+            if err:
+                st.warning(f"Refresh error: {err}")
+            elif live:
+                prices.update(live)
+                st.session_state["_live_prices"] = live
+                st.success(f"Updated {len(live)} stock prices")
+    if st.session_state.get("_live_prices"):
+        prices.update(st.session_state["_live_prices"])
 
     # Load all watchlists
     b_wl = data.get("engine_b_watchlist", [])
@@ -196,6 +210,11 @@ def show_command_center():
             )
             if p["held"]:
                 card_html += f"<div style='margin-top:2px;'>{render_badge('HELD','#94a3b8')}</div>"
+            # AI ANALYST
+            best_stock = d_tickers.get(p["ticker"]) or c_tickers.get(p["ticker"]) or b_tickers.get(p["ticker"]) or {}
+            best_engine = "D" if p["in_d"] else ("C" if p["in_c"] else "B")
+            v, vc2, ai_html = ai_analyst(best_stock, engine=best_engine, engine_score=ea, held=p["held"])
+            card_html += ai_html
             card_html += "</div>"
             st.markdown(card_html, unsafe_allow_html=True)
     else:

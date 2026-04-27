@@ -17,6 +17,7 @@ from utils import (
     mcap_tag, render_mini_bar, render_52w_position,
     sector_summary, overlap_analysis, render_check,
     smart_signal_b, momentum_velocity,
+    ai_analyst, refresh_prices_yfinance,
 )
 
 MAX_POSITIONS = 10
@@ -318,6 +319,9 @@ def show_engine_b():
                 f"{smart_signal_b(s, cv, in_c, in_d)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
+            with st.expander(f"AI Analysis · {nm}", expanded=False):
+                _, _, ai_html = ai_analyst(s, engine="B", engine_score=ea, held=ah)
+                st.markdown(ai_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
                 with st.expander(f"Buy {nm}", expanded=False):
                     d_in=st.number_input("Durability",value=0.0,key=f"db_{j}",max_value=100.0)

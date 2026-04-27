@@ -772,3 +772,164 @@ def smart_signal_d(s, dns):
         f"padding:4px 8px;background:#f8fafc;border-radius:6px;border-left:3px solid {color};'>"
         f"<b style='color:{color};'>{label}:</b> {txt}</div>"
     )
+
+# ============================================================
+# AI STOCK ANALYST (Rule-Based — FREE, no API)
+# ============================================================
+def ai_analyst(stock, engine="B", engine_score=None, held=False):
+    """Generate institutional-grade analysis paragraph for any stock.
+    Returns (verdict, color, analysis_html)."""
+    nm = stock.get("name", "Unknown")
+    roe = stock.get("roe"); pe = stock.get("pe"); pio = stock.get("piotroski")
+    de = stock.get("de"); pg = stock.get("profit_growth"); peg = stock.get("peg")
+    mcap = stock.get("mcap"); prom = stock.get("promoter"); fii = stock.get("fii")
+    inst = stock.get("inst"); rq = stock.get("rev_qoq"); sec = stock.get("sector","")
+    dur = stock.get("durability"); mom = stock.get("momentum")
+    h52 = stock.get("high_52w"); l52 = stock.get("low_52w")
+    ltp = stock.get("ltp",0) or 0
+    vds = stock.get("vds",0); dns = stock.get("dns",0)
+    is_dbl = stock.get("is_double", False)
+
+    score = 0
+    strengths = []; risks = []
+
+    # 1. VALUATION (max 9)
+    if pe is not None:
+        if pe < 12: score += 6; strengths.append(f"deeply undervalued at PE {pe:.0f}")
+        elif pe < 18: score += 4; strengths.append(f"attractively priced at PE {pe:.0f}")
+        elif pe < 25: score += 2
+        elif pe < 40: score += 0; risks.append(f"PE {pe:.0f} is stretched")
+        else: score -= 2; risks.append(f"PE {pe:.0f} is dangerously expensive")
+    if peg is not None:
+        if peg <= 0.5: score += 3; strengths.append(f"PEG {peg:.1f} = extreme value vs growth")
+        elif peg <= 1.0: score += 2; strengths.append(f"PEG {peg:.1f} = undervalued")
+        elif peg <= 1.5: score += 1
+        else: score -= 1; risks.append(f"PEG {peg:.1f} overpriced vs growth")
+
+    # 2. QUALITY (max 6)
+    if roe is not None:
+        if roe > 25: score += 3; strengths.append(f"exceptional ROE {roe:.0f}%")
+        elif roe > 20: score += 2; strengths.append(f"strong ROE {roe:.0f}%")
+        elif roe > 15: score += 1
+        else: risks.append(f"ROE {roe:.0f}% below threshold")
+    if pio is not None:
+        if pio >= 8: score += 2; strengths.append(f"Piotroski {pio:.0f}/9 near-perfect")
+        elif pio >= 7: score += 1
+        else: risks.append(f"Piotroski {pio:.0f}/9 is weak")
+    if de is not None:
+        if de < 0.3: score += 1; strengths.append("virtually debt-free")
+        elif de > 1.5: score -= 2; risks.append(f"D/E {de:.1f} is high leverage")
+
+    # 3. GROWTH (max 5)
+    if pg is not None:
+        if pg > 50: score += 3; strengths.append(f"explosive {pg:.0f}% profit growth")
+        elif pg > 25: score += 2; strengths.append(f"strong {pg:.0f}% profit growth")
+        elif pg > 10: score += 1
+        elif pg < 0: score -= 2; risks.append(f"profit declining {pg:.0f}%")
+    if rq is not None:
+        if rq > 10: score += 2; strengths.append(f"revenue accelerating +{rq:.0f}% QoQ")
+        elif rq < -10: score -= 2; risks.append(f"revenue declining {rq:.0f}% QoQ")
+
+    # 4. MOMENTUM (max 5)
+    if dur is not None and mom is not None:
+        if dur > 75 and mom > 65: score += 5; strengths.append("institutions aggressively accumulating")
+        elif dur > 55 and mom > 59: score += 3; strengths.append("institutional buying confirmed")
+        elif dur > 45: score += 1
+        else: score -= 1; risks.append("institutional interest fading")
+
+    # 5. OWNERSHIP (max 4)
+    if prom is not None:
+        if prom > 65: score += 1; strengths.append(f"promoter {prom:.0f}% skin in game")
+        elif prom < 30: risks.append(f"promoter only {prom:.0f}%")
+    if inst is not None and inst > 30: score += 2; strengths.append(f"institutional {inst:.0f}% validated")
+    elif inst is not None and inst > 15: score += 1
+    if fii is not None and fii > 10: score += 1; strengths.append(f"FII {fii:.1f}% smart money")
+
+    # 6. TECHNICAL (max 3)
+    if h52 is not None and l52 is not None and ltp > 0 and h52 > l52:
+        pos52 = (ltp - l52) / (h52 - l52) * 100
+        if pos52 < 30: score += 3; strengths.append(f"near 52W low at {pos52:.0f}%")
+        elif pos52 < 50: score += 2
+        elif pos52 > 90: score -= 1; risks.append(f"at {pos52:.0f}% of 52W high")
+
+    # 7. MULTI-ENGINE (max 5)
+    if is_dbl: score += 2; strengths.append("double screener")
+    if engine == "C" and vds >= 12: score += 3
+    elif engine == "C" and vds >= 8: score += 2
+    elif engine == "D" and dns >= 16: score += 3
+    elif engine == "D" and dns >= 11: score += 2
+
+    # 8. ENGINE A GATE
+    if engine_score is not None:
+        if engine_score > 62: score += 5; strengths.append("Engine A FULL DEPLOY")
+        elif engine_score > 52: score += 3
+        elif engine_score > 30: score += 1
+        elif engine_score <= 20: score -= 5; risks.append("ENGINE A: EXIT ALL")
+        elif engine_score <= 30: score -= 3; risks.append("Engine A FREEZE")
+
+    # VERDICT
+    if score >= 25: verdict, vc = "STRONG BUY", "#059669"
+    elif score >= 18: verdict, vc = "BUY", "#16a34a"
+    elif score >= 12: verdict, vc = "ACCUMULATE", "#2563eb"
+    elif score >= 6: verdict, vc = "WAIT", "#d97706"
+    elif score >= 0: verdict, vc = "AVOID", "#ea580c"
+    else: verdict, vc = "DANGER", "#dc2626"
+
+    top_s = ". ".join(strengths[:4]) + "." if strengths else "No clear strengths."
+    risk_s = " ".join(risks[:3]) if risks else ""
+    risk_line = f" However, {risk_s}." if risk_s else ""
+
+    if verdict in ("STRONG BUY", "BUY"):
+        action = "Hold and add on dips." if held else f"Consider entry. Size per Engine {engine} rules."
+    elif verdict == "ACCUMULATE":
+        action = "Add on 5-10% dips only."
+    elif verdict == "WAIT":
+        action = "Monitor weekly. Wait for correction or improvement."
+    else:
+        action = "Do not deploy capital."
+
+    html = (
+        f"<div style='padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);"
+        f"border-radius:8px;border-left:4px solid {vc};margin-top:8px;'>"
+        f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
+        f"<span style='font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:1px;'>AI ANALYST</span>"
+        f"<span style='font-size:12px;font-weight:800;color:{vc};'>{verdict} ({score}/40)</span></div>"
+        f"<div style='font-size:11px;color:#475569;line-height:1.5;'>{top_s}{risk_line}</div>"
+        f"<div style='font-size:10px;color:{vc};font-weight:600;margin-top:6px;'>Action: {action}</div></div>"
+    )
+    return verdict, vc, html
+
+# ============================================================
+# LIVE PRICE REFRESH (yfinance)
+# ============================================================
+def refresh_prices_yfinance(stock_data):
+    """Fetch live prices via yfinance. Returns {ticker: price}, error."""
+    try:
+        import yfinance as yf
+    except ImportError:
+        return {}, "yfinance not installed"
+    all_tickers = set()
+    for key in ["engine_b","engine_c","engine_d",
+                 "engine_b_watchlist","engine_c_watchlist","engine_d_watchlist"]:
+        for s in stock_data.get(key, []):
+            tk = s.get("ticker","")
+            if tk: all_tickers.add(tk)
+    if not all_tickers: return {}, "No tickers"
+    yf_tickers = [f"{tk}.NS" for tk in all_tickers]
+    tk_map = {f"{tk}.NS": tk for tk in all_tickers}
+    try:
+        data = yf.download(yf_tickers, period="1d", progress=False, threads=True)
+        prices = {}
+        if len(yf_tickers) == 1:
+            val = data["Close"].iloc[-1] if len(data) > 0 else None
+            if val is not None and not pd.isna(val):
+                prices[tk_map[yf_tickers[0]]] = round(float(val), 2)
+        else:
+            close = data["Close"]
+            for tk_ns in close.columns:
+                val = close[tk_ns].iloc[-1] if len(close[tk_ns]) > 0 else None
+                if val is not None and not pd.isna(val):
+                    prices[tk_map.get(tk_ns, tk_ns.replace(".NS",""))] = round(float(val), 2)
+        return prices, None
+    except Exception as e:
+        return {}, str(e)

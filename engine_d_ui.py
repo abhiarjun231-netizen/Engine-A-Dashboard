@@ -18,6 +18,7 @@ from utils import (
     mcap_tag, render_mini_bar, render_52w_position,
     sector_summary, render_check, peg_reading, compound_stars,
     smart_signal_d,
+    ai_analyst,
 )
 
 MAX_POSITIONS = 15
@@ -422,6 +423,9 @@ def show_engine_d():
                 f"{smart_signal_d(s, dns2)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
+            with st.expander(f"AI Analysis · {nm}", expanded=False):
+                _, _, ai_html = ai_analyst(s, engine="D", engine_score=ea, held=ah)
+                st.markdown(ai_html, unsafe_allow_html=True)
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
                 with st.expander(f"Buy {nm}", expanded=False):
                     bp=st.number_input("Price ₹",value=float(cp2),key=f"bp_d_{j}",format="%.2f")
