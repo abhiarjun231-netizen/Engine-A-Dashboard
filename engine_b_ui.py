@@ -272,12 +272,12 @@ def show_engine_b():
                 f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
                 f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
                 f"<div style='font-size:13px;font-weight:800;color:{cc};'>Conv: {cv}/10</div></div>"
-                f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
                 f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
                 f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
-                f"<div style='font-size:11px;'>"
-                f"{'₹'+fmt(s.get('mcap'),0)+'Cr ' if s.get('mcap') else ''}"
-                f"{render_stage_badge(mc_label)}</div></div>"
+                f"<div style='font-size:11px;display:flex;align-items:center;gap:4px;'>"
+                f"{'<span style=\"color:#475569;font-weight:600;\">₹'+fmt(s.get('mcap'),0)+'Cr</span>' if s.get('mcap') else ''}"
+                f" {render_stage_badge(mc_label)}</div></div>"
             )
             if dur is not None or mom is not None:
                 d_color = "#16a34a" if dur and dur>55 else ("#d97706" if dur and dur>=45 else "#dc2626")
