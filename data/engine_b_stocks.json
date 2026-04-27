@@ -380,6 +380,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Indosolar",
+      "ticker": "WAAREEINDO",
+      "entry": 466.85,
+      "qty": 9,
+      "buy_date": "2026-04-27",
+      "peak": 466.85,
+      "dna_score": 10,
+      "is_double": false,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Consumer Durables"
     }
   ],
   "engine_b_watchlist": [
