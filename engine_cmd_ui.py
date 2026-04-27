@@ -19,7 +19,7 @@ def show_command_center():
     data = load_stocks_json()
     prices = load_stock_prices()
     ea_data = get_engine_a_score()
-    ea = int(ea_data.get("total_score", 0)) if ea_data else None
+    ea = int(ea_data.get("raw_score", 0)) if ea_data else None
 
     # REFRESH BUTTON
     if st.button("Refresh Live Prices", type="primary", use_container_width=True, key="refresh_cmd"):
