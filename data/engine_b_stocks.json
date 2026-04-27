@@ -452,12 +452,25 @@
       "entry": 2815.0,
       "qty": 1,
       "buy_date": "2026-04-27",
-      "peak": 2815.0,
+      "peak": 2816.7,
       "dna_score": 9,
       "is_double": false,
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Banking and Finance"
+    },
+    {
+      "name": "Engineers India",
+      "ticker": "ENGINERSIN",
+      "entry": 260.02,
+      "qty": 16,
+      "buy_date": "2026-04-27",
+      "peak": 260.02,
+      "dna_score": 9,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Commercial Services & Supplies"
     }
   ],
   "engine_b_watchlist": [
