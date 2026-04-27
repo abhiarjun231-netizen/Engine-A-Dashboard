@@ -302,6 +302,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Hindustan Zinc",
+      "ticker": "HINDZINC",
+      "entry": 625.4,
+      "qty": 12,
+      "buy_date": "2026-04-27",
+      "peak": 625.4,
+      "dna_score": 14,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_b_watchlist": [
