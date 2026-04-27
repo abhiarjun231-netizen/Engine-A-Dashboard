@@ -367,6 +367,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Consumer Durables"
+    },
+    {
+      "name": "Jayaswal Neco Ind",
+      "ticker": "JAYNECOIND",
+      "entry": 103.41,
+      "qty": 42,
+      "buy_date": "2026-04-27",
+      "peak": 103.41,
+      "dna_score": 10,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_b_watchlist": [
