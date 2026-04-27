@@ -419,6 +419,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "General Industrials"
+    },
+    {
+      "name": "Swaraj Engines",
+      "ticker": "SWARAJENG",
+      "entry": 3973.5,
+      "qty": 1,
+      "buy_date": "2026-04-27",
+      "peak": 3973.5,
+      "dna_score": 9,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Automobiles & Auto Components"
     }
   ],
   "engine_b_watchlist": [
