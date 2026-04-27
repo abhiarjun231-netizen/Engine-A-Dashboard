@@ -19,6 +19,7 @@ from utils import (
     smart_signal_b, momentum_velocity,
     ai_analyst, refresh_prices_yfinance,
     render_earnings_info, earnings_alert,
+    load_stock_analysis, render_volume_badge,
 )
 
 MAX_POSITIONS = 10
@@ -55,6 +56,7 @@ def dvm_status(d, m):
 def show_engine_b():
     data = load_stocks_json()
     prices = load_stock_prices()
+    analysis = load_stock_analysis()
     sd = get_engine_a_score()
     ea = int(sd["raw_score"]) if sd else None
     pos = data.get("engine_b", [])
@@ -309,7 +311,8 @@ def show_engine_b():
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
                 f"<span>D/E:{fmt(s.get('de'),1)}</span>"
-                f"{'<span>Sec:'+sec[:12]+'</span>' if sec else ''}</div>"
+                f"{'<span>Sec:'+sec[:12]+'</span>' if sec else ''}"
+                f" {render_volume_badge(analysis.get(tk,{}).get('vol_ratio'), s.get('delivery_pct'))}</div>"
             )
             pg = s.get("profit_growth"); prom = s.get("promoter"); fii_val = s.get("fii")
             has_extra = pg is not None or prom is not None or fii_val is not None

@@ -20,6 +20,7 @@ from utils import (
     smart_signal_d,
     ai_analyst,
     render_earnings_info, earnings_alert,
+    load_stock_analysis, render_volume_badge,
 )
 
 MAX_POSITIONS = 15
@@ -54,6 +55,7 @@ def dna_score(stock, is_double=False):
 def show_engine_d():
     data = load_stocks_json()
     prices = load_stock_prices()
+    analysis = load_stock_analysis()
     sd = get_engine_a_score()
     ea = int(sd["raw_score"]) if sd else None
     pos = data.get("engine_d", [])
@@ -420,7 +422,8 @@ def show_engine_d():
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
                 f"<span>D/E:{fmt(s.get('de'),1)}</span>"
-                f"<span>PEG:{fmt(peg_val,1)}</span></div>"
+                f"<span>PEG:{fmt(peg_val,1)}</span>"
+                f" {render_volume_badge(analysis.get(tk,{}).get('vol_ratio'), s.get('delivery_pct'))}</div>"
                 f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
                 f"{'<span style=\"color:#16a34a;font-weight:600;\">PG:+'+fmt(pg,0)+'%</span>' if pg and pg>0 else ('<span style=\"color:#dc2626;\">PG:'+fmt(pg,0)+'%</span>' if pg else '')}"
                 f"{'<span>Prom:'+fmt(s.get('promoter'),0)+'%</span>' if s.get('promoter') else ''}"

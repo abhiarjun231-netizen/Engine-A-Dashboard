@@ -22,6 +22,28 @@ STOCKS_FILE = Path("data/engine_b_stocks.json")
 PRICES_FILE = Path("data/engine_b_prices.csv")
 ANALYSIS_FILE = Path("data/stock_analysis.csv")
 
+def load_stock_analysis():
+    """Load stock analysis data (volume ratio, 52W, trends) from CSV."""
+    if not ANALYSIS_FILE.exists():
+        return {}
+    try:
+        df = pd.read_csv(ANALYSIS_FILE)
+        result = {}
+        for _, row in df.iterrows():
+            tk = str(row.get("ticker", "")).strip()
+            if tk:
+                result[tk] = {
+                    "vol_ratio": round(float(row.get("vol_ratio", 0)), 2),
+                    "high_52w_live": float(row.get("high_52w", 0)),
+                    "low_52w_live": float(row.get("low_52w", 0)),
+                    "pct_52w": float(row.get("pct_52w", 0)),
+                    "change_60d": float(row.get("change_60d", 0)),
+                    "change_90d": float(row.get("change_90d", 0)),
+                }
+        return result
+    except:
+        return {}
+
 def get_github_token():
     try:
         return st.secrets["GITHUB_TOKEN"]
@@ -175,6 +197,11 @@ def parse_trendlyne_csv(uploaded_file):
                 col_map["mf"] = c
             elif "institutional" in cl and "hold" in cl:
                 col_map["inst"] = c
+            elif "delivery" in cl and "%" in cl:
+                col_map["delivery_pct"] = c
+            elif "delivery" in cl and ("vol" in cl or "qty" in cl):
+                if "delivery_pct" not in col_map:
+                    col_map["delivery_pct"] = c
             elif "latest" in cl and "result" in cl:
                 col_map["last_result"] = c
             elif "next" in cl and "result" in cl:
@@ -189,7 +216,7 @@ def parse_trendlyne_csv(uploaded_file):
             if not stock["name"] or not stock["ticker"]:
                 continue
 
-            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200", "durability", "momentum", "promoter", "fii", "dii", "high_52w", "low_52w", "roce", "mf", "inst"]:
+            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200", "durability", "momentum", "promoter", "fii", "dii", "high_52w", "low_52w", "roce", "mf", "inst", "delivery_pct"]:
                 if key in col_map:
                     try:
                         val = row.get(col_map[key], "")
@@ -632,6 +659,31 @@ def compound_stars(dns):
     filled = "★" * stars
     empty = "☆" * (5 - stars)
     return f"<span style='color:#f59e0b;font-size:13px;letter-spacing:2px;'>{filled}{empty}</span>"
+
+def render_volume_badge(vol_ratio, delivery_pct=None):
+    """Render volume ratio badge + delivery % with color coding."""
+    parts = []
+    if vol_ratio is not None and vol_ratio > 0:
+        if vol_ratio >= 2.0:
+            color = "#dc2626"; label = f"Vol:{vol_ratio}x UNUSUAL"
+        elif vol_ratio >= 1.5:
+            color = "#16a34a"; label = f"Vol:{vol_ratio}x HIGH"
+        elif vol_ratio >= 0.7:
+            color = "#64748b"; label = f"Vol:{vol_ratio}x"
+        elif vol_ratio >= 0.3:
+            color = "#d97706"; label = f"Vol:{vol_ratio}x LOW"
+        else:
+            color = "#dc2626"; label = f"Vol:{vol_ratio}x DEAD"
+        parts.append(f"<span style='font-size:10px;color:{color};font-weight:600;'>{label}</span>")
+    if delivery_pct is not None and delivery_pct > 0:
+        if delivery_pct >= 60:
+            dc = "#16a34a"; dl = f"Del:{delivery_pct:.0f}%"
+        elif delivery_pct >= 40:
+            dc = "#64748b"; dl = f"Del:{delivery_pct:.0f}%"
+        else:
+            dc = "#dc2626"; dl = f"Del:{delivery_pct:.0f}%"
+        parts.append(f"<span style='font-size:10px;color:{dc};font-weight:600;'>{dl}</span>")
+    return " ".join(parts)
 
 def render_earnings_info(stock):
     """Render earnings date info on card."""
