@@ -131,6 +131,19 @@
       "value_depth_score": 10,
       "is_double": true,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Chennai Petroleum",
+      "ticker": "CHENNPETRO",
+      "entry": 1000.7,
+      "qty": 5,
+      "buy_date": "2026-04-27",
+      "peak": 1000.7,
+      "entry_pe": 4.77,
+      "current_pe": 4.77,
+      "value_depth_score": 10,
+      "is_double": true,
+      "sector": "Oil & Gas"
     }
   ],
   "engine_d": [],
