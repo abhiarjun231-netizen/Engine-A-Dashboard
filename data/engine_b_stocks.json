@@ -77,6 +77,19 @@
       "prev_momentum": 60.0,
       "conviction": 2,
       "sector": "Transportation"
+    },
+    {
+      "name": "GE T&D",
+      "ticker": "GVT&D",
+      "entry": 4564.9,
+      "qty": 2,
+      "buy_date": "2026-04-27",
+      "peak": 4564.9,
+      "durability": 90.0,
+      "momentum": 71.0,
+      "prev_momentum": 71.0,
+      "conviction": 9,
+      "sector": "General Industrials"
     }
   ],
   "engine_c": [],
