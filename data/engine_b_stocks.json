@@ -354,6 +354,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Textiles Apparels & Accessories"
+    },
+    {
+      "name": "Websol Energy",
+      "ticker": "WEBELSOLAR",
+      "entry": 116.39,
+      "qty": 66,
+      "buy_date": "2026-04-27",
+      "peak": 116.39,
+      "dna_score": 11,
+      "is_double": false,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Consumer Durables"
     }
   ],
   "engine_b_watchlist": [
