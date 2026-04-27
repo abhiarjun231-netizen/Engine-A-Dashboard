@@ -309,12 +309,25 @@
       "entry": 625.4,
       "qty": 12,
       "buy_date": "2026-04-27",
-      "peak": 625.4,
+      "peak": 626.6,
       "dna_score": 14,
       "is_double": true,
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Indus Towers",
+      "ticker": "INDUSTOWER",
+      "entry": 403.15,
+      "qty": 19,
+      "buy_date": "2026-04-27",
+      "peak": 403.15,
+      "dna_score": 12,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Telecom Services"
     }
   ],
   "engine_b_watchlist": [
