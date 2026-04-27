@@ -90,6 +90,19 @@
       "prev_momentum": 71.0,
       "conviction": 9,
       "sector": "General Industrials"
+    },
+    {
+      "name": "Hindalco Industries",
+      "ticker": "HINDALCO",
+      "entry": 1061.1,
+      "qty": 7,
+      "buy_date": "2026-04-27",
+      "peak": 1061.1,
+      "durability": 80.0,
+      "momentum": 68.0,
+      "prev_momentum": 68.0,
+      "conviction": 4,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_c": [
