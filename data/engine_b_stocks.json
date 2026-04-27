@@ -465,12 +465,25 @@
       "entry": 260.02,
       "qty": 16,
       "buy_date": "2026-04-27",
-      "peak": 260.02,
+      "peak": 260.24,
       "dna_score": 9,
       "is_double": true,
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Commercial Services & Supplies"
+    },
+    {
+      "name": "Pokarna",
+      "ticker": "POKARNA",
+      "entry": 909.6,
+      "qty": 4,
+      "buy_date": "2026-04-27",
+      "peak": 909.6,
+      "dna_score": 9,
+      "is_double": false,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Cement and Construction"
     }
   ],
   "engine_b_watchlist": [
