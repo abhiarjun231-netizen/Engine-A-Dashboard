@@ -341,6 +341,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "General Industrials"
+    },
+    {
+      "name": "Sumeet Industries",
+      "ticker": "SUMEETINDS",
+      "entry": 29.57,
+      "qty": 260,
+      "buy_date": "2026-04-27",
+      "peak": 29.57,
+      "dna_score": 11,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Textiles Apparels & Accessories"
     }
   ],
   "engine_b_watchlist": [
