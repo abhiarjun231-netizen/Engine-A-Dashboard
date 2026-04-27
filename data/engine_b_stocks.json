@@ -432,6 +432,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Automobiles & Auto Components"
+    },
+    {
+      "name": "Chennai Petroleum",
+      "ticker": "CHENNPETRO",
+      "entry": 1001.15,
+      "qty": 4,
+      "buy_date": "2026-04-27",
+      "peak": 1001.15,
+      "dna_score": 9,
+      "is_double": false,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Oil & Gas"
     }
   ],
   "engine_b_watchlist": [
