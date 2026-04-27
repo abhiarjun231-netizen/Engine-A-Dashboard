@@ -248,11 +248,19 @@ def show_engine_d():
     render_section_title("Position Sizer")
     with st.expander("Calculate", expanded=False):
         av = d_cap - ti; mx = d_cap * MAX_PCT / 100
-        st.markdown(f"**Available:** ₹{av:,.0f} | **Max/stock:** ₹{mx:,.0f}")
+        st.markdown(
+            f"<div style='font-size:13px;color:#1e293b;font-weight:600;margin-bottom:8px;'>"
+            f"Available: <span style='color:#059669;'>₹{av:,.0f}</span> | "
+            f"Max/stock: <span style='color:#2563eb;'>₹{mx:,.0f}</span></div>",
+            unsafe_allow_html=True)
         pr = st.number_input("Price ₹", value=100.0, key="ps_d", min_value=1.0, format="%.2f")
         if pr>0:
             mq = int(min(av,mx)/pr)
-            st.markdown(f"**Suggested:** {mq} shares = ₹{mq*pr:,.0f}")
+            st.markdown(
+                f"<div style='font-size:14px;color:#1e293b;font-weight:700;margin-top:8px;'>"
+                f"Suggested: <span style='color:#059669;'>{mq} shares</span> = "
+                f"<span style='color:#2563eb;'>₹{mq*pr:,.0f}</span></div>",
+                unsafe_allow_html=True)
 
     # WATCHLIST
     render_section_title("Screener Watchlist")
