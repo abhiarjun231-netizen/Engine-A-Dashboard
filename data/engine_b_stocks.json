@@ -6,12 +6,25 @@
       "entry": 995.45,
       "qty": 8,
       "buy_date": "2026-04-27",
-      "peak": 995.45,
+      "peak": 998.0,
       "durability": 85.0,
       "momentum": 71.0,
       "prev_momentum": 71.0,
       "conviction": 8,
       "sector": "Oil & Gas"
+    },
+    {
+      "name": "National Aluminium",
+      "ticker": "NATIONALUM",
+      "entry": 441.1,
+      "qty": 18,
+      "buy_date": "2026-04-27",
+      "peak": 441.1,
+      "durability": 85.0,
+      "momentum": 75.0,
+      "prev_momentum": 75.0,
+      "conviction": 9,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_c": [],
