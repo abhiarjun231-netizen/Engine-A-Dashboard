@@ -138,12 +138,25 @@
       "entry": 1000.7,
       "qty": 5,
       "buy_date": "2026-04-27",
-      "peak": 1000.7,
+      "peak": 1000.9,
       "entry_pe": 4.77,
       "current_pe": 4.77,
       "value_depth_score": 10,
       "is_double": true,
       "sector": "Oil & Gas"
+    },
+    {
+      "name": "Websol Energy",
+      "ticker": "WEBELSOLAR",
+      "entry": 116.38,
+      "qty": 49,
+      "buy_date": "2026-04-27",
+      "peak": 116.38,
+      "entry_pe": 21.66,
+      "current_pe": 21.66,
+      "value_depth_score": 9,
+      "is_double": true,
+      "sector": "Consumer Durables"
     }
   ],
   "engine_d": [],
