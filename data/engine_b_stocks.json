@@ -274,6 +274,19 @@
       "value_depth_score": 6,
       "is_double": true,
       "sector": "Automobiles & Auto Components"
+    },
+    {
+      "name": "Engineers India",
+      "ticker": "ENGINERSIN",
+      "entry": 260.02,
+      "qty": 12,
+      "buy_date": "2026-04-27",
+      "peak": 260.02,
+      "entry_pe": 18.8,
+      "current_pe": 18.8,
+      "value_depth_score": 6,
+      "is_double": true,
+      "sector": "Commercial Services & Supplies"
     }
   ],
   "engine_d": [],
