@@ -19,12 +19,25 @@
       "entry": 441.1,
       "qty": 18,
       "buy_date": "2026-04-27",
-      "peak": 441.1,
+      "peak": 442.15,
       "durability": 85.0,
       "momentum": 75.0,
       "prev_momentum": 75.0,
       "conviction": 9,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Multi Commodity Exchange",
+      "ticker": "MCX",
+      "entry": 2806.0,
+      "qty": 3,
+      "buy_date": "2026-04-27",
+      "peak": 2806.0,
+      "durability": 85.0,
+      "momentum": 71.0,
+      "prev_momentum": 71.0,
+      "conviction": 9,
+      "sector": "Banking and Finance"
     }
   ],
   "engine_c": [],
