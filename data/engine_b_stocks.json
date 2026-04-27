@@ -1,5 +1,19 @@
 {
-  "engine_b": [],
+  "engine_b": [
+    {
+      "name": "Chennai Petroleum",
+      "ticker": "CHENNPETRO",
+      "entry": 995.45,
+      "qty": 8,
+      "buy_date": "2026-04-27",
+      "peak": 995.45,
+      "durability": 85.0,
+      "momentum": 71.0,
+      "prev_momentum": 71.0,
+      "conviction": 8,
+      "sector": "Oil & Gas"
+    }
+  ],
   "engine_c": [],
   "engine_d": [],
   "engine_b_watchlist": [
