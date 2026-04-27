@@ -196,6 +196,19 @@
       "value_depth_score": 9,
       "is_double": true,
       "sector": "General Industrials"
+    },
+    {
+      "name": "Pokarna",
+      "ticker": "POKARNA",
+      "entry": 909.6,
+      "qty": 6,
+      "buy_date": "2026-04-27",
+      "peak": 909.6,
+      "entry_pe": 24.85,
+      "current_pe": 24.85,
+      "value_depth_score": 8,
+      "is_double": true,
+      "sector": "Cement and Construction"
     }
   ],
   "engine_d": [],
