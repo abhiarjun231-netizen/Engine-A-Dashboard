@@ -51,6 +51,19 @@
       "prev_momentum": 67.0,
       "conviction": 3,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Shipping Corporation",
+      "ticker": "SCI",
+      "entry": 294.24,
+      "qty": 28,
+      "buy_date": "2026-04-27",
+      "peak": 294.24,
+      "durability": 90.0,
+      "momentum": 67.0,
+      "prev_momentum": 67.0,
+      "conviction": 5,
+      "sector": "Transportation"
     }
   ],
   "engine_c": [],
