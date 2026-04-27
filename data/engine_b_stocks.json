@@ -235,6 +235,19 @@
       "value_depth_score": 7,
       "is_double": true,
       "sector": "Automobiles & Auto Components"
+    },
+    {
+      "name": "Gokul Agro Resources",
+      "ticker": "GOKULAGRO",
+      "entry": 228.14,
+      "qty": 14,
+      "buy_date": "2026-04-27",
+      "peak": 228.14,
+      "entry_pe": 22.53,
+      "current_pe": 22.53,
+      "value_depth_score": 7,
+      "is_double": true,
+      "sector": "FMCG"
     }
   ],
   "engine_d": [],
