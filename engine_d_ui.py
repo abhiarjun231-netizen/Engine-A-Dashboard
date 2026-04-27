@@ -19,6 +19,7 @@ from utils import (
     sector_summary, render_check, peg_reading, compound_stars,
     smart_signal_d,
     ai_analyst,
+    render_earnings_info, earnings_alert,
 )
 
 MAX_POSITIONS = 15
@@ -366,6 +367,7 @@ def show_engine_d():
             f"</div>"
             f"<div style='font-size:11px;color:#64748b;margin-bottom:6px;'>"
             f"<b style='color:#16a34a;'>{low_peg} stocks</b> with PEG ≤ 0.5 (extreme value)</div>"
+            f"{earnings_alert(wl)}"
             f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
             f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
             "</div>",
@@ -423,7 +425,8 @@ def show_engine_d():
                 f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
                 f" {render_stage_badge(vd)}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div>"
-                f"{smart_signal_d(s, dns2)}</div>"
+                f"{smart_signal_d(s, dns2)}"
+                f"{render_earnings_info(s)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
             with st.expander(f"AI Analysis · {nm}", expanded=False):

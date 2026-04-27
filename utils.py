@@ -175,6 +175,10 @@ def parse_trendlyne_csv(uploaded_file):
                 col_map["mf"] = c
             elif "institutional" in cl and "hold" in cl:
                 col_map["inst"] = c
+            elif "latest" in cl and "result" in cl:
+                col_map["last_result"] = c
+            elif "next" in cl and "result" in cl:
+                col_map["next_result"] = c
 
         stocks = []
         for _, row in df.iterrows():
@@ -199,6 +203,12 @@ def parse_trendlyne_csv(uploaded_file):
                 stock["sector"] = str(row.get(col_map["sector"], "")).strip()
             else:
                 stock["sector"] = ""
+
+            for str_key in ["last_result", "next_result"]:
+                if str_key in col_map:
+                    stock[str_key] = str(row.get(col_map[str_key], "")).strip()
+                else:
+                    stock[str_key] = ""
 
             stocks.append(stock)
 
@@ -622,6 +632,41 @@ def compound_stars(dns):
     filled = "★" * stars
     empty = "☆" * (5 - stars)
     return f"<span style='color:#f59e0b;font-size:13px;letter-spacing:2px;'>{filled}{empty}</span>"
+
+def render_earnings_info(stock):
+    """Render earnings date info on card."""
+    lr = stock.get("last_result", "")
+    nr = stock.get("next_result", "")
+    if not lr and not nr:
+        return ""
+    parts = []
+    if lr: parts.append(f"<span>Last: <b>{lr}</b></span>")
+    if nr:
+        # Check if result is upcoming (simple check)
+        parts.append(f"<span style='color:#d97706;font-weight:600;'>Next: {nr}</span>")
+    return (
+        f"<div style='display:flex;gap:10px;font-size:10px;color:#64748b;margin-top:4px;"
+        f"padding:3px 8px;background:#fffbeb;border-radius:4px;border-left:3px solid #f59e0b;'>"
+        f"<span style='color:#92400e;font-weight:700;'>RESULTS</span>"
+        f"{'  '.join(parts)}</div>"
+    )
+
+def earnings_alert(stocks):
+    """Generate earnings alert for Intelligence Summary."""
+    upcoming = []
+    for s in stocks:
+        nr = s.get("next_result", "")
+        if nr:
+            upcoming.append({"name": s.get("name",""), "date": nr})
+    if not upcoming:
+        return ""
+    upcoming.sort(key=lambda x: x["date"])
+    names = ", ".join(u["name"][:12] for u in upcoming[:5])
+    return (
+        f"<div style='font-size:11px;color:#92400e;margin-bottom:6px;'>"
+        f"📅 <b>{len(upcoming)} stocks</b> with upcoming results: {names}"
+        f"{'...' if len(upcoming)>5 else ''}</div>"
+    )
 
 # ============================================================
 # SMART SIGNAL TEXT GENERATORS

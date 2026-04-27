@@ -18,6 +18,7 @@ from utils import (
     sector_summary, overlap_analysis, render_check,
     smart_signal_b, momentum_velocity,
     ai_analyst, refresh_prices_yfinance,
+    render_earnings_info, earnings_alert,
 )
 
 MAX_POSITIONS = 10
@@ -245,6 +246,7 @@ def show_engine_b():
             f"<b style='color:#4338ca;'>Multi-Engine:</b> {n_c} also in Value · {n_d} also in Compounder"
             f"{'  ·  <b style=\"color:#b45309;\">ALL 3: '+all_names+'</b>' if in_all else ''}</div>"
             f"{'<div style=\"font-size:11px;margin-bottom:6px;\"><b style=\"color:#16a34a;\">↑↑ '+str(acc)+' accelerating</b>  <b style=\"color:#d97706;\">↓ '+str(cool)+' cooling</b>  <b style=\"color:#dc2626;\">↓↓↓ '+str(crash)+' crashing</b></div>' if has_vel else '<div style=\"font-size:10px;color:#94a3b8;margin-bottom:6px;\">Velocity: Upload new CSV next week to see momentum changes</div>'}"
+            f"{earnings_alert(wl)}"
             f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
             f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
             "</div>",
@@ -317,7 +319,8 @@ def show_engine_b():
                 f"<div style='margin-top:4px;'>{render_stage_badge(vd)}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}"
                 f"{overlap_badges}</div>"
-                f"{smart_signal_b(s, cv, in_c, in_d)}</div>"
+                f"{smart_signal_b(s, cv, in_c, in_d)}"
+                f"{render_earnings_info(s)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
             with st.expander(f"AI Analysis · {nm}", expanded=False):

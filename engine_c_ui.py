@@ -19,6 +19,7 @@ from utils import (
     sector_summary, render_check,
     smart_signal_c,
     ai_analyst,
+    render_earnings_info, earnings_alert,
 )
 
 MAX_POSITIONS = 15
@@ -291,6 +292,7 @@ def show_engine_c():
             f"color:#1e293b;'>{len(wl)}</div><div style='font-size:10px;color:#94a3b8;'>TOTAL</div></div>"
             f"</div>"
             f"{'<div style=\"font-size:11px;color:#dc2626;margin-bottom:6px;\">⚠ '+str(traps)+' stocks with revenue decline — check value traps</div>' if traps else ''}"
+            f"{earnings_alert(wl)}"
             f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
             f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
             "</div>",
@@ -394,7 +396,8 @@ def show_engine_c():
                 f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
                 f" {render_stage_badge(vd)}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div>"
-                f"{smart_signal_c(s, vds)}</div>"
+                f"{smart_signal_c(s, vds)}"
+                f"{render_earnings_info(s)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
             with st.expander(f"AI Analysis · {nm}", expanded=False):
