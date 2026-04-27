@@ -289,7 +289,21 @@
       "sector": "Commercial Services & Supplies"
     }
   ],
-  "engine_d": [],
+  "engine_d": [
+    {
+      "name": "National Aluminium",
+      "ticker": "NATIONALUM",
+      "entry": 441.85,
+      "qty": 17,
+      "buy_date": "2026-04-27",
+      "peak": 441.85,
+      "dna_score": 15,
+      "is_double": true,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Metals & Mining"
+    }
+  ],
   "engine_b_watchlist": [
     {
       "name": "Chennai Petroleum",
