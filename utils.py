@@ -165,8 +165,16 @@ def parse_trendlyne_csv(uploaded_file):
                 col_map["high_52w"] = c
             elif "52" in cl and "low" in cl:
                 col_map["low_52w"] = c
+            elif "1y high" in cl or ("1y" in cl and "high" in cl):
+                col_map["high_52w"] = c
+            elif "1y low" in cl or ("1y" in cl and "low" in cl):
+                col_map["low_52w"] = c
             elif "roce" in cl:
                 col_map["roce"] = c
+            elif "mf" in cl and "hold" in cl:
+                col_map["mf"] = c
+            elif "institutional" in cl and "hold" in cl:
+                col_map["inst"] = c
 
         stocks = []
         for _, row in df.iterrows():
@@ -177,7 +185,7 @@ def parse_trendlyne_csv(uploaded_file):
             if not stock["name"] or not stock["ticker"]:
                 continue
 
-            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200", "durability", "momentum", "promoter", "fii", "dii", "high_52w", "low_52w", "roce"]:
+            for key in ["roe", "pe", "piotroski", "ltp", "mcap", "de", "peg", "profit_growth", "rev_qoq", "sma200", "durability", "momentum", "promoter", "fii", "dii", "high_52w", "low_52w", "roce", "mf", "inst"]:
                 if key in col_map:
                     try:
                         val = row.get(col_map[key], "")
