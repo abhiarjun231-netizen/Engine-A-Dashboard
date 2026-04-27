@@ -151,12 +151,25 @@
       "entry": 116.38,
       "qty": 49,
       "buy_date": "2026-04-27",
-      "peak": 116.38,
+      "peak": 116.39,
       "entry_pe": 21.66,
       "current_pe": 21.66,
       "value_depth_score": 9,
       "is_double": true,
       "sector": "Consumer Durables"
+    },
+    {
+      "name": "Sumeet Industries",
+      "ticker": "SUMEETINDS",
+      "entry": 29.56,
+      "qty": 195,
+      "buy_date": "2026-04-27",
+      "peak": 29.56,
+      "entry_pe": 16.43,
+      "current_pe": 16.43,
+      "value_depth_score": 9,
+      "is_double": true,
+      "sector": "Textiles Apparels & Accessories"
     }
   ],
   "engine_d": [],
