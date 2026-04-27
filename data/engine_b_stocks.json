@@ -164,12 +164,25 @@
       "entry": 29.56,
       "qty": 195,
       "buy_date": "2026-04-27",
-      "peak": 29.56,
+      "peak": 29.57,
       "entry_pe": 16.43,
       "current_pe": 16.43,
       "value_depth_score": 9,
       "is_double": true,
       "sector": "Textiles Apparels & Accessories"
+    },
+    {
+      "name": "Indus Towers",
+      "ticker": "INDUSTOWER",
+      "entry": 402.2,
+      "qty": 14,
+      "buy_date": "2026-04-27",
+      "peak": 402.2,
+      "entry_pe": 14.84,
+      "current_pe": 14.84,
+      "value_depth_score": 9,
+      "is_double": true,
+      "sector": "Telecom Services"
     }
   ],
   "engine_d": [],
