@@ -209,6 +209,19 @@
       "value_depth_score": 8,
       "is_double": true,
       "sector": "Cement and Construction"
+    },
+    {
+      "name": "PTC",
+      "ticker": "PTC",
+      "entry": 194.29,
+      "qty": 29,
+      "buy_date": "2026-04-27",
+      "peak": 194.29,
+      "entry_pe": 6.72,
+      "current_pe": 6.72,
+      "value_depth_score": 8,
+      "is_double": true,
+      "sector": "Utilities"
     }
   ],
   "engine_d": [],
