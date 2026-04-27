@@ -118,6 +118,19 @@
       "value_depth_score": 10,
       "is_double": true,
       "sector": "Consumer Durables"
+    },
+    {
+      "name": "Hindustan Zinc",
+      "ticker": "HINDZINC",
+      "entry": 627.5,
+      "qty": 9,
+      "buy_date": "2026-04-27",
+      "peak": 627.5,
+      "entry_pe": 18.99,
+      "current_pe": 18.99,
+      "value_depth_score": 10,
+      "is_double": true,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_d": [],
