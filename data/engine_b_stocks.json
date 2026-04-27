@@ -92,7 +92,21 @@
       "sector": "General Industrials"
     }
   ],
-  "engine_c": [],
+  "engine_c": [
+    {
+      "name": "National Aluminium",
+      "ticker": "NATIONALUM",
+      "entry": 442.35,
+      "qty": 13,
+      "buy_date": "2026-04-27",
+      "peak": 442.35,
+      "entry_pe": 13.21,
+      "current_pe": 13.21,
+      "value_depth_score": 11,
+      "is_double": true,
+      "sector": "Metals & Mining"
+    }
+  ],
   "engine_d": [],
   "engine_b_watchlist": [
     {
