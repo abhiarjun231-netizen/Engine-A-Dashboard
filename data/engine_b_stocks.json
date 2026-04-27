@@ -164,7 +164,7 @@
       "entry": 29.56,
       "qty": 195,
       "buy_date": "2026-04-27",
-      "peak": 30.0,
+      "peak": 30.22,
       "entry_pe": 16.43,
       "current_pe": 16.43,
       "value_depth_score": 9,
@@ -216,7 +216,7 @@
       "entry": 194.29,
       "qty": 29,
       "buy_date": "2026-04-27",
-      "peak": 195.17,
+      "peak": 195.2,
       "entry_pe": 6.72,
       "current_pe": 6.72,
       "value_depth_score": 8,
@@ -255,7 +255,7 @@
       "entry": 103.41,
       "qty": 31,
       "buy_date": "2026-04-27",
-      "peak": 103.41,
+      "peak": 104.23,
       "entry_pe": 21.54,
       "current_pe": 21.54,
       "value_depth_score": 6,
@@ -348,7 +348,7 @@
       "entry": 29.57,
       "qty": 260,
       "buy_date": "2026-04-27",
-      "peak": 30.0,
+      "peak": 30.22,
       "dna_score": 11,
       "is_double": true,
       "is_immortal": false,
@@ -374,7 +374,7 @@
       "entry": 103.41,
       "qty": 42,
       "buy_date": "2026-04-27",
-      "peak": 103.41,
+      "peak": 104.23,
       "dna_score": 10,
       "is_double": true,
       "is_immortal": false,
@@ -400,7 +400,7 @@
       "entry": 194.29,
       "qty": 22,
       "buy_date": "2026-04-27",
-      "peak": 195.17,
+      "peak": 195.2,
       "dna_score": 10,
       "is_double": true,
       "is_immortal": false,
@@ -3684,6 +3684,16 @@
       "token": "28879",
       "symbol": "CARRARO-EQ",
       "name": "CARRARO"
+    },
+    "HINDALCO": {
+      "token": "1363",
+      "symbol": "HINDALCO-EQ",
+      "name": "HINDALCO"
+    },
+    "TATASTEEL": {
+      "token": "3499",
+      "symbol": "TATASTEEL-EQ",
+      "name": "TATASTEEL"
     }
   },
   "_last_token_update": "2026-04-27"
