@@ -38,6 +38,19 @@
       "prev_momentum": 71.0,
       "conviction": 9,
       "sector": "Banking and Finance"
+    },
+    {
+      "name": "Welspun Corp",
+      "ticker": "WELCORP",
+      "entry": 1212.15,
+      "qty": 6,
+      "buy_date": "2026-04-27",
+      "peak": 1212.15,
+      "durability": 70.0,
+      "momentum": 67.0,
+      "prev_momentum": 67.0,
+      "conviction": 3,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_c": [],
