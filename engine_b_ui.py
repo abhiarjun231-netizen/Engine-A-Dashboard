@@ -62,7 +62,7 @@ def show_engine_b():
     closed = data.get("engine_b_closed", [])
     cap = float(data.get("_capital", 100000))
     eq_pct = int(sd.get("equity_pct", 55)) if sd else 55
-    b_cap = cap * eq_pct / 100 * 30 / 100
+    b_cap = round(cap * eq_pct / 100 * 30 / 100, 2)
 
     # HEADER
     st.markdown(
@@ -84,7 +84,7 @@ def show_engine_b():
 
     # SUMMARY
     render_section_title("Portfolio Summary")
-    ti = sum(float(s.get("entry",0))*int(s.get("qty",0)) for s in pos)
+    ti = round(sum(float(s.get("entry",0))*int(s.get("qty",0)) for s in pos), 2)
     tc = sum(prices.get(s.get("ticker",""),float(s.get("entry",0)))*int(s.get("qty",0)) for s in pos)
     tp = tc - ti
     ps, pc = fmt_pnl(tp)
@@ -150,7 +150,7 @@ def show_engine_b():
     # POSITION SIZER
     render_section_title("Position Sizer")
     with st.expander("Calculate", expanded=False):
-        av = b_cap - ti; mx = b_cap * MAX_PCT / 100
+        av = round(b_cap - ti, 2); mx = round(b_cap * MAX_PCT / 100, 2)
         st.markdown(
             f"<div style='font-size:13px;color:#1e293b;font-weight:600;margin-bottom:8px;'>"
             f"Available: <span style='color:#059669;'>₹{av:,.0f}</span> | "
@@ -340,7 +340,7 @@ def show_engine_b():
                     m_in=st.number_input("Momentum",value=0.0,key=f"mb_{j}",max_value=100.0)
                     if d_in<=55 or m_in<=59: st.warning("Below entry threshold.")
                     bp=st.number_input("Price ₹",value=float(cp2),key=f"bp_b_{j}",format="%.2f")
-                    mx2=min(b_cap-ti, b_cap*MAX_PCT/100)
+                    mx2=round(min(b_cap-ti, b_cap*MAX_PCT/100), 2)
                     sq=int(mx2/bp) if bp>0 else 0
                     bq=st.number_input("Qty",value=max(sq,1),min_value=1,key=f"bq_b_{j}")
                     st.markdown(f"**₹{bp*bq:,.0f}**")

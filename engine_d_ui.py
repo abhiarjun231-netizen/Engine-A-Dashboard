@@ -61,7 +61,7 @@ def show_engine_d():
     closed = data.get("engine_d_closed", [])
     cap = float(data.get("_capital", 100000))
     eq_pct = int(sd.get("equity_pct", 55)) if sd else 55
-    d_cap = cap * eq_pct / 100 * 40 / 100
+    d_cap = round(cap * eq_pct / 100 * 40 / 100, 2)
 
     # HEADER
     st.markdown(
@@ -83,7 +83,7 @@ def show_engine_d():
 
     # SUMMARY
     render_section_title("Portfolio Summary")
-    ti = sum(float(s.get("entry",0))*int(s.get("qty",0)) for s in pos)
+    ti = round(sum(float(s.get("entry",0))*int(s.get("qty",0)) for s in pos), 2)
     tc = sum(prices.get(s.get("ticker",""),float(s.get("entry",0)))*int(s.get("qty",0)) for s in pos)
     tp = tc - ti
     ps, pc = fmt_pnl(tp)
@@ -247,7 +247,7 @@ def show_engine_d():
     # POSITION SIZER
     render_section_title("Position Sizer")
     with st.expander("Calculate", expanded=False):
-        av = d_cap - ti; mx = d_cap * MAX_PCT / 100
+        av = round(d_cap - ti, 2); mx = round(d_cap * MAX_PCT / 100, 2)
         st.markdown(
             f"<div style='font-size:13px;color:#1e293b;font-weight:600;margin-bottom:8px;'>"
             f"Available: <span style='color:#059669;'>₹{av:,.0f}</span> | "
@@ -443,7 +443,7 @@ def show_engine_d():
             if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
                 with st.expander(f"Buy {nm}", expanded=False):
                     bp=st.number_input("Price ₹",value=float(cp2),key=f"bp_d_{j}",format="%.2f")
-                    mx2=min(d_cap-ti, d_cap*MAX_PCT/100)
+                    mx2=round(min(d_cap-ti, d_cap*MAX_PCT/100), 2)
                     if dns2>=16: sz=10
                     elif dns2>=11: sz=7
                     else: sz=4
