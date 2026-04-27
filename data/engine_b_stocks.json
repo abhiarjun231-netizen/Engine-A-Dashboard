@@ -222,6 +222,19 @@
       "value_depth_score": 8,
       "is_double": true,
       "sector": "Utilities"
+    },
+    {
+      "name": "Swaraj Engines",
+      "ticker": "SWARAJENG",
+      "entry": 3973.5,
+      "qty": 1,
+      "buy_date": "2026-04-27",
+      "peak": 3973.5,
+      "entry_pe": 24.4,
+      "current_pe": 24.4,
+      "value_depth_score": 7,
+      "is_double": true,
+      "sector": "Automobiles & Auto Components"
     }
   ],
   "engine_d": [],
