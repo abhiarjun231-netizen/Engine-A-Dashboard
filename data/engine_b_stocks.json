@@ -261,6 +261,19 @@
       "value_depth_score": 6,
       "is_double": true,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Pix Transmissions",
+      "ticker": "PIXTRANS",
+      "entry": 1482.9,
+      "qty": 2,
+      "buy_date": "2026-04-27",
+      "peak": 1482.9,
+      "entry_pe": 18.45,
+      "current_pe": 18.45,
+      "value_depth_score": 6,
+      "is_double": true,
+      "sector": "Automobiles & Auto Components"
     }
   ],
   "engine_d": [],
