@@ -103,6 +103,19 @@
       "prev_momentum": 68.0,
       "conviction": 4,
       "sector": "Metals & Mining"
+    },
+    {
+      "name": "Hindustan Zinc",
+      "ticker": "HINDZINC",
+      "entry": 628.25,
+      "qty": 13,
+      "buy_date": "2026-04-27",
+      "peak": 628.25,
+      "durability": 80.0,
+      "momentum": 65.0,
+      "prev_momentum": 65.0,
+      "conviction": 8,
+      "sector": "Metals & Mining"
     }
   ],
   "engine_c": [
