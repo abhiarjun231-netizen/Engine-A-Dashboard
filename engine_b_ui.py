@@ -276,6 +276,7 @@ def show_engine_b():
                 f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
                 f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
                 f"<div style='font-size:11px;'>"
+                f"{'₹'+fmt(s.get('mcap'),0)+'Cr ' if s.get('mcap') else ''}"
                 f"{render_stage_badge(mc_label)}</div></div>"
             )
             if dur is not None or mom is not None:
