@@ -64,6 +64,19 @@
       "prev_momentum": 67.0,
       "conviction": 5,
       "sector": "Transportation"
+    },
+    {
+      "name": "Great Eastern",
+      "ticker": "GESHIP",
+      "entry": 1426.1,
+      "qty": 5,
+      "buy_date": "2026-04-27",
+      "peak": 1426.1,
+      "durability": 70.0,
+      "momentum": 60.0,
+      "prev_momentum": 60.0,
+      "conviction": 2,
+      "sector": "Transportation"
     }
   ],
   "engine_c": [],
