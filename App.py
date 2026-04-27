@@ -91,6 +91,25 @@ st.markdown("""
         border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     div[data-testid="stExpander"] summary { font-weight: 600; color: #1e293b; }
+    div[data-testid="stExpander"] label,
+    div[data-testid="stExpander"] .stMarkdown p,
+    div[data-testid="stExpander"] .stMarkdown span,
+    div[data-testid="stExpander"] .stMarkdown li,
+    div[data-testid="stExpander"] [data-testid="stWidgetLabel"] p,
+    div[data-testid="stExpander"] [data-testid="stWidgetLabel"] label {
+        color: #1e293b !important; font-weight: 500 !important;
+    }
+    div[data-testid="stExpander"] .stAlert p,
+    div[data-testid="stExpander"] [data-testid="stAlert"] p {
+        color: #92400e !important; font-weight: 500 !important;
+    }
+    .stNumberInput label, .stTextInput label, .stSelectbox label,
+    .stTextArea label, .stRadio label, .stCheckbox label {
+        color: #1e293b !important; font-weight: 500 !important;
+    }
+    .stCaption, .stCaption p { color: #64748b !important; }
+    div[data-testid="stExpander"] small,
+    div[data-testid="stExpander"] .stCaption { color: #64748b !important; }
     .stButton > button {
         background: linear-gradient(135deg, #f8fafc, #ffffff); color: #1e293b;
         border: 1px solid #e2e8f0; border-radius: 12px; font-weight: 600;
