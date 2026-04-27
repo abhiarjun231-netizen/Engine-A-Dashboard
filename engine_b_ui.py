@@ -296,8 +296,20 @@ def show_engine_b():
                 f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#94a3b8;margin-bottom:4px;'>"
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
+                f"<span>D/E:{fmt(s.get('de'),1)}</span>"
                 f"{'<span>Sec:'+sec[:12]+'</span>' if sec else ''}</div>"
             )
+            pg = s.get("profit_growth"); prom = s.get("promoter"); fii_val = s.get("fii")
+            has_extra = pg is not None or prom is not None or fii_val is not None
+            if has_extra:
+                card_html += (
+                    f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#94a3b8;margin-bottom:4px;'>"
+                    f"{'<span style=\"color:#16a34a;font-weight:600;\">PG:+'+fmt(pg,0)+'%</span>' if pg and pg>0 else ('<span style=\"color:#dc2626;\">PG:'+fmt(pg,0)+'%</span>' if pg and pg<0 else '')}"
+                    f"{'<span>Prom:'+fmt(prom,0)+'%</span>' if prom else ''}"
+                    f"{'<span>FII:'+fmt(fii_val,1)+'%</span>' if fii_val else ''}"
+                    f"{'<span>Inst:'+fmt(s.get('inst'),1)+'%</span>' if s.get('inst') else ''}"
+                    f"</div>"
+                )
             card_html += (
                 f"{render_52w_position(cp2, s.get('low_52w'), s.get('high_52w'))}"
                 f"<div style='margin-top:4px;'>{render_stage_badge(vd)}"
