@@ -445,6 +445,19 @@
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Oil & Gas"
+    },
+    {
+      "name": "Multi Commodity Exchange",
+      "ticker": "MCX",
+      "entry": 2815.0,
+      "qty": 1,
+      "buy_date": "2026-04-27",
+      "peak": 2815.0,
+      "dna_score": 9,
+      "is_double": false,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "Banking and Finance"
     }
   ],
   "engine_b_watchlist": [
