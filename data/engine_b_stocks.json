@@ -400,12 +400,25 @@
       "entry": 194.29,
       "qty": 22,
       "buy_date": "2026-04-27",
-      "peak": 194.29,
+      "peak": 195.0,
       "dna_score": 10,
       "is_double": true,
       "is_immortal": false,
       "is_legendary": false,
       "sector": "Utilities"
+    },
+    {
+      "name": "GE T&D",
+      "ticker": "GVT&D",
+      "entry": 4565.0,
+      "qty": 1,
+      "buy_date": "2026-04-27",
+      "peak": 4565.0,
+      "dna_score": 10,
+      "is_double": false,
+      "is_immortal": false,
+      "is_legendary": false,
+      "sector": "General Industrials"
     }
   ],
   "engine_b_watchlist": [
