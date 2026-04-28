@@ -3629,6 +3629,16 @@
       "token": "24398",
       "symbol": "EMCURE-EQ",
       "name": "EMCURE"
+    },
+    "CANBK": {
+      "token": "10794",
+      "symbol": "CANBK-EQ",
+      "name": "CANBK"
+    },
+    "INDIANB": {
+      "token": "14309",
+      "symbol": "INDIANB-EQ",
+      "name": "INDIANB"
     }
   },
   "_last_token_update": "2026-04-28"
