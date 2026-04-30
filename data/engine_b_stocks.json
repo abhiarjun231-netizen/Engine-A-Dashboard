@@ -4585,6 +4585,41 @@
       "token": "14309",
       "symbol": "INDIANB-EQ",
       "name": "INDIANB"
+    },
+    "PHOENIXLTD": {
+      "token": "14552",
+      "symbol": "PHOENIXLTD-EQ",
+      "name": "PHOENIXLTD"
+    },
+    "IPCALAB": {
+      "token": "1633",
+      "symbol": "IPCALAB-EQ",
+      "name": "IPCALAB"
+    },
+    "JBCHEPHARM": {
+      "token": "1726",
+      "symbol": "JBCHEPHARM-EQ",
+      "name": "JBCHEPHARM"
+    },
+    "SOLARINDS": {
+      "token": "13332",
+      "symbol": "SOLARINDS-EQ",
+      "name": "SOLARINDS"
+    },
+    "APOLLOHOSP": {
+      "token": "157",
+      "symbol": "APOLLOHOSP-EQ",
+      "name": "APOLLOHOSP"
+    },
+    "GRANULES": {
+      "token": "11872",
+      "symbol": "GRANULES-EQ",
+      "name": "GRANULES"
+    },
+    "ATUL": {
+      "token": "263",
+      "symbol": "ATUL-EQ",
+      "name": "ATUL"
     }
   },
   "_last_token_update": "2026-04-30"
