@@ -4556,6 +4556,16 @@
       "token": "263",
       "symbol": "ATUL-EQ",
       "name": "ATUL"
+    },
+    "INFOBEAN": {
+      "token": "11027",
+      "symbol": "INFOBEAN-EQ",
+      "name": "INFOBEAN"
+    },
+    "SJS": {
+      "token": "6643",
+      "symbol": "SJS-EQ",
+      "name": "SJS"
     }
   },
   "_last_token_update": "2026-04-30"
