@@ -1,9 +1,9 @@
 {
   "_comment": "Engine A manual inputs. Update from Trendlyne + Trading Economics Sunday morning.",
-  "_last_updated": "2026-04-29",
+  "_last_updated": "2026-04-30",
   "_updated_by": "abhishek",
   "nifty_pe": {
-    "value": 20.9,
+    "value": 20.7,
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/equity/1887/NIFTY/nifty-50/",
@@ -12,7 +12,7 @@
     "notes": "Nifty 50 PE from Trendlyne main page. Used for Valuation score (max 15)."
   },
   "fii_30day_net_cr": {
-    "value": -70782,
+    "value": -73250,
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/",
@@ -21,7 +21,7 @@
     "notes": "FII Net 30-day in Rs Crores. Negative = net sellers. Used for Flows score."
   },
   "dii_30day_net_cr": {
-    "value": 60209,
+    "value": 62741,
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/",
@@ -30,7 +30,7 @@
     "notes": "DII Net 30-day in Rs Crores. Positive = net buyers. Used for Flows score."
   },
   "breadth_pct_above_200dma": {
-    "value": 43.0,
+    "value": 41.6,
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/fundamentals/stock-screener/797020/nifty-500-above-200-sma/index/NIFTY500/nifty-500/",
