@@ -84,7 +84,7 @@
       "entry": 4564.9,
       "qty": 2,
       "buy_date": "2026-04-27",
-      "peak": 4565.0,
+      "peak": 4570.6,
       "durability": 90.0,
       "momentum": 71.0,
       "prev_momentum": 71.0,
@@ -268,7 +268,7 @@
       "entry": 228.14,
       "qty": 14,
       "buy_date": "2026-04-27",
-      "peak": 230.96,
+      "peak": 233.41,
       "entry_pe": 22.53,
       "current_pe": 22.53,
       "value_depth_score": 7,
@@ -281,7 +281,7 @@
       "entry": 103.41,
       "qty": 31,
       "buy_date": "2026-04-27",
-      "peak": 111.59,
+      "peak": 112.24,
       "entry_pe": 21.54,
       "current_pe": 21.54,
       "value_depth_score": 6,
@@ -400,7 +400,7 @@
       "entry": 103.41,
       "qty": 42,
       "buy_date": "2026-04-27",
-      "peak": 111.59,
+      "peak": 112.24,
       "dna_score": 10,
       "is_double": true,
       "is_immortal": false,
@@ -439,7 +439,7 @@
       "entry": 4565.0,
       "qty": 1,
       "buy_date": "2026-04-27",
-      "peak": 4565.0,
+      "peak": 4570.6,
       "dna_score": 10,
       "is_double": false,
       "is_immortal": false,
@@ -3641,5 +3641,5 @@
       "name": "INDIANB"
     }
   },
-  "_last_token_update": "2026-04-29"
+  "_last_token_update": "2026-04-30"
 }
