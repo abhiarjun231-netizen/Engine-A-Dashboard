@@ -1,0 +1,10 @@
+{
+  "name": "Abhishek's Engine",
+  "short_name": "Engine",
+  "description": "5-Engine Investment System Dashboard",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8f9fb",
+  "theme_color": "#ffffff",
+  "orientation": "portrait"
+}
