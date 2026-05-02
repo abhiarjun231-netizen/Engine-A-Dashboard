@@ -91,16 +91,16 @@ def read_csv_stocks(filepath):
             reader = csv.reader(f)
             headers = [h.strip() for h in next(reader,[])]
             col = {}
-            col["name"] = find_col(headers,["company","name","stock"])
-            col["ticker"] = find_col(headers,["ticker","symbol","nse code","nse symbol"])
-            col["price"] = find_col(headers,["price","cmp","close","last","current price"])
+            col["name"] = find_col(headers,["stock","company","name"])
+            col["ticker"] = find_col(headers,["nse code","nse symbol","ticker","symbol"])
+            col["price"] = find_col(headers,["ltp","price","cmp","close","last","current price"])
             col["mcap"] = find_col(headers,["market cap","mcap","m.cap","m cap"])
-            col["roe"] = find_col(headers,["roe annual","roe %","roe"])
+            col["roe"] = find_col(headers,["roe ann","roe annual","roe %","roe"])
             col["pe"] = find_col(headers,["pe ttm","pe ratio","p/e"])
             col["pio"] = find_col(headers,["piotroski","pio"])
-            col["de"] = find_col(headers,["debt to equity","d/e","debt equity","de ratio"])
-            col["pg"] = find_col(headers,["profit growth annual","profit growth yoy","pat growth"],["3yr","3 yr"])
-            col["pg_3yr"] = find_col(headers,["profit growth 3yr","pg 3yr","profit growth 3 yr"])
+            col["de"] = find_col(headers,["debt to total equity","debt to equity","d/e","debt equity","de ratio"])
+            col["pg"] = find_col(headers,["net profit ann","profit growth annual","profit ann  yoy","profit growth yoy","pat growth"],["3y","3 y","qoq"])
+            col["pg_3yr"] = find_col(headers,["net profit 3y","profit growth 3yr","profit 3y","pg 3yr"])
             col["prom"] = find_col(headers,["promoter hold","promoter %","promoter"])
             col["fii"] = find_col(headers,["fii hold","fii %","fii"])
             col["inst"] = find_col(headers,["institutional","inst hold","inst %","dii"])
@@ -108,14 +108,21 @@ def read_csv_stocks(filepath):
             col["dvm_m"] = find_col(headers,["momentum score","trendlyne momentum"],["durability"])
             col["peg"] = find_col(headers,["peg ttm","peg ratio","peg"])
             col["rev_qoq"] = find_col(headers,["revenue qoq","rev qoq","revenue growth qoq"])
-            # FIXED: delivery% — exclude volume/qty columns
-            col["delivery"] = find_col(headers,["delivery % avg","delivery avg month","delivery %"],["volume","qty","quantity","val","total"])
+            # Delivery%: "Delivery% Vol  Avg Month" — search for "delivery% vol" (the % distinguishes from volume)
+            col["delivery"] = find_col(headers,["delivery% vol  avg month","delivery% vol avg month","delivery% vol  avg","delivery% vol avg","delivery % avg","delivery avg month"],["qty","quantity"])
             col["sector"] = find_col(headers,["sector","industry"])
-            col["w52_high"] = find_col(headers,["52 week high","52w high","52wk high","high 52"])
-            col["w52_low"] = find_col(headers,["52 week low","52w low","52wk low","low 52"])
-            col["results"] = find_col(headers,["result date","results date","next result","earnings"])
+            col["w52_high"] = find_col(headers,["1y high","52 week high","52w high","52wk high","high 52"])
+            col["w52_low"] = find_col(headers,["1y low","52 week low","52w low","52wk low","low 52"])
+            col["results"] = find_col(headers,["latest financial result","financial result","result date","results date","next result","earnings"])
 
-            print(f"  [{os.path.basename(filepath)}] delivery col: {headers[col['delivery']] if col['delivery']>=0 else 'NOT FOUND'}")
+            # Debug column matching
+            for k,v in col.items():
+                matched = headers[v] if v>=0 else "NOT FOUND"
+                if v<0: print(f"  [{os.path.basename(filepath)}] ⚠️ {k}: {matched}")
+            found_count = sum(1 for v in col.values() if v>=0)
+            print(f"  [{os.path.basename(filepath)}] Matched {found_count}/{len(col)} columns. "
+                  f"price={headers[col['price']] if col['price']>=0 else 'MISSING'}, "
+                  f"delivery={headers[col['delivery']] if col['delivery']>=0 else 'MISSING'}")
 
             for row in reader:
                 if len(row)<3: continue
