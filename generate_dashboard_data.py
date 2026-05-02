@@ -5,7 +5,7 @@ Adds: sector concentration, overlap map, velocity, earnings, intelligence summar
 """
 
 import json, csv, os, glob
-from datetime import datetime
+from datetime import datetime, timedelta
 
 DATA_DIR = "data"
 DOCS_DIR = "docs"
@@ -635,9 +635,15 @@ def build():
            "cash_available":0,"positions":0,
            "b_deployed":0,"b_budget":0,"c_deployed":0,"c_budget":0,
            "d_deployed":0,"d_budget":0}
+    positions_display = {"momentum":[],"value":[],"compounders":[]}
+    tax = {"stcg_rate":20,"ltcg_rate":12.5,"ltcg_exemption":125000,
+           "stcg_count":0,"ltcg_count":0,"unrealized_stcg":0,"unrealized_ltcg":0}
     if os.path.exists(STOCKS_FILE):
         try:
             with open(STOCKS_FILE,"r") as f: pos_data = json.load(f)
+            # Read capital from positions file (saved by dashboard)
+            if "capital" in pos_data:
+                ea["capital"] = int(safe_float(pos_data["capital"]))
             cap = ea.get("capital",500000)
             eq_amt = cap * alloc["equity"] / 100
             pnl["b_budget"] = round(eq_amt * 0.3, 2)
@@ -645,6 +651,10 @@ def build():
             pnl["d_budget"] = round(eq_amt * 0.4, 2)
 
             total_inv = 0; total_cur = 0; pos_count = 0
+            now_dt = datetime.now()
+            ltcg_cutoff = now_dt - timedelta(days=365)
+            stcg_gain = 0; ltcg_gain = 0; stcg_cnt = 0; ltcg_cnt = 0
+
             for eng_key in ["momentum","value","compounders","positions"]:
                 if eng_key not in pos_data: continue
                 positions_list = pos_data[eng_key]
@@ -666,15 +676,39 @@ def build():
                         total_inv += inv
                         total_cur += val
                         pos_count += 1
+                        gain = round(val - inv, 2)
+                        gain_pct = round(((val - inv) / inv * 100) if inv > 0 else 0, 2)
+
+                        # STCG vs LTCG
+                        buy_date_str = p.get("buy_date","")
+                        is_ltcg = False
+                        if buy_date_str:
+                            try:
+                                bd = datetime.strptime(str(buy_date_str).strip()[:10], "%Y-%m-%d")
+                                if bd < ltcg_cutoff: is_ltcg = True
+                            except: pass
+                        if is_ltcg:
+                            ltcg_gain += gain; ltcg_cnt += 1
+                        else:
+                            stcg_gain += gain; stcg_cnt += 1
 
                         # Track per-engine deployment
-                        eng = p.get("engine","")
-                        if eng_key == "momentum" or "b" in eng.lower():
-                            pnl["b_deployed"] += round(inv, 2)
-                        elif eng_key == "value" or "c" in eng.lower():
-                            pnl["c_deployed"] += round(inv, 2)
-                        elif eng_key == "compounders" or "d" in eng.lower():
-                            pnl["d_deployed"] += round(inv, 2)
+                        eng = p.get("engine","").lower()
+                        disp_eng = eng_key
+                        if eng_key == "momentum" or eng in ("b","momentum"):
+                            pnl["b_deployed"] += round(inv, 2); disp_eng = "momentum"
+                        elif eng_key == "value" or eng in ("c","value"):
+                            pnl["c_deployed"] += round(inv, 2); disp_eng = "value"
+                        elif eng_key == "compounders" or eng in ("d","compounder","compounders"):
+                            pnl["d_deployed"] += round(inv, 2); disp_eng = "compounders"
+
+                        # Collect for display
+                        if disp_eng in positions_display:
+                            positions_display[disp_eng].append({
+                                "ticker":t,"qty":int(qty),"buy_price":round(buy,2),
+                                "current_price":round(cur,2),"pnl":gain,"pnl_pct":gain_pct,
+                                "buy_date":buy_date_str,"is_ltcg":is_ltcg
+                            })
 
             pnl["total_invested"] = round(total_inv, 2)
             pnl["current_value"] = round(total_cur, 2)
@@ -682,7 +716,11 @@ def build():
             pnl["pnl_pct"] = round(((total_cur - total_inv) / total_inv * 100) if total_inv > 0 else 0, 2)
             pnl["cash_available"] = round(cap - total_inv, 2)
             pnl["positions"] = pos_count
+            tax["stcg_count"] = stcg_cnt; tax["ltcg_count"] = ltcg_cnt
+            tax["unrealized_stcg"] = round(stcg_gain, 2); tax["unrealized_ltcg"] = round(ltcg_gain, 2)
             print(f"[OK] P&L: Invested={pnl['total_invested']} Current={pnl['current_value']} P&L={pnl['pnl']}")
+            print(f"[OK] Tax: STCG={stcg_cnt} pos +{stcg_gain} | LTCG={ltcg_cnt} pos +{ltcg_gain}")
+            print(f"[OK] Positions: B={len(positions_display['momentum'])} C={len(positions_display['value'])} D={len(positions_display['compounders'])}")
         except Exception as e:
             print(f"[WARN] P&L calc: {e}")
 
@@ -711,7 +749,8 @@ def build():
         "upcomingEarnings":earnings[:20],
         "indianMarkets":indian_markets,"globalMarkets":global_markets,
         "manualInputs":manual_inputs,"pnl":pnl,"safety":safety,
-        "lastUpdate":now,"version":"3.0"}
+        "positions":positions_display,"tax":tax,
+        "lastUpdate":now,"version":"3.1"}
 
     os.makedirs(DOCS_DIR,exist_ok=True)
     with open(OUTPUT_FILE,"w") as f: json.dump(dashboard,f,indent=2)
