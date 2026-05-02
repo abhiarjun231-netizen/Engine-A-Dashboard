@@ -592,9 +592,126 @@ def build():
         except: pass
 
     now=datetime.now().strftime("%d %b %Y, %I:%M %p")
+
+    # ── Indian Markets (from live_prices.csv) ──
+    indian_markets = {}
+    lp2 = os.path.join(DATA_DIR,"live_prices.csv")
+    if os.path.exists(lp2):
+        try:
+            with open(lp2,"r",encoding="utf-8-sig") as f:
+                for row in csv.DictReader(f):
+                    sym = row.get("symbol","").strip()
+                    p = safe_float(row.get("price",0))
+                    if p > 0:
+                        indian_markets[sym] = round(p,2)
+        except: pass
+    print(f"[OK] Indian Markets: {len(indian_markets)} indices")
+
+    # ── Global Markets (from global_prices.csv) ──
+    global_markets = {}
+    gp2 = os.path.join(DATA_DIR,"global_prices.csv")
+    if os.path.exists(gp2):
+        try:
+            with open(gp2,"r",encoding="utf-8-sig") as f:
+                for row in csv.DictReader(f):
+                    sym = row.get("symbol","").strip()
+                    p = safe_float(row.get("price",0))
+                    if p > 0:
+                        global_markets[sym] = round(p,2)
+        except: pass
+    print(f"[OK] Global Markets: {len(global_markets)} items")
+
+    # ── Manual Inputs ──
+    manual_inputs = {}
+    mi_file = os.path.join(DATA_DIR,"manual_inputs.json")
+    if os.path.exists(mi_file):
+        try:
+            with open(mi_file,"r") as f: manual_inputs = json.load(f)
+            print(f"[OK] Manual inputs loaded: {list(manual_inputs.keys())}")
+        except: pass
+
+    # ── P&L from positions ──
+    pnl = {"total_invested":0,"current_value":0,"pnl":0,"pnl_pct":0,
+           "cash_available":0,"positions":0,
+           "b_deployed":0,"b_budget":0,"c_deployed":0,"c_budget":0,
+           "d_deployed":0,"d_budget":0}
+    if os.path.exists(STOCKS_FILE):
+        try:
+            with open(STOCKS_FILE,"r") as f: pos_data = json.load(f)
+            cap = ea.get("capital",500000)
+            eq_amt = cap * alloc["equity"] / 100
+            pnl["b_budget"] = round(eq_amt * 0.3, 2)
+            pnl["c_budget"] = round(eq_amt * 0.3, 2)
+            pnl["d_budget"] = round(eq_amt * 0.4, 2)
+
+            total_inv = 0; total_cur = 0; pos_count = 0
+            for eng_key in ["momentum","value","compounders","positions"]:
+                if eng_key not in pos_data: continue
+                positions_list = pos_data[eng_key]
+                if not isinstance(positions_list, list): continue
+                for p in positions_list:
+                    if not isinstance(p, dict): continue
+                    qty = safe_float(p.get("qty", p.get("quantity", 1)))
+                    buy = safe_float(p.get("buy_price", p.get("entry_price", p.get("avg_price", 0))))
+                    cur = safe_float(p.get("current_price", p.get("ltp", p.get("price", 0))))
+                    t = p.get("ticker", p.get("symbol", "")).replace(".NS","").replace(".BO","").upper().strip()
+
+                    # Try to get current price from live prices
+                    if cur == 0 and t in prices:
+                        cur = safe_float(prices[t].get("price", 0))
+
+                    if buy > 0 and qty > 0:
+                        inv = buy * qty
+                        val = cur * qty if cur > 0 else inv
+                        total_inv += inv
+                        total_cur += val
+                        pos_count += 1
+
+                        # Track per-engine deployment
+                        eng = p.get("engine","")
+                        if eng_key == "momentum" or "b" in eng.lower():
+                            pnl["b_deployed"] += round(inv, 2)
+                        elif eng_key == "value" or "c" in eng.lower():
+                            pnl["c_deployed"] += round(inv, 2)
+                        elif eng_key == "compounders" or "d" in eng.lower():
+                            pnl["d_deployed"] += round(inv, 2)
+
+            pnl["total_invested"] = round(total_inv, 2)
+            pnl["current_value"] = round(total_cur, 2)
+            pnl["pnl"] = round(total_cur - total_inv, 2)
+            pnl["pnl_pct"] = round(((total_cur - total_inv) / total_inv * 100) if total_inv > 0 else 0, 2)
+            pnl["cash_available"] = round(cap - total_inv, 2)
+            pnl["positions"] = pos_count
+            print(f"[OK] P&L: Invested={pnl['total_invested']} Current={pnl['current_value']} P&L={pnl['pnl']}")
+        except Exception as e:
+            print(f"[WARN] P&L calc: {e}")
+
+    # ── Red Flag & PE Bubble checks ──
+    nifty_pe = safe_float(manual_inputs.get("nifty_pe", 0))
+    red_flag = False
+    pe_bubble = False
+
+    # Red Flag: Trend<=3 AND Vol<=2 AND (Flows<=3 OR FII<-15000)
+    comps = {c["name"]:c["score"] for c in ea.get("components",[])}
+    trend_score = comps.get("Trend",0)
+    vol_score = comps.get("Volatility",0)
+    flow_score = comps.get("Flows",0)
+    fii_val = safe_float(manual_inputs.get("fii", manual_inputs.get("fii_30d",0)))
+    if trend_score <= 3 and vol_score <= 2 and (flow_score <= 3 or fii_val < -15000):
+        red_flag = True
+
+    # PE Bubble: Nifty PE > 26
+    if nifty_pe > 26:
+        pe_bubble = True
+
+    safety = {"red_flag": red_flag, "pe_bubble": pe_bubble, "nifty_pe": nifty_pe}
+
     dashboard={"engineA":ea,"momentum":momentum[:30],"value":value[:30],"compounders":compounders[:30],
         "fortress":fort,"command":command,"intelligence":intelligence,
-        "upcomingEarnings":earnings[:20],"lastUpdate":now,"version":"2.0"}
+        "upcomingEarnings":earnings[:20],
+        "indianMarkets":indian_markets,"globalMarkets":global_markets,
+        "manualInputs":manual_inputs,"pnl":pnl,"safety":safety,
+        "lastUpdate":now,"version":"3.0"}
 
     os.makedirs(DOCS_DIR,exist_ok=True)
     with open(OUTPUT_FILE,"w") as f: json.dump(dashboard,f,indent=2)
