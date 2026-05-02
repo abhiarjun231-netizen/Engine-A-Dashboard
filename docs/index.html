@@ -356,17 +356,27 @@ function renderDirector() {
   const im = D.indianMarkets||{};
   if(Object.keys(im).length>0) {
     html+=`<div class="card"><div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:12px">INDIAN MARKETS (LIVE)</div>`;
-    const imKeys = [['Nifty 50','nifty_50','NIFTY 50'],['India VIX','india_vix','INDIA VIX','India VIX'],['Nifty 500','nifty_500','NIFTY 500'],['Nifty Midcap 100','nifty_midcap_100','NIFTY MIDCAP 100'],['Nifty Midcap 50','nifty_midcap_50','NIFTY MIDCAP 50']];
+    const imKeys = [['Nifty 50','nifty_50','NIFTY 50'],['India VIX','india_vix','INDIA VIX'],['Nifty 500','nifty_500','NIFTY 500'],['Nifty Midcap 100','nifty_midcap_100','NIFTY MIDCAP 100'],['Nifty Midcap 50','nifty_midcap_50','NIFTY MIDCAP 50']];
+    const usedKeys = new Set();
+    const norm = s => String(s).toLowerCase().replace(/[\s_]/g,'');
     imKeys.forEach(keys=>{
       let val = 0;
-      for(let k of keys) { if(im[k]) { val=im[k]; break; } }
-      // Also try case-insensitive
-      if(!val) { for(let [k,v] of Object.entries(im)) { if(keys.some(key=>k.toLowerCase().includes(key.toLowerCase().replace(' ','')))) { val=v; break; } } }
+      let usedKey = null;
+      // Exact match first
+      for(let k of keys) { if(im[k]!==undefined) { val=im[k]; usedKey=k; break; } }
+      // Normalized match (handles case/space/underscore variants)
+      if(!usedKey) {
+        const wanted = keys.map(norm);
+        for(let [k,v] of Object.entries(im)) {
+          if(wanted.includes(norm(k))) { val=v; usedKey=k; break; }
+        }
+      }
+      if(usedKey) usedKeys.add(usedKey);
       if(val) html+=`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2)">${keys[0]}</span><span style="font-size:14px;font-weight:800;color:var(--text)">${typeof val==='number'?val.toLocaleString('en-IN',{maximumFractionDigits:2}):val}</span></div>`;
     });
     // Show any remaining keys not already displayed
     for(let [k,v] of Object.entries(im)) {
-      if(!imKeys.some(keys=>keys.some(key=>k.toLowerCase().includes(key.toLowerCase().replace(' ',''))))) {
+      if(!usedKeys.has(k)) {
         html+=`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2)">${k}</span><span style="font-size:14px;font-weight:800;color:var(--text)">${typeof v==='number'?v.toLocaleString('en-IN',{maximumFractionDigits:2}):v}</span></div>`;
       }
     }
