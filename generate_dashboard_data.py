@@ -170,8 +170,8 @@ def read_live_prices():
                         elif isinstance(v,(int,float)): prices[t]={"price":v,"change":0}
             except: pass
 
-    # CSV files from test_angel.py
-    for pat in ["stock_analysis*.csv","stock_data*.csv","angel_*.csv"]:
+    # CSV files from test_angel.py — engine_b_prices.csv has LTP, stock_analysis.csv has vol_ratio
+    for pat in ["engine_b_prices*.csv","engine_*_prices*.csv","stock_analysis*.csv","stock_data*.csv","angel_*.csv"]:
         for pf in glob.glob(os.path.join(DATA_DIR,pat)):
             try:
                 with open(pf,"r",encoding="utf-8-sig") as f:
@@ -214,6 +214,24 @@ def read_live_prices():
         except: pass
 
     print(f"[OK] Prices: {len(prices)} tickers")
+
+    # Merge vol_ratio from stock_analysis.csv separately (different structure)
+    sa_file=os.path.join(DATA_DIR,"stock_analysis.csv")
+    if os.path.exists(sa_file):
+        try:
+            with open(sa_file,"r",encoding="utf-8-sig") as f:
+                for row in csv.DictReader(f):
+                    t=safe_str(row.get("ticker","")).replace(".NS","").replace(".BO","").upper().strip()
+                    if not t or t=="NAN": continue
+                    vr=safe_float(row.get("vol_ratio",0))
+                    if t in prices:
+                        if vr>0: prices[t]["vol_ratio"]=round(vr,2)
+                    else:
+                        prices[t]={"price":0,"change":0,"vol_ratio":round(vr,2)}
+            print(f"[OK] Vol ratios merged from stock_analysis.csv")
+        except Exception as e:
+            print(f"[WARN] stock_analysis.csv: {e}")
+
     return prices
 
 # ── Scoring ──
@@ -536,6 +554,35 @@ def build():
                 elif gvix<15 and crude<60: fort["gold_signal"]="TRIM"
                 print(f"[OK] Macro: VIX={fort['gvix']} Crude={fort['crude']}"); break
             except: pass
+
+    # Read live_prices.csv + global_prices.csv (written by test_angel.py)
+    lp_file=os.path.join(DATA_DIR,"live_prices.csv")
+    if os.path.exists(lp_file):
+        try:
+            with open(lp_file,"r") as f:
+                for row in csv.DictReader(f):
+                    sym=row.get("symbol","").lower()
+                    p=safe_float(row.get("price",0))
+                    if "vix" in sym and p>0: fort["gvix"]=round(p,1)
+            print(f"[OK] India VIX from live_prices.csv: {fort['gvix']}")
+        except: pass
+
+    gp_file=os.path.join(DATA_DIR,"global_prices.csv")
+    if os.path.exists(gp_file):
+        try:
+            with open(gp_file,"r") as f:
+                for row in csv.DictReader(f):
+                    sym=row.get("symbol","").lower()
+                    p=safe_float(row.get("price",0))
+                    if "brent" in sym or "crude" in sym:
+                        if p>0: fort["crude"]=round(p,1)
+                    elif "inr" in sym:
+                        if p>0: fort["inr"]=round(p,2)
+            # Recalculate gold signal with fresh data
+            if fort["gvix"]>25 or fort["crude"]>100: fort["gold_signal"]="ACCUMULATE"
+            elif fort["gvix"]<15 and fort["crude"]<60: fort["gold_signal"]="TRIM"
+            print(f"[OK] Global: Crude={fort['crude']} INR={fort['inr']}")
+        except: pass
 
     now=datetime.now().strftime("%d %b %Y, %I:%M %p")
     dashboard={"engineA":ea,"momentum":momentum[:30],"value":value[:30],"compounders":compounders[:30],
