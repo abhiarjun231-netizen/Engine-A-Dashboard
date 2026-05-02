@@ -3206,7 +3206,7 @@
     "gold_signal": "ACCUMULATE",
     "gvix": 18.5,
     "crude": 108.2,
-    "inr": 94.91,
+    "inr": 94.88,
     "debt_alloc": 150000,
     "gold_alloc": 75000,
     "bharatbond": {
@@ -3696,6 +3696,40 @@
       "verdict": "BUY"
     }
   ],
-  "lastUpdate": "02 May 2026, 08:21 AM",
-  "version": "2.0"
+  "indianMarkets": {
+    "Nifty 50": 23997.55,
+    "India VIX": 18.46,
+    "Nifty 500": 22683.55,
+    "Nifty Midcap 100": 59784.85,
+    "Nifty Midcap 50": 16882.5
+  },
+  "globalMarkets": {
+    "US 10Y Yield": 4.38,
+    "DXY": 98.21,
+    "Global VIX": 16.99,
+    "INR/USD": 94.88,
+    "Brent Crude": 108.17
+  },
+  "manualInputs": {},
+  "pnl": {
+    "total_invested": 0,
+    "current_value": 0,
+    "pnl": 0,
+    "pnl_pct": 0,
+    "cash_available": 500000,
+    "positions": 0,
+    "b_deployed": 0,
+    "b_budget": 82500.0,
+    "c_deployed": 0,
+    "c_budget": 82500.0,
+    "d_deployed": 0,
+    "d_budget": 110000.0
+  },
+  "safety": {
+    "red_flag": false,
+    "pe_bubble": false,
+    "nifty_pe": 0.0
+  },
+  "lastUpdate": "02 May 2026, 01:09 PM",
+  "version": "3.0"
 }
