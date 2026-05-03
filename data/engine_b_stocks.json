@@ -4488,6 +4488,21 @@
       "token": "8840",
       "symbol": "USHAMART-EQ",
       "name": "USHAMART"
+    },
+    "CEMPRO": {
+      "token": "5622",
+      "symbol": "CEMPRO-EQ",
+      "name": "CEMPRO"
+    },
+    "APLAPOLLO": {
+      "token": "25780",
+      "symbol": "APLAPOLLO-EQ",
+      "name": "APLAPOLLO"
+    },
+    "KAJARIACER": {
+      "token": "1808",
+      "symbol": "KAJARIACER-EQ",
+      "name": "KAJARIACER"
     }
   },
   "_last_token_update": "2026-05-03",
