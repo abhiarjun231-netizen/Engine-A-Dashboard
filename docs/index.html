@@ -408,6 +408,8 @@ function renderIntelligence(engine) {
 
 function renderPositions(engine){var pos=((D.positions||{})[engine])||[];if(pos.length===0)return'';var html='<div class="card"><div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:10px">MY POSITIONS ('+pos.length+')</div>';pos.forEach(function(p){var plC=p.pnl>=0?'var(--green)':'var(--red)';html+='<div class="pos-card" style="border-left:3px solid '+plC+'"><div class="pos-head"><div><span class="pos-ticker">'+p.ticker+'</span><span class="pos-qty">'+p.qty+' qty</span></div><div class="pos-pnl"><div class="amt" style="color:'+plC+'">'+(p.pnl>=0?'+':'')+fmtINR(p.pnl)+'</div><div class="pct" style="color:'+plC+'">'+(p.pnl_pct>=0?'+':'')+p.pnl_pct+'%</div></div></div><div class="pos-detail"><span>Buy: '+fmtINR(p.buy_price)+'</span><span>CMP: '+fmtINR(p.current_price)+'</span><span>'+(p.buy_date||'\u2014')+'</span></div><div class="pos-sell"><button class="btn btn-danger btn-sm" onclick="doSell(\''+engine+'\',\''+p.ticker+'\')">Sell</button></div></div>';});html+='</div>';return html;}
 
+function renderPortfolioSummary(engine){const pnl=D.pnl||{};const pos=((D.positions||{})[engine])||[];const map={momentum:{budget:pnl.b_budget||0,deployed:pnl.b_deployed||0,max:10,label:'ENGINE B'},value:{budget:pnl.c_budget||0,deployed:pnl.c_deployed||0,max:15,label:'ENGINE C'},compounders:{budget:pnl.d_budget||0,deployed:pnl.d_deployed||0,max:15,label:'ENGINE D'}};const e=map[engine];if(!e)return'';const totalPnl=pos.reduce(function(s,p){return s+(p.pnl||0);},0);const totalInv=pos.reduce(function(s,p){return s+(p.buy_price||0)*(p.qty||0);},0);const pnlPct=totalInv>0?((totalPnl/totalInv)*100).toFixed(1):0;const avail=Math.max(0,e.budget-e.deployed);const pnlC=totalPnl>=0?'var(--green)':'var(--red)';return'<div class="card"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center"><div style="padding:12px 8px;border-radius:10px;background:var(--card-alt)"><div style="font-size:9px;color:var(--text3);font-weight:600;letter-spacing:1px">BUDGET</div><div style="font-size:18px;font-weight:800;color:var(--accent);margin-top:4px">'+fmtINR(e.budget)+'</div></div><div style="padding:12px 8px;border-radius:10px;background:var(--card-alt)"><div style="font-size:9px;color:var(--text3);font-weight:600;letter-spacing:1px">DEPLOYED</div><div style="font-size:18px;font-weight:800;color:var(--text);margin-top:4px">'+fmtINR(e.deployed)+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+pos.length+'/'+e.max+'</div></div><div style="padding:12px 8px;border-radius:10px;background:var(--card-alt)"><div style="font-size:9px;color:var(--text3);font-weight:600;letter-spacing:1px">P&L</div><div style="font-size:18px;font-weight:800;color:'+pnlC+';margin-top:4px">'+(totalPnl>=0?'+':'')+fmtINR(totalPnl)+'</div><div style="font-size:11px;color:'+pnlC+';margin-top:2px">'+(totalPnl>=0?'+':'')+pnlPct+'%</div></div></div><div style="margin-top:10px;background:var(--border);border-radius:6px;height:6px;overflow:hidden"><div style="height:100%;border-radius:6px;background:var(--accent);width:'+(e.budget>0?Math.min(100,Math.round(e.deployed/e.budget*100)):0)+'%"></div></div><div style="font-size:10px;color:var(--text3);text-align:right;margin-top:4px">Available: '+fmtINR(avail)+'</div></div>';}
+
 // ── Tab Renderers ──
 function renderDirector() {
   const a = D.engineA;
@@ -572,7 +574,8 @@ function renderMomentum() {
   const stalk=stocks.filter(s=>s.stage==='STALK').length;
   const guard=stocks.filter(s=>s.stage==='GUARD'||s.stage==='WEAK').length;
 
-  let html = renderPositions('momentum');
+  let html = renderPortfolioSummary('momentum');
+  html += renderPositions('momentum');
   html += renderIntelligence('momentum');
   html += `<div class="summary-row">`;
   [{v:strike,l:'STRIKE',c:'var(--green)'},{v:stalk,l:'STALK',c:'var(--amber)'},{v:guard,l:'GUARD',c:'var(--text3)'},{v:stocks.length,l:'TOTAL',c:'var(--accent)'}].forEach(x=>{
@@ -621,7 +624,8 @@ function renderValue() {
   const solid=stocks.filter(s=>(s.vds||0)>=8&&(s.vds||0)<12).length;
   const mod=stocks.filter(s=>(s.vds||0)<8).length;
 
-  let html=renderPositions('value');
+  let html=renderPortfolioSummary('value');
+  html+=renderPositions('value');
   html+=renderIntelligence('value');
   html+=`<div class="summary-row">`;
   [{v:deep,l:'DEEP VALUE',c:'var(--green)'},{v:solid,l:'SOLID',c:'var(--accent)'},{v:mod,l:'MODERATE',c:'var(--amber)'},{v:stocks.length,l:'TOTAL',c:'var(--text)'}].forEach(x=>{
@@ -671,7 +675,8 @@ function renderCompounder() {
   const elite=stocks.filter(s=>(s.dna||0)>=16).length;
   const strong=stocks.filter(s=>(s.dna||0)>=11&&(s.dna||0)<16).length;
 
-  let html=renderPositions('compounders');
+  let html=renderPortfolioSummary('compounders');
+  html+=renderPositions('compounders');
   html+=renderIntelligence('compounder');
   html+=`<div class="summary-row">`;
   [{v:elite,l:'ELITE',c:'var(--green)'},{v:strong,l:'STRONG',c:'var(--accent)'},{v:stocks.length,l:'TOTAL',c:'var(--text)'}].forEach(x=>{
