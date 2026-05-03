@@ -4483,6 +4483,11 @@
       "token": "19234",
       "symbol": "LAURUSLABS-EQ",
       "name": "LAURUSLABS"
+    },
+    "USHAMART": {
+      "token": "8840",
+      "symbol": "USHAMART-EQ",
+      "name": "USHAMART"
     }
   },
   "_last_token_update": "2026-05-03",
