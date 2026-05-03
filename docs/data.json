@@ -4790,10 +4790,10 @@
     "Brent Crude": 108.17
   },
   "manualInputs": {
-    "nifty_pe": 0,
-    "fii": 0,
-    "dii": 0,
-    "breadth": 0,
+    "nifty_pe": 20.9,
+    "fii": -70135,
+    "dii": 51063,
+    "breadth": 42.2,
     "yield_inverted": "No",
     "rbi_stance": "Neutral",
     "cpi": 3.4,
@@ -4816,7 +4816,7 @@
   "safety": {
     "red_flag": false,
     "pe_bubble": false,
-    "nifty_pe": 0.0
+    "nifty_pe": 20.9
   },
   "positions": {
     "momentum": [
@@ -5225,6 +5225,6 @@
     "unrealized_stcg": 1240.9,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "03 May 2026, 02:58 PM",
+  "lastUpdate": "03 May 2026, 06:02 PM",
   "version": "3.1"
 }
