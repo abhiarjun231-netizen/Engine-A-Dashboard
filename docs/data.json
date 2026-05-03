@@ -4800,17 +4800,17 @@
     "pmi": 55.9
   },
   "pnl": {
-    "total_invested": 127379.81,
-    "current_value": 129165.29,
-    "pnl": 1785.48,
-    "pnl_pct": 1.4,
-    "cash_available": 372620.19,
-    "positions": 21,
+    "total_invested": 225420.17,
+    "current_value": 226661.07,
+    "pnl": 1240.9,
+    "pnl_pct": 0.55,
+    "cash_available": 274579.83,
+    "positions": 39,
     "b_deployed": 71688.27,
     "b_budget": 82500.0,
-    "c_deployed": 55691.54,
+    "c_deployed": 72093.09000000001,
     "c_budget": 82500.0,
-    "d_deployed": 0,
+    "d_deployed": 81638.81,
     "d_budget": 110000.0
   },
   "safety": {
@@ -4913,12 +4913,42 @@
     ],
     "value": [
       {
+        "ticker": "NATIONALUM",
+        "qty": 13,
+        "buy_price": 442.35,
+        "current_price": 399.3,
+        "pnl": -559.65,
+        "pnl_pct": -9.73,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
         "ticker": "WAAREEINDO",
         "qty": 12,
         "buy_price": 466.85,
         "current_price": 0.0,
         "pnl": 0.0,
         "pnl_pct": 0.0,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "HINDZINC",
+        "qty": 9,
+        "buy_price": 627.5,
+        "current_price": 595.95,
+        "pnl": -283.95,
+        "pnl_pct": -5.03,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "CHENNPETRO",
+        "qty": 5,
+        "buy_price": 1000.7,
+        "current_price": 1128.35,
+        "pnl": 638.25,
+        "pnl_pct": 12.76,
         "buy_date": "2026-04-27",
         "is_ltcg": false
       },
@@ -5033,17 +5063,168 @@
         "is_ltcg": false
       }
     ],
-    "compounders": []
+    "compounders": [
+      {
+        "ticker": "NATIONALUM",
+        "qty": 17,
+        "buy_price": 441.85,
+        "current_price": 399.3,
+        "pnl": -723.35,
+        "pnl_pct": -9.63,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "HINDZINC",
+        "qty": 12,
+        "buy_price": 625.4,
+        "current_price": 595.95,
+        "pnl": -353.4,
+        "pnl_pct": -4.71,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "INDUSTOWER",
+        "qty": 19,
+        "buy_price": 403.15,
+        "current_price": 409.95,
+        "pnl": 129.2,
+        "pnl_pct": 1.69,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "GVPIL",
+        "qty": 14,
+        "buy_price": 544.05,
+        "current_price": 0.0,
+        "pnl": 0.0,
+        "pnl_pct": 0.0,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "SUMEETINDS",
+        "qty": 260,
+        "buy_price": 29.57,
+        "current_price": 30.01,
+        "pnl": 114.4,
+        "pnl_pct": 1.49,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "WEBELSOLAR",
+        "qty": 66,
+        "buy_price": 116.39,
+        "current_price": 110.66,
+        "pnl": -378.18,
+        "pnl_pct": -4.92,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "JAYNECOIND",
+        "qty": 42,
+        "buy_price": 103.41,
+        "current_price": 110.79,
+        "pnl": 309.96,
+        "pnl_pct": 7.14,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "WAAREEINDO",
+        "qty": 9,
+        "buy_price": 466.85,
+        "current_price": 0.0,
+        "pnl": 0.0,
+        "pnl_pct": 0.0,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "PTC",
+        "qty": 22,
+        "buy_price": 194.29,
+        "current_price": 207.7,
+        "pnl": 295.02,
+        "pnl_pct": 6.9,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "GVT&D",
+        "qty": 1,
+        "buy_price": 4565.0,
+        "current_price": 4466.2,
+        "pnl": -98.8,
+        "pnl_pct": -2.16,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "SWARAJENG",
+        "qty": 1,
+        "buy_price": 3973.5,
+        "current_price": 3957.0,
+        "pnl": -16.5,
+        "pnl_pct": -0.42,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "CHENNPETRO",
+        "qty": 4,
+        "buy_price": 1001.15,
+        "current_price": 1128.35,
+        "pnl": 508.8,
+        "pnl_pct": 12.71,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "MCX",
+        "qty": 1,
+        "buy_price": 2815.0,
+        "current_price": 2971.5,
+        "pnl": 156.5,
+        "pnl_pct": 5.56,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "ENGINERSIN",
+        "qty": 16,
+        "buy_price": 260.02,
+        "current_price": 251.94,
+        "pnl": -129.28,
+        "pnl_pct": -3.11,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      },
+      {
+        "ticker": "POKARNA",
+        "qty": 4,
+        "buy_price": 909.6,
+        "current_price": 871.2,
+        "pnl": -153.6,
+        "pnl_pct": -4.22,
+        "buy_date": "2026-04-27",
+        "is_ltcg": false
+      }
+    ]
   },
   "tax": {
     "stcg_rate": 20,
     "ltcg_rate": 12.5,
     "ltcg_exemption": 125000,
-    "stcg_count": 21,
+    "stcg_count": 39,
     "ltcg_count": 0,
-    "unrealized_stcg": 1785.48,
+    "unrealized_stcg": 1240.9,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "03 May 2026, 02:10 PM",
+  "lastUpdate": "03 May 2026, 02:58 PM",
   "version": "3.1"
 }
