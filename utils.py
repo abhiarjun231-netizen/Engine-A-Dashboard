@@ -82,7 +82,7 @@ def get_default_stocks_json():
         "engine_b": [], "engine_c": [], "engine_d": [],
         "engine_b_watchlist": [], "engine_c_watchlist": [], "engine_d_watchlist": [],
         "engine_b_closed": [], "engine_c_closed": [], "engine_d_closed": [],
-        "_capital": 100000, "_token_cache": {},
+        "_capital": 100000, "capital": 100000, "_token_cache": {},
         "_b_watchlist_date": "", "_c_watchlist_date": "", "_d_watchlist_date": "",
     }
 
@@ -1006,7 +1006,7 @@ def refresh_prices_yfinance(stock_data):
     except ImportError:
         return {}, "yfinance not installed"
     all_tickers = set()
-    for key in ["engine_b","engine_c","engine_d",
+    for key in ["engine_b","engine_c","engine_d","momentum","value","compounders",
                  "engine_b_watchlist","engine_c_watchlist","engine_d_watchlist"]:
         for s in stock_data.get(key, []):
             tk = s.get("ticker","")

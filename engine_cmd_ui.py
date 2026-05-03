@@ -40,9 +40,9 @@ def show_command_center():
     d_wl = data.get("engine_d_watchlist", [])
 
     # Load all positions
-    b_pos = data.get("engine_b", [])
-    c_pos = data.get("engine_c", [])
-    d_pos = data.get("engine_d", [])
+    b_pos = data.get("engine_b", []) + data.get("momentum", [])
+    c_pos = data.get("engine_c", []) + data.get("value", [])
+    d_pos = data.get("engine_d", []) + data.get("compounders", [])
 
     # Ticker sets
     b_tickers = {s.get("ticker",""): s for s in b_wl}
@@ -61,7 +61,7 @@ def show_command_center():
 
     total_pos = len(b_pos) + len(c_pos) + len(d_pos)
     total_wl = len(b_wl) + len(c_wl) + len(d_wl)
-    capital = data.get("_capital", 100000)
+    capital = data.get("_capital", data.get("capital", 100000))
 
     st.markdown(
         f"<div class='data-card' style='border-left:4px solid {ea_color};padding:16px 18px;'>"

@@ -13,7 +13,7 @@ from utils import (
 def show_engine_e():
     sd = get_engine_a_score()
     data = load_stocks_json()
-    cap = float(data.get("_capital", 100000))
+    cap = float(data.get("_capital", data.get("capital", 100000)))
 
     if not sd:
         render_info_card("No Engine A score available. Run the workflow first.")

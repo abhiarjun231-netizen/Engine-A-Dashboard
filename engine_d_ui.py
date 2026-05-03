@@ -58,10 +58,11 @@ def show_engine_d():
     analysis = load_stock_analysis()
     sd = get_engine_a_score()
     ea = int(sd["raw_score"]) if sd else None
-    pos = data.get("engine_d", [])
+    pos = data.get("engine_d", []) + data.get("compounders", []);
+    data["engine_d"] = pos  # normalize for indexing
     wl = data.get("engine_d_watchlist", [])
     closed = data.get("engine_d_closed", [])
-    cap = float(data.get("_capital", 100000))
+    cap = float(data.get("_capital", data.get("capital", 100000)))
     eq_pct = int(sd.get("equity_pct", 55)) if sd else 55
     d_cap = round(cap * eq_pct / 100 * 40 / 100, 2)
 
@@ -85,8 +86,8 @@ def show_engine_d():
 
     # SUMMARY
     render_section_title("Portfolio Summary")
-    ti = round(sum(float(s.get("entry",0))*int(s.get("qty",0)) for s in pos), 2)
-    tc = sum(prices.get(s.get("ticker",""),float(s.get("entry",0)))*int(s.get("qty",0)) for s in pos)
+    ti = round(sum(float(s.get("entry", s.get("buy_price", 0)))*int(s.get("qty",0)) for s in pos), 2)
+    tc = sum(prices.get(s.get("ticker",""),float(s.get("entry", s.get("buy_price", 0))))*int(s.get("qty",0)) for s in pos)
     tp = tc - ti
     ps, pc = fmt_pnl(tp)
     pp, _ = fmt_pct((tp/ti*100) if ti>0 else 0)
@@ -102,7 +103,7 @@ def show_engine_d():
     else:
         for i, p in enumerate(pos):
             tk = p.get("ticker",""); nm = p.get("name",tk)
-            en = float(p.get("entry",0)); qt = int(p.get("qty",0))
+            en = float(p.get("entry", p.get("buy_price", 0))); qt = int(p.get("qty",0))
             bd = p.get("buy_date",""); pk = float(p.get("peak",en))
             dns = int(p.get("dna_score",0) or 0)
             is_imm = p.get("is_immortal", False)
