@@ -445,12 +445,12 @@ function renderDirector() {
     const plBg = pnl.pnl>=0?'var(--green-light)':'var(--red-light)';
     html+=`<div class="card"><div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:12px">P&L TRACKING</div>`;
     html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">`;
-    html+=`<div style="padding:10px;border-radius:10px;background:var(--card-alt);text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">INVESTED</div><div style="font-size:16px;font-weight:800;color:var(--text)">₹${pnl.total_invested.toLocaleString('en-IN')}</div></div>`;
-    html+=`<div style="padding:10px;border-radius:10px;background:var(--card-alt);text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">CURRENT VALUE</div><div style="font-size:16px;font-weight:800;color:var(--text)">₹${pnl.current_value.toLocaleString('en-IN')}</div></div>`;
+    html+=`<div style="padding:10px;border-radius:10px;background:var(--card-alt);text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">INVESTED</div><div style="font-size:16px;font-weight:800;color:var(--text)">₹${Math.round(pnl.total_invested).toLocaleString('en-IN')}</div></div>`;
+    html+=`<div style="padding:10px;border-radius:10px;background:var(--card-alt);text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">CURRENT VALUE</div><div style="font-size:16px;font-weight:800;color:var(--text)">₹${Math.round(pnl.current_value).toLocaleString('en-IN')}</div></div>`;
     html+=`</div>`;
     html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
-    html+=`<div style="padding:10px;border-radius:10px;background:${plBg};text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">P&L</div><div style="font-size:16px;font-weight:800;color:${plColor}">${pnl.pnl>=0?'+':''}₹${Math.abs(pnl.pnl).toLocaleString('en-IN')} (${pnl.pnl>=0?'+':''}${pnl.pnl_pct}%)</div></div>`;
-    html+=`<div style="padding:10px;border-radius:10px;background:var(--accent-light);text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">CASH AVAILABLE</div><div style="font-size:16px;font-weight:800;color:var(--accent)">₹${pnl.cash_available.toLocaleString('en-IN')}</div></div>`;
+    html+=`<div style="padding:10px;border-radius:10px;background:${plBg};text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">P&L</div><div style="font-size:16px;font-weight:800;color:${plColor}">${pnl.pnl>=0?'+':''}₹${Math.round(Math.abs(pnl.pnl)).toLocaleString('en-IN')} (${pnl.pnl>=0?'+':''}${pnl.pnl_pct}%)</div></div>`;
+    html+=`<div style="padding:10px;border-radius:10px;background:var(--accent-light);text-align:center"><div style="font-size:9px;color:var(--text3);font-weight:600">CASH AVAILABLE</div><div style="font-size:16px;font-weight:800;color:var(--accent)">₹${Math.round(pnl.cash_available).toLocaleString('en-IN')}</div></div>`;
     html+=`</div>`;
     // Per-engine deployed
     html+=`<div style="margin-top:10px">`;
