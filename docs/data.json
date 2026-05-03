@@ -1,7 +1,7 @@
 {
   "engineA": {
-    "score": 45,
-    "prevScore": 45,
+    "score": 46,
+    "prevScore": 46,
     "components": [
       {
         "name": "Valuation",
@@ -30,7 +30,7 @@
       },
       {
         "name": "Macro",
-        "score": 9,
+        "score": 10,
         "max": 12
       },
       {
@@ -45,7 +45,7 @@
       }
     ],
     "history": [
-      45
+      46
     ],
     "capital": 500000,
     "allocation": {
@@ -3710,7 +3710,16 @@
     "INR/USD": 94.88,
     "Brent Crude": 108.17
   },
-  "manualInputs": {},
+  "manualInputs": {
+    "nifty_pe": 0,
+    "fii": 0,
+    "dii": 0,
+    "breadth": 0,
+    "yield_inverted": "No",
+    "rbi_stance": "Neutral",
+    "cpi": 3.4,
+    "pmi": 55.9
+  },
   "pnl": {
     "total_invested": 0,
     "current_value": 0,
@@ -3744,6 +3753,6 @@
     "unrealized_stcg": 0,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "03 May 2026, 06:19 AM",
+  "lastUpdate": "03 May 2026, 12:03 PM",
   "version": "3.1"
 }
