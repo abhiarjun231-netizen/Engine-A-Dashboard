@@ -1698,6 +1698,11 @@
       "token": "6643",
       "symbol": "SJS-EQ",
       "name": "SJS"
+    },
+    "LAURUSLABS": {
+      "token": "19234",
+      "symbol": "LAURUSLABS-EQ",
+      "name": "LAURUSLABS"
     }
   },
   "_last_token_update": "2026-05-03",
