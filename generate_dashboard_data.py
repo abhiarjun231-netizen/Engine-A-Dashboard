@@ -656,17 +656,23 @@ def build():
             now_dt = datetime.now()
             ltcg_cutoff = now_dt - timedelta(days=365)
             stcg_gain = 0; ltcg_gain = 0; stcg_cnt = 0; ltcg_cnt = 0
+            seen_positions = set()  # Prevent double-counting across old/new keys
 
-            for eng_key in ["momentum","value","compounders","positions"]:
+            for eng_key in ["momentum","value","compounders","positions","engine_b","engine_c","engine_d"]:
                 if eng_key not in pos_data: continue
                 positions_list = pos_data[eng_key]
                 if not isinstance(positions_list, list): continue
                 for p in positions_list:
                     if not isinstance(p, dict): continue
                     qty = safe_float(p.get("qty", p.get("quantity", 1)))
-                    buy = safe_float(p.get("buy_price", p.get("entry_price", p.get("avg_price", 0))))
+                    buy = safe_float(p.get("buy_price", p.get("entry_price", p.get("entry", p.get("avg_price", 0)))))
                     cur = safe_float(p.get("current_price", p.get("ltp", p.get("price", 0))))
                     t = p.get("ticker", p.get("symbol", "")).replace(".NS","").replace(".BO","").upper().strip()
+
+                    # Dedup: skip if already counted from another key
+                    pos_key = f"{t}_{eng_key}"
+                    if t in seen_positions: continue
+                    seen_positions.add(t)
 
                     # Try to get current price from live prices
                     if cur == 0 and t in prices:
@@ -697,11 +703,11 @@ def build():
                         # Track per-engine deployment
                         eng = p.get("engine","").lower()
                         disp_eng = eng_key
-                        if eng_key == "momentum" or eng in ("b","momentum"):
+                        if eng_key in ("momentum","engine_b") or eng in ("b","momentum"):
                             pnl["b_deployed"] += round(inv, 2); disp_eng = "momentum"
-                        elif eng_key == "value" or eng in ("c","value"):
+                        elif eng_key in ("value","engine_c") or eng in ("c","value"):
                             pnl["c_deployed"] += round(inv, 2); disp_eng = "value"
-                        elif eng_key == "compounders" or eng in ("d","compounder","compounders"):
+                        elif eng_key in ("compounders","engine_d") or eng in ("d","compounder","compounders"):
                             pnl["d_deployed"] += round(inv, 2); disp_eng = "compounders"
 
                         # Collect for display
@@ -746,7 +752,7 @@ def build():
 
     safety = {"red_flag": red_flag, "pe_bubble": pe_bubble, "nifty_pe": nifty_pe}
 
-    dashboard={"engineA":ea,"momentum":momentum[:30],"value":value[:30],"compounders":compounders[:30],
+    dashboard={"engineA":ea,"momentum":momentum,"value":value,"compounders":compounders,
         "fortress":fort,"command":command,"intelligence":intelligence,
         "upcomingEarnings":earnings[:20],
         "indianMarkets":indian_markets,"globalMarkets":global_markets,
