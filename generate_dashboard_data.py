@@ -671,8 +671,11 @@ def build():
 
                     # Dedup: skip if already counted from another key
                     pos_key = f"{t}_{eng_key}"
-                    if t in seen_positions: continue
-                    seen_positions.add(t)
+                    # Map old keys to new keys for dedup (engine_b=momentum, engine_c=value, engine_d=compounders)
+                    dedup_map = {"engine_b":"momentum","engine_c":"value","engine_d":"compounders","momentum":"engine_b","value":"engine_c","compounders":"engine_d"}
+                    alt_key = f"{t}_{dedup_map.get(eng_key,'')}"
+                    if pos_key in seen_positions or alt_key in seen_positions: continue
+                    seen_positions.add(pos_key)
 
                     # Try to get current price from live prices
                     if cur == 0 and t in prices:
