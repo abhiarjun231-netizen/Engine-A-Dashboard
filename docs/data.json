@@ -3730,6 +3730,20 @@
     "pe_bubble": false,
     "nifty_pe": 0.0
   },
-  "lastUpdate": "02 May 2026, 01:09 PM",
-  "version": "3.0"
+  "positions": {
+    "momentum": [],
+    "value": [],
+    "compounders": []
+  },
+  "tax": {
+    "stcg_rate": 20,
+    "ltcg_rate": 12.5,
+    "ltcg_exemption": 125000,
+    "stcg_count": 0,
+    "ltcg_count": 0,
+    "unrealized_stcg": 0,
+    "unrealized_ltcg": 0
+  },
+  "lastUpdate": "03 May 2026, 06:19 AM",
+  "version": "3.1"
 }
