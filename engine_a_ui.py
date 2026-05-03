@@ -335,7 +335,7 @@ def show_engine_a():
     # ALLOCATION
     eq = int(score["equity_pct"])
     # New 3-engine equity split: B=30%, C=30%, D=40%
-    eb = round(eq * 30 / 100); ec = round(eq * 30 / 100); ed = round(eq * 40 / 100)
+    # NOTE: Don't round percentages — calculate amounts directly from equity amount to avoid banker's rounding
     debt = int(score["debt_pct"]); gold = int(score["gold_pct"])
     dur = score["duration_signal"]; gsig = score["gold_signal"]
 
@@ -346,7 +346,7 @@ def show_engine_a():
             "<div class='alloc-tile'>"
             "<div class='alloc-label'>Equity</div>"
             f"<div class='alloc-pct' style='color:#16a34a'>{eq}%</div>"
-            f"<div class='alloc-sub'>B: {eb}% · C: {ec}% · D: {ed}%</div>"
+            f"<div class='alloc-sub'>B: 30% · C: 30% · D: 40%</div>"
             "</div>",
             unsafe_allow_html=True
         )
@@ -390,44 +390,44 @@ def show_engine_a():
     # ============================================================
     # CAPITAL DEPLOYMENT
     # ============================================================
-    total_capital = float(stocks_data.get("_capital", 100000))
+    total_capital = float(stocks_data.get("_capital", stocks_data.get("capital", 100000)))
 
     eq_amount = round(total_capital * eq / 100)
-    eb_amount = round(total_capital * eb / 100)
-    ec_amount = round(total_capital * ec / 100)
-    ed_amount = round(total_capital * ed / 100)
+    eb_amount = round(eq_amount * 0.30)
+    ec_amount = round(eq_amount * 0.30)
+    ed_amount = round(eq_amount * 0.40)
     debt_amount = round(total_capital * debt / 100)
     gold_amount = round(total_capital * gold / 100)
 
     b_invested = 0; b_current = 0
-    for s in stocks_data.get("engine_b", []):
+    for s in stocks_data.get("engine_b", []) + stocks_data.get("momentum", []):
         try:
-            entry = float(s.get("entry", 0))
-            qty = int(s.get("qty", 0))
+            entry = float(s.get("entry", s.get("buy_price", s.get("avg_price", 0))))
+            qty = int(s.get("qty", s.get("quantity", 0)))
             b_invested += entry * qty
-            ticker = s.get("ticker", "")
+            ticker = s.get("ticker", s.get("symbol", ""))
             cur_price = stock_prices.get(ticker, entry)
             b_current += cur_price * qty
         except: pass
 
     c_invested = 0; c_current = 0
-    for s in stocks_data.get("engine_c", []):
+    for s in stocks_data.get("engine_c", []) + stocks_data.get("value", []):
         try:
-            entry = float(s.get("entry", 0))
-            qty = int(s.get("qty", 0))
+            entry = float(s.get("entry", s.get("buy_price", s.get("avg_price", 0))))
+            qty = int(s.get("qty", s.get("quantity", 0)))
             c_invested += entry * qty
-            ticker = s.get("ticker", "")
+            ticker = s.get("ticker", s.get("symbol", ""))
             cur_price = stock_prices.get(ticker, entry)
             c_current += cur_price * qty
         except: pass
 
     d_invested = 0; d_current = 0
-    for s in stocks_data.get("engine_d", []):
+    for s in stocks_data.get("engine_d", []) + stocks_data.get("compounders", []):
         try:
-            entry = float(s.get("entry", 0))
-            qty = int(s.get("qty", 0))
+            entry = float(s.get("entry", s.get("buy_price", s.get("avg_price", 0))))
+            qty = int(s.get("qty", s.get("quantity", 0)))
             d_invested += entry * qty
-            ticker = s.get("ticker", "")
+            ticker = s.get("ticker", s.get("symbol", ""))
             cur_price = stock_prices.get(ticker, entry)
             d_current += cur_price * qty
         except: pass
@@ -439,9 +439,9 @@ def show_engine_a():
     pnl_color = "#16a34a" if total_pnl >= 0 else "#dc2626"
     pnl_sign = "+" if total_pnl >= 0 else ""
 
-    b_available = max(0, eb_amount - b_invested)
-    c_available = max(0, ec_amount - c_invested)
-    d_available = max(0, ed_amount - d_invested)
+    b_available = round(max(0, eb_amount - b_invested))
+    c_available = round(max(0, ec_amount - c_invested))
+    d_available = round(max(0, ed_amount - d_invested))
 
     st.markdown("<div class='section-title'>Capital Deployment</div>", unsafe_allow_html=True)
 
@@ -488,6 +488,7 @@ def show_engine_a():
                             file_content = base64.b64decode(get_resp.json()["content"]).decode("utf-8")
                             file_data = json.loads(file_content)
                             file_data["_capital"] = int(new_capital)
+                            file_data["capital"] = int(new_capital)
                             new_content = json.dumps(file_data, indent=2, ensure_ascii=False)
                             put_body = {
                                 "message": f"Update capital to {int(new_capital)}",
@@ -610,11 +611,11 @@ def show_engine_a():
     unrealized_stcg = 0; unrealized_ltcg = 0
     stcg_positions = 0; ltcg_positions = 0
 
-    for s in stocks_data.get("engine_b", []) + stocks_data.get("engine_c", []) + stocks_data.get("engine_d", []):
+    for s in stocks_data.get("engine_b", []) + stocks_data.get("engine_c", []) + stocks_data.get("engine_d", []) + stocks_data.get("momentum", []) + stocks_data.get("value", []) + stocks_data.get("compounders", []):
         try:
-            entry = float(s.get("entry", 0))
-            qty = int(s.get("qty", 0))
-            ticker = s.get("ticker", "")
+            entry = float(s.get("entry", s.get("buy_price", s.get("avg_price", 0))))
+            qty = int(s.get("qty", s.get("quantity", 0)))
+            ticker = s.get("ticker", s.get("symbol", ""))
             cur_price = stock_prices.get(ticker, entry)
             unrealized_pnl = (cur_price - entry) * qty
             buy_date_str = s.get("buy_date", "")
@@ -640,7 +641,7 @@ def show_engine_a():
 
     has_realized = (realized_stcg != 0 or realized_ltcg != 0)
     has_unrealized = (unrealized_stcg != 0 or unrealized_ltcg != 0)
-    has_positions = len(stocks_data.get("engine_b", [])) + len(stocks_data.get("engine_c", [])) + len(stocks_data.get("engine_d", [])) > 0
+    has_positions = len(stocks_data.get("engine_b", [])) + len(stocks_data.get("engine_c", [])) + len(stocks_data.get("engine_d", [])) + len(stocks_data.get("momentum", [])) + len(stocks_data.get("value", [])) + len(stocks_data.get("compounders", [])) > 0
     has_closed = len(stocks_data.get("engine_b_closed", [])) + len(stocks_data.get("engine_c_closed", [])) + len(stocks_data.get("engine_d_closed", [])) > 0
 
     st.markdown("<div class='section-title'>Tax Estimate (FY 2026-27)</div>", unsafe_allow_html=True)

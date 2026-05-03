@@ -644,6 +644,8 @@ def build():
             # Read capital from positions file (saved by dashboard)
             if "capital" in pos_data:
                 ea["capital"] = int(safe_float(pos_data["capital"]))
+            elif "_capital" in pos_data:
+                ea["capital"] = int(safe_float(pos_data["_capital"]))
             cap = ea.get("capital",500000)
             eq_amt = cap * alloc["equity"] / 100
             pnl["b_budget"] = round(eq_amt * 0.3, 2)
