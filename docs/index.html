@@ -286,15 +286,6 @@ const $ = id => document.getElementById(id);
 const h = (tag, cls, html) => `<${tag} class="${cls||''}">${html||''}</${tag}>`;
 const formatINR = n => n>=1e7?`₹${(n/1e7).toFixed(1)}Cr`:n>=1e5?`₹${(n/1e5).toFixed(1)}L`:`₹${n.toLocaleString('en-IN')}`;
 
-const vStyles = {
-  'STRONG BUY':{bg:'var(--green-light)',text:'var(--green)',border:'var(--green-border)'},
-  'BUY':{bg:'var(--accent-light)',text:'var(--accent)',border:'var(--accent-border)'},
-  'ACCUMULATE':{bg:'var(--amber-light)',text:'var(--amber)',border:'var(--amber-border)'},
-  'WAIT':{bg:'#f8fafc',text:'var(--text3)',border:'var(--border)'},
-  'AVOID':{bg:'var(--red-light)',text:'var(--red)',border:'var(--red-border)'},
-  'DANGER':{bg:'var(--red-light)',text:'var(--red)',border:'var(--red-border)'},
-};
-
 function bar(val, max, color, height=5) {
   const pct = Math.min((val/max)*100,100);
   return `<div class="bar-track" style="height:${height}px"><div class="bar-fill" style="width:${pct}%;background:${color};height:100%"></div></div>`;
@@ -317,10 +308,6 @@ function dvmBars(d, m) {
 
 function statGrid(items) {
   return `<div class="stat-grid">${items.map(i=>`<div class="stat-item"><div class="stat-key">${i.l}</div><div class="stat-val" style="color:${i.c||'var(--text)'}">${i.v}</div></div>`).join('')}</div>`;
-}
-
-function signal(text, color) {
-  return `<div class="signal" style="border-color:${color}">💡 ${text}</div>`;
 }
 
 function sparklineSVG(data, w=80, ht=24, color='#2563eb') {
@@ -359,52 +346,7 @@ function renderSectorBars(sectors) {
   return html;
 }
 
-function renderIntelligence(engine) {
-  var intel=(D.intelligence||{})[engine];
-  var overlap=(D.intelligence||{}).overlap||{};
-  if(!intel) return '';
-  var html='<div class="card" style="border-left:4px solid var(--accent)">';
-
-  if(engine==='momentum') {
-    html+='<div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1.5px;margin-bottom:10px">MOMENTUM INTELLIGENCE</div>';
-    html+='<div style="display:flex;gap:12px;margin-bottom:10px">';
-    [{v:intel.strike||0,l:'STRIKE',c:'var(--green)'},{v:intel.stalk||0,l:'STALK',c:'var(--amber)'},{v:intel.weak||0,l:'WEAK',c:'var(--text3)'},{v:(D.momentum||[]).length,l:'TOTAL',c:'var(--accent)'}].forEach(function(x){html+='<div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:800;color:'+x.c+'">'+x.v+'</div><div style="font-size:10px;color:var(--text3)">'+x.l+'</div></div>';});
-    html+='</div>';
-    // Multi-engine overlap text
-    var a3=overlap.all3||[];
-    var mv=overlap.mom_val||[]; var mc=overlap.mom_comp||[];
-    if(a3.length>0||mv.length>0||mc.length>0) {
-      html+='<div style="font-size:11px;color:var(--text2);margin-bottom:8px"><b style="color:var(--accent)">Multi-Engine:</b> ';
-      var parts=[];
-      if(mv.length+a3.length>0) parts.push((mv.length+a3.length)+' also in Value');
-      if(mc.length+a3.length>0) parts.push((mc.length+a3.length)+' also in Compounder');
-      html+=parts.join(' \u00B7 ');
-      if(a3.length>0) html+=' \u00B7 <b style="color:var(--green)">ALL 3: '+a3.join(', ')+'</b>';
-      html+='</div>';
-    }
-  } else if(engine==='value') {
-    html+='<div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1.5px;margin-bottom:10px">VALUE INTELLIGENCE</div>';
-    html+='<div style="display:flex;gap:12px;margin-bottom:10px">';
-    [{v:intel.deep||0,l:'DEEP VALUE',c:'var(--green)'},{v:intel.solid||0,l:'SOLID',c:'var(--accent)'},{v:intel.moderate||0,l:'MODERATE',c:'var(--amber)'},{v:(D.value||[]).length,l:'TOTAL',c:'var(--text)'}].forEach(function(x){html+='<div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:800;color:'+x.c+'">'+x.v+'</div><div style="font-size:10px;color:var(--text3)">'+x.l+'</div></div>';});
-    html+='</div>';
-    if(intel.traps>0) html+='<div style="font-size:11px;color:var(--red);margin-bottom:8px">\u26A0 '+intel.traps+' stocks with value trap flags</div>';
-    html+='<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Avg PE: <b>'+intel.avg_pe+'</b></div>';
-  } else if(engine==='compounder') {
-    var doubles=(D.compounders||[]).filter(function(s){return s.double_screener;}).length;
-    var lowPeg=(D.compounders||[]).filter(function(s){return s.peg>0&&s.peg<=0.5;}).length;
-    html+='<div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1.5px;margin-bottom:10px">COMPOUNDER INTELLIGENCE</div>';
-    html+='<div style="display:flex;gap:12px;margin-bottom:10px">';
-    [{v:intel.elite||0,l:'ELITE',c:'var(--green)'},{v:intel.strong||0,l:'STRONG',c:'var(--accent)'},{v:doubles,l:'DOUBLES',c:'var(--purple)'},{v:(D.compounders||[]).length,l:'TOTAL',c:'var(--text)'}].forEach(function(x){html+='<div style="text-align:center;flex:1"><div style="font-size:20px;font-weight:800;color:'+x.c+'">'+x.v+'</div><div style="font-size:10px;color:var(--text3)">'+x.l+'</div></div>';});
-    html+='</div>';
-    if(lowPeg>0) html+='<div style="font-size:11px;color:var(--text2);margin-bottom:8px"><b style="color:var(--green)">'+lowPeg+' stocks</b> with PEG \u2264 0.5 (extreme value)</div>';
-    html+='<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Avg PEG: <b>'+(intel.avg_peg||0)+'</b></div>';
-  }
-
-  // Sector bars
-  html+=renderSectorBars(intel.sectors);
-  html+='</div>';
-  return html;
-}
+// Intelligence removed — will be rebuilt
 
 function getProfitStage(pct,eng,buy,peak){if(eng==='momentum'){if(pct>=30)return{s:'PROFIT TRAIL',c:'#059669',stop:Math.round(peak*0.9),sp:((peak*0.9-buy)/buy*100).toFixed(1)};if(pct>=20)return{s:'PROFIT LOCKED',c:'#059669',stop:Math.round(buy*1.1),sp:'10.0'};if(pct>=10)return{s:'RISK-FREE',c:'#16a34a',stop:Math.round(buy),sp:'0.0'};if(pct<=-10)return{s:'GUARD',c:'#d97706',stop:Math.round(peak*0.85),sp:((peak*0.85-buy)/buy*100).toFixed(1)};return{s:'INITIAL',c:'#2563eb',stop:Math.round(peak*0.85),sp:((peak*0.85-buy)/buy*100).toFixed(1)};}if(eng==='value'){if(pct>=40)return{s:'WIDE TRAIL',c:'#059669',stop:Math.round(peak*0.9),sp:((peak*0.9-buy)/buy*100).toFixed(1)};if(pct>=25)return{s:'PROFIT TRAIL',c:'#059669',stop:Math.round(peak*0.92),sp:((peak*0.92-buy)/buy*100).toFixed(1)};if(pct>=15)return{s:'PROFIT LOCKED',c:'#059669',stop:Math.round(buy*1.05),sp:'5.0'};if(pct>=8)return{s:'RISK-FREE',c:'#16a34a',stop:Math.round(buy),sp:'0.0'};return{s:'INITIAL',c:'#2563eb',stop:Math.round(buy*0.93),sp:'-7.0'};}/*compounders*/if(pct>=100)return{s:'IMMORTAL',c:'#f59e0b',stop:Math.round(peak*0.85),sp:((peak*0.85-buy)/buy*100).toFixed(1)};if(pct>=50)return{s:'PROFIT TRAIL',c:'#059669',stop:Math.round(peak*0.88),sp:((peak*0.88-buy)/buy*100).toFixed(1)};if(pct>=35)return{s:'TRAIL',c:'#059669',stop:Math.round(peak*0.9),sp:((peak*0.9-buy)/buy*100).toFixed(1)};if(pct>=20)return{s:'LOCKED',c:'#16a34a',stop:Math.round(buy*1.08),sp:'8.0'};if(pct>=10)return{s:'RISK-FREE',c:'#16a34a',stop:Math.round(buy*0.97),sp:'-3.0'};return{s:'INCUBATE',c:'#818cf8',stop:Math.round(buy*0.9),sp:'-10.0'};}
 function dvm(d,m){var dC=d>55?'#16a34a':d>=45?'#d97706':'#dc2626';var mC=m>59?'#16a34a':m>=49?'#d97706':'#dc2626';var act=d>55&&m>59?'RIDE':d<45||m<49?'EXIT':'GUARD';var aC=act==='RIDE'?'#16a34a':act==='GUARD'?'#d97706':'#dc2626';return{dC:dC,mC:mC,act:act,aC:aC};}
@@ -581,7 +523,6 @@ function renderMomentum() {
 
   let html = renderPortfolioSummary('momentum');
   html += renderPositions('momentum');
-  html += renderIntelligence('momentum');
   html += `<div class="summary-row">`;
   [{v:strike,l:'STRIKE',c:'var(--green)'},{v:stalk,l:'STALK',c:'var(--amber)'},{v:guard,l:'GUARD',c:'var(--text3)'},{v:stocks.length,l:'TOTAL',c:'var(--accent)'}].forEach(x=>{
     html+=`<div class="summary-item"><div class="summary-val" style="color:${x.c}">${x.v}</div><div class="summary-label">${x.l}</div></div>`;
@@ -589,7 +530,6 @@ function renderMomentum() {
   html+=`</div>`;
 
   stocks.forEach(s=>{
-    const vs=vStyles[s.verdict]||vStyles['WAIT'];
     const pc=s.change>=0?'var(--green)':'var(--red)';
     const pcBg=s.change>=0?'var(--green-light)':'var(--red-light)';
     const stageC=s.stage==='RIDE'?'green':s.stage==='STRIKE'?'accent':'amber';
@@ -602,7 +542,7 @@ function renderMomentum() {
     if(s.multi) html+=`<span class="badge" style="background:${s.multi==='ALL 3'?'var(--green-light)':'var(--accent-light)'};color:${s.multi==='ALL 3'?'var(--green)':'var(--accent)'};border:1px solid ${s.multi==='ALL 3'?'var(--green-border)':'var(--accent-border)'}">${s.multi}</span>`;
     html+=`</div><div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span class="price">₹${(s.price||0).toLocaleString()}</span><span class="change" style="color:${pc};background:${pcBg}">${s.change>=0?'+':''}${s.change||0}%</span></div><span style="font-size:11px;color:var(--text3)">MCap ₹${((s.mcap||0)/100).toFixed(0)}Cr · ${s.sector||'—'}</span></div>`;
 
-    html+=`<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="verdict-pill" style="background:${vs.bg};color:${vs.text};border:1.5px solid ${vs.border}">${s.verdict}</div><span style="font-size:11px;color:var(--text3)">AI: <span style="font-weight:800;color:var(--text)">${s.ai_score}</span>/40</span><span class="badge" style="background:var(--${stageC}-light);color:var(--${stageC});border:1px solid var(--${stageC}-border);letter-spacing:1px">${s.stage}</span></div></div>`;
+    html+=`<div style="text-align:right"><span class="badge" style="background:var(--${stageC}-light);color:var(--${stageC});border:1px solid var(--${stageC}-border);letter-spacing:1px">${s.stage}</span></div></div>`;
 
     html+=dvmBars(s.dvm_d||0,s.dvm_m||0);
     html+=`<div class="vel-row"><span>Velocity: <span style="font-weight:800;color:${velC}">${s.velocity||'+0'} ${velIcon}</span></span><span>Vol:<span style="font-weight:800;color:${volC}">${s.vol_ratio||0}x</span> Del:<span style="font-weight:800;color:${delC}">${s.delivery||0}%</span></span></div>`;
@@ -617,7 +557,6 @@ function renderMomentum() {
       {l:'FII',v:`${s.fii||0}%`},
       {l:'EARN',v:s.earnings||'—',c:'var(--accent)'},
     ]);
-    html+=signal(s.signal||'—',vs.text);
     html+=`</div>`;
   });
   return html;
@@ -631,7 +570,6 @@ function renderValue() {
 
   let html=renderPortfolioSummary('value');
   html+=renderPositions('value');
-  html+=renderIntelligence('value');
   html+=`<div class="summary-row">`;
   [{v:deep,l:'DEEP VALUE',c:'var(--green)'},{v:solid,l:'SOLID',c:'var(--accent)'},{v:mod,l:'MODERATE',c:'var(--amber)'},{v:stocks.length,l:'TOTAL',c:'var(--text)'}].forEach(x=>{
     html+=`<div class="summary-item"><div class="summary-val" style="color:${x.c}">${x.v}</div><div class="summary-label">${x.l}</div></div>`;
@@ -639,7 +577,6 @@ function renderValue() {
   html+=`</div>`;
 
   stocks.forEach(s=>{
-    const vs=vStyles[s.verdict]||vStyles['WAIT'];
     const pc=s.change>=0?'var(--green)':'var(--red)';
     const pcBg=s.change>=0?'var(--green-light)':'var(--red-light)';
     const pr=s.pe_room||{current:0,p25:0,p50:0,p75:0};
@@ -648,9 +585,8 @@ function renderValue() {
     html+=`<div class="card"><div class="stock-header"><div><div style="display:flex;align-items:center;gap:8px"><span class="ticker">${s.ticker}</span>`;
     if(s.multi) html+=`<span class="badge" style="background:var(--green-light);color:var(--green);border:1px solid var(--green-border)">${s.multi}</span>`;
     html+=`</div><div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span class="price">₹${s.price||0}</span><span class="change" style="color:${pc};background:${pcBg}">${s.change>=0?'+':''}${s.change||0}%</span></div></div>`;
-    html+=`<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="verdict-pill" style="background:${vs.bg};color:${vs.text};border:1.5px solid ${vs.border}">${s.verdict}</div><span style="font-size:11px;color:var(--text3)">VDS: <span style="font-weight:800;color:${(s.vds||0)>=12?'var(--green)':'var(--amber)'}">${s.vds||0}/15</span></span></div></div>`;
+    html+=`<div style="text-align:right"><span style="font-size:11px;color:var(--text3)">VDS: <span style="font-weight:800;color:${(s.vds||0)>=12?'var(--green)':'var(--amber)'}">${s.vds||0}/15</span></span></div></div>`;
 
-    // PE Expansion
     html+=`<div class="pe-box"><div class="pe-title">PE EXPANSION ROOM</div><div class="pe-row"><div class="pe-now"><div class="num">${pr.current}</div><div class="lbl">NOW</div></div><div class="pe-arrow"></div>`;
     [{l:'Book 25%',v:pr.p25},{l:'Book 50%',v:pr.p50},{l:'Book 75%',v:pr.p75}].forEach(p=>{
       html+=`<div class="pe-target"><div class="num">${p.v}</div><div class="lbl">${p.l}</div></div>`;
@@ -669,7 +605,6 @@ function renderValue() {
       {l:'FII',v:`${s.fii||0}%`},
       {l:'DEL',v:`${s.delivery||0}%`,c:(s.delivery||0)>=60?'var(--green)':''},
     ]);
-    html+=signal(s.signal||'—',vs.text);
     html+=`</div>`;
   });
   return html;
@@ -682,7 +617,6 @@ function renderCompounder() {
 
   let html=renderPortfolioSummary('compounders');
   html+=renderPositions('compounders');
-  html+=renderIntelligence('compounder');
   html+=`<div class="summary-row">`;
   [{v:elite,l:'ELITE',c:'var(--green)'},{v:strong,l:'STRONG',c:'var(--accent)'},{v:stocks.length,l:'TOTAL',c:'var(--text)'}].forEach(x=>{
     html+=`<div class="summary-item"><div class="summary-val" style="color:${x.c}">${x.v}</div><div class="summary-label">${x.l}</div></div>`;
@@ -690,7 +624,6 @@ function renderCompounder() {
   html+=`</div>`;
 
   stocks.forEach(s=>{
-    const vs=vStyles[s.verdict]||vStyles['WAIT'];
     const pc=s.change>=0?'var(--green)':'var(--red)';
     const pcBg=s.change>=0?'var(--green-light)':'var(--red-light)';
     const starsStr='★'.repeat(s.stars||0)+'☆'.repeat(5-(s.stars||0));
@@ -706,7 +639,7 @@ function renderCompounder() {
     if(s.multi) html+=`<span class="badge" style="background:${s.multi==='ALL 3'?'var(--green-light)':'var(--accent-light)'};color:${s.multi==='ALL 3'?'var(--green)':'var(--accent)'};border:1px solid ${s.multi==='ALL 3'?'var(--green-border)':'var(--accent-border)'}">${s.multi}</span>`;
     html+=`</div><div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span class="price">₹${(s.price||0).toLocaleString()}</span><span class="change" style="color:${pc};background:${pcBg}">${s.change>=0?'+':''}${s.change||0}%</span></div><span class="stars">${starsStr}</span></div>`;
 
-    html+=`<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="verdict-pill" style="background:${vs.bg};color:${vs.text};border:1.5px solid ${vs.border}">${s.verdict}</div><span style="font-size:11px;color:var(--text3)">DNA: <span style="font-weight:800;color:${(s.dna||0)>=16?'var(--green)':'var(--amber)'}">${s.dna||0}/20</span></span><span class="badge" style="background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-border);letter-spacing:1px">${s.stage||'IDENTIFY'}</span></div></div>`;
+    html+=`<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span style="font-size:11px;color:var(--text3)">DNA: <span style="font-weight:800;color:${(s.dna||0)>=16?'var(--green)':'var(--amber)'}">${s.dna||0}/20</span></span><span class="badge" style="background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-border);letter-spacing:1px">${s.stage||'IDENTIFY'}</span></div></div>`;
 
     html+=`<div class="ets-peg-row"><div class="ets-box"><div class="lbl">EARNINGS TRAJECTORY</div><div class="val" style="color:${etsColors[ets]}">${etsLabels[ets]} (${ets}/4)</div></div><div class="peg-box"><div class="lbl">PEG RATIO</div><div class="val" style="color:${pegC}">${peg} ${pegLabel}</div></div></div>`;
 
@@ -722,7 +655,6 @@ function renderCompounder() {
       {l:'VOL',v:`${s.vol_ratio||0}x`,c:(s.vol_ratio||0)>=2?'var(--red)':''},
       {l:'DEL',v:`${s.delivery||0}%`,c:(s.delivery||0)>=60?'var(--green)':''},
     ]);
-    html+=signal(s.signal||'—',vs.text);
     html+=`</div>`;
   });
   return html;
@@ -765,8 +697,8 @@ function renderCommand() {
   picks.forEach(t=>{
     const stock=allStocks.find(s=>s.ticker===t);
     if(!stock) return;
-    const vs=vStyles[stock.verdict]||vStyles['WAIT'];
-    html+=`<div class="power-item" style="border-left-color:${vs.text}"><div><span class="power-ticker">${t}</span><span class="power-price">₹${(stock.price||0).toLocaleString()}</span></div><div class="verdict-pill" style="background:${vs.bg};color:${vs.text};border:1.5px solid ${vs.border};font-size:10px;padding:4px 10px">${stock.verdict}</div></div>`;
+    const pc=stock.change>=0?'var(--green)':'var(--red)';
+    html+=`<div class="power-item" style="border-left-color:var(--accent)"><div><span class="power-ticker">${t}</span><span class="power-price">₹${(stock.price||0).toLocaleString()}</span></div><span style="font-size:11px;font-weight:700;color:${pc}">${stock.change>=0?'+':''}${stock.change||0}%</span></div>`;
   });
   html+=`</div>`;
 
