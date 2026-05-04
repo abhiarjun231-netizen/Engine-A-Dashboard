@@ -168,7 +168,6 @@ def show_engine_d():
                 f"<div style='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:10px;color:#94a3b8;'>"
                 f"<span>Qty: {qt}</span><span>Days: {hd}</span>"
                 f"<span>Stop: ₹{stp:,.0f} ({sd2:.1f}%)</span>"
-                f"<span>DNA: {dns}/20</span>"
                 f"<span style='color:{tax_color};font-weight:600;'>{tax_badge}</span></div>"
             )
 
@@ -359,36 +358,27 @@ def show_engine_d():
             nm=s.get("name",""); tk=s.get("ticker",""); lp=s.get("ltp",0) or 0
             cp2=prices.get(tk,lp); opp=((cp2-lp)/lp*100) if lp>0 and cp2>0 else 0
             os2,oc=fmt_pct(opp)
-            dns2=s.get("dns",0)
             scr=s.get("screener","S3")
-            vd="ELITE" if dns2>=16 else ("STRONG" if dns2>=11 else ("POTENTIAL" if dns2>=7 else "WEAK"))
-            vc="#16a34a" if dns2>=16 else ("#2563eb" if dns2>=11 else ("#d97706" if dns2>=7 else "#94a3b8"))
             ah = tk in ht
             mc_label, mc_color = mcap_tag(s.get("mcap"))
             pg = s.get("profit_growth"); peg_val = s.get("peg")
-            peg_txt, peg_col = peg_reading(peg_val)
             de_val = s.get("de")
-            # Kill Shot checks
             growth_ok = pg is None or pg > 0
             debt_ok = de_val is None or de_val < 1.5
             kill_html = (
                 f"<div style='display:flex;gap:10px;font-size:10px;margin-top:4px;'>"
                 f"<span>{render_check('Growth', growth_ok)}</span>"
                 f"<span>{render_check('Debt', debt_ok)}</span>"
-                f"<span style='color:{peg_col};font-weight:600;'>PEG: {peg_txt}</span>"
                 f"</div>"
             )
 
             card_html = (
-                f"<div class='data-card' style='border-left:4px solid {vc};'>"
-                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;'>"
+                f"<div class='data-card' style='border-left:4px solid #2563eb;'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
                 f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
-                f"<div style='font-size:13px;font-weight:800;color:{vc};'>DNA: {dns2}/20</div></div>"
-                f"<div style='text-align:right;margin-bottom:6px;'>{compound_stars(dns2)}</div>"
-                f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
-                f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
-                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
                 f"<div style='font-size:11px;display:flex;align-items:center;gap:4px;'>{'<span style=\"color:#475569;font-weight:600;\">₹'+fmt(s.get('mcap'),0)+'Cr</span>' if s.get('mcap') else ''} {render_stage_badge(mc_label)}</div></div>"
+                f"<div style='font-size:12px;color:#64748b;margin-bottom:6px;'>₹{cp2:,.0f}"
+                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
                 f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
@@ -405,7 +395,6 @@ def show_engine_d():
                 f"{kill_html}"
                 f"<div style='margin-top:4px;'>"
                 f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
-                f" {render_stage_badge(vd)}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div>"
                 f"{render_earnings_info(s)}</div>"
             )

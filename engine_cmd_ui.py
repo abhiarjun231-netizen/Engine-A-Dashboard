@@ -168,39 +168,28 @@ def show_command_center():
             eng_bg = "#fef3c7" if eng_count == 3 else "#e0e7ff"
             eng_tc = "#b45309" if eng_count == 3 else "#4338ca"
 
-            # Which engines
             engines_in = []
-            if p["in_b"]: engines_in.append(f"<span style='color:#3b82f6;font-weight:700;'>MOM:{p['conv']}</span>")
-            if p["in_c"]: engines_in.append(f"<span style='color:#2563eb;font-weight:700;'>VAL:{p['vds']}</span>")
-            if p["in_d"]: engines_in.append(f"<span style='color:#059669;font-weight:700;'>CMP:{p['dns']}</span>")
-            engines_html = " · ".join(engines_in)
+            if p["in_b"]: engines_in.append("MOM")
+            if p["in_c"]: engines_in.append("VAL")
+            if p["in_d"]: engines_in.append("CMP")
+            engines_html = " · ".join(f"<span style='font-weight:700;color:#475569;'>{e}</span>" for e in engines_in)
 
             mc_label, mc_color = mcap_tag(p.get("mcap"))
             opp = ((p["price"] - p["ltp"]) / p["ltp"] * 100) if p["ltp"] > 0 and p["price"] > 0 else 0
             os2, oc = fmt_pct(opp)
 
-            # Power bar (max ~35 realistic)
-            bar_pct = min(p["power"] / 35 * 100, 100)
-            bar_color = "#059669" if p["power"] >= 25 else ("#2563eb" if p["power"] >= 15 else "#d97706")
-
             card_html = (
                 f"<div class='data-card' style='border-left:4px solid {border_color};'>"
-                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;'>"
+                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
                 f"<div style='font-weight:800;color:#1e293b;font-size:15px;'>{p['name']}</div>"
-                f"<div style='font-size:14px;font-weight:800;color:{bar_color};'>PWR: {p['power']}</div></div>"
+                f"<div style='display:flex;align-items:center;gap:4px;'>{render_badge(eng_label, eng_bg, eng_tc)}</div></div>"
                 f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
                 f"<div style='font-size:12px;color:#64748b;'>₹{p['price']:,.0f}"
                 f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
-                f"<div style='display:flex;align-items:center;gap:4px;flex-wrap:wrap;'>{render_badge(eng_label, eng_bg, eng_tc)}"
+                f"<div style='display:flex;align-items:center;gap:4px;'>"
                 f" {'<span style=\"color:#475569;font-size:11px;font-weight:600;\">₹'+fmt(p.get('mcap'),0)+'Cr</span>' if p.get('mcap') else ''}"
                 f" {render_stage_badge(mc_label)}</div></div>"
-                f"<div style='margin-bottom:6px;'>"
-                f"<div style='height:6px;background:#e2e8f0;border-radius:3px;'>"
-                f"<div style='width:{bar_pct:.0f}%;height:100%;background:{bar_color};"
-                f"border-radius:3px;'></div></div>"
-                f"<div style='display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-top:2px;'>"
-                f"<span>{engines_html}</span>"
-                f"<span>Power Score</span></div></div>"
+                f"<div style='font-size:10px;color:#94a3b8;margin-bottom:6px;'>{engines_html}</div>"
                 f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#94a3b8;margin-bottom:4px;'>"
                 f"<span>ROE:{fmt(p.get('roe'),0)}</span>"
                 f"<span>PE:{fmt(p.get('pe'),0)}</span>"

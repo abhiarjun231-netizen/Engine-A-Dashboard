@@ -142,8 +142,7 @@ def show_engine_c():
                 f"<div style='font-size:13px;font-weight:700;color:{pc2};'>{pp2} (₹{ps2})</div></div>"
                 f"<div style='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:10px;color:#94a3b8;'>"
                 f"<span>Qty: {qt}</span><span>Days: {hd}</span>"
-                f"<span>Stop: ₹{stp:,.0f} ({sd2:.1f}%)</span>"
-                f"<span>VDS: {vds}/15</span></div>"
+                f"<span>Stop: ₹{stp:,.0f} ({sd2:.1f}%)</span></div>"
                 f"<div style='display:flex;gap:8px;font-size:11px;flex-wrap:wrap;'>"
                 f"<span>PE: {entry_pe:.0f} → {cur_pe:.0f} ({pe_exp:+.0f}%)</span>"
                 f"{'  '+render_stage_badge(pe_signal) if pe_signal else ''}"
@@ -285,15 +284,11 @@ def show_engine_c():
             nm=s.get("name",""); tk=s.get("ticker",""); lp=s.get("ltp",0) or 0
             cp2=prices.get(tk,lp); opp=((cp2-lp)/lp*100) if lp>0 and cp2>0 else 0
             os2,oc=fmt_pct(opp)
-            vds=s.get("vds",0)
             scr=s.get("screener","S1")
-            vd="DEEP VALUE GEM" if vds>=12 else ("SOLID VALUE" if vds>=8 else ("MODERATE VALUE" if vds>=5 else "THIN VALUE"))
-            vc="#16a34a" if vds>=12 else ("#2563eb" if vds>=8 else ("#d97706" if vds>=5 else "#94a3b8"))
             ah = tk in ht
             mc_label, mc_color = mcap_tag(s.get("mcap"))
             pg = s.get("profit_growth"); rq = s.get("rev_qoq")
             prom = s.get("promoter")
-            # Value Trap checks
             rev_ok = rq is None or rq > -10
             prom_ok = prom is None or prom > 0
             trap_html = (
@@ -303,20 +298,6 @@ def show_engine_c():
                 f"</div>"
             )
 
-            card_html = (
-                f"<div class='data-card' style='border-left:4px solid {vc};'>"
-                f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
-                f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
-                f"<div style='font-size:13px;font-weight:800;color:{vc};'>VDS: {vds}/15</div></div>"
-                f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
-                f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
-                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
-                f"<div style='font-size:11px;display:flex;align-items:center;gap:4px;'>{'<span style=\"color:#475569;font-weight:600;\">₹'+fmt(s.get('mcap'),0)+'Cr</span>' if s.get('mcap') else ''} {render_stage_badge(mc_label)}</div></div>"
-                f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
-                f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
-                f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
-                f"<span>D/E:{fmt(s.get('de'),1)}</span></div>"
-            )
             # PE Expansion Room
             pe_val = s.get("pe")
             pe_room_html = ""
@@ -324,7 +305,6 @@ def show_engine_c():
                 pe_ceiling = 25
                 room_pct = ((pe_ceiling - pe_val) / pe_val) * 100
                 if room_pct > 0:
-                    # Ladder milestones
                     pe_30 = pe_val * 1.30
                     pe_50 = pe_val * 1.50
                     pe_80 = pe_val * 1.80
@@ -352,14 +332,12 @@ def show_engine_c():
                     )
 
             card_html = (
-                f"<div class='data-card' style='border-left:4px solid {vc};'>"
+                f"<div class='data-card' style='border-left:4px solid #2563eb;'>"
                 f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
                 f"<div style='font-weight:700;color:#1e293b;font-size:14px;'>{nm}</div>"
-                f"<div style='font-size:13px;font-weight:800;color:{vc};'>VDS: {vds}/15</div></div>"
-                f"<div style='display:flex;justify-content:space-between;margin-bottom:6px;'>"
-                f"<div style='font-size:12px;color:#64748b;'>₹{cp2:,.0f}"
-                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
                 f"<div style='font-size:11px;display:flex;align-items:center;gap:4px;'>{'<span style=\"color:#475569;font-weight:600;\">₹'+fmt(s.get('mcap'),0)+'Cr</span>' if s.get('mcap') else ''} {render_stage_badge(mc_label)}</div></div>"
+                f"<div style='font-size:12px;color:#64748b;margin-bottom:6px;'>₹{cp2:,.0f}"
+                f"<span style='color:{oc};margin-left:6px;'>{os2}</span></div>"
                 f"<div style='display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#64748b;margin-bottom:4px;'>"
                 f"<span>ROE:{fmt(s.get('roe'),0)}</span><span>PE:{fmt(s.get('pe'),0)}</span>"
                 f"<span>Pio:{fmt(s.get('piotroski'),0)}</span>"
@@ -377,7 +355,6 @@ def show_engine_c():
                 f"{trap_html}"
                 f"<div style='margin-top:4px;'>"
                 f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
-                f" {render_stage_badge(vd)}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div>"
                 f"{render_earnings_info(s)}</div>"
             )
