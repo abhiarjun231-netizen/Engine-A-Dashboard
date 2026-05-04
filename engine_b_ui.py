@@ -20,6 +20,7 @@ from utils import (
     refresh_prices_yfinance,
     render_earnings_info, earnings_alert,
     load_stock_analysis, render_volume_badge,
+    rules_engine_b, render_signals_html, ai_narrative,
 )
 
 MAX_POSITIONS = 10
@@ -224,6 +225,7 @@ def show_engine_b():
         ct = set(s.get("ticker","") for s in data.get("engine_c",[])+data.get("engine_c_watchlist",[]))
         dt = set(s.get("ticker","") for s in data.get("engine_d",[])+data.get("engine_d_watchlist",[]))
         ht = set(s.get("ticker","") for s in pos)
+        all_pos_list = data.get("engine_b",[]) + data.get("engine_c",[]) + data.get("engine_d",[])
 
         # STOCK CARDS
         for j,s in enumerate(wl):
@@ -239,6 +241,9 @@ def show_engine_b():
             if in_c and in_d: overlap_badges = "  " + render_badge("ALL 3 ENGINES", "#fef3c7", "#b45309")
             elif in_c: overlap_badges = "  " + render_badge("+ VALUE", "#e0e7ff", "#4338ca")
             elif in_d: overlap_badges = "  " + render_badge("+ COMPOUNDER", "#e0e7ff", "#4338ca")
+
+            # RULES ENGINE SIGNALS
+            signals = rules_engine_b(s, ea, analysis, all_pos_list, ct, dt)
 
             card_html = (
                 f"<div class='data-card' style='border-left:4px solid #3b82f6;'>"
@@ -283,9 +288,23 @@ def show_engine_b():
                 f"<div style='margin-top:4px;'>"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}"
                 f"{overlap_badges}</div>"
+                f"{render_signals_html(signals)}"
                 f"{render_earnings_info(s)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
+            with st.expander(f"AI Analysis · {nm}", expanded=False):
+                cached_key = f"_ai_b_{tk}"
+                if cached_key in st.session_state:
+                    st.markdown(st.session_state[cached_key], unsafe_allow_html=True)
+                else:
+                    if st.button(f"Generate AI Analysis", key=f"ai_b_{j}"):
+                        with st.spinner("Analyzing..."):
+                            ai_html = ai_narrative(s, "B", signals, ea)
+                            if ai_html:
+                                st.session_state[cached_key] = ai_html
+                                st.markdown(ai_html, unsafe_allow_html=True)
+                            else:
+                                st.warning("Add ANTHROPIC_API_KEY to secrets for AI analysis.")
         if st.button("Clear Watchlist", key="cwl_b"):
             data["engine_b_watchlist"]=[]; data["_b_watchlist_date"]=""
             ok,msg=save_stocks_to_github(data,"Clear Engine B watchlist")

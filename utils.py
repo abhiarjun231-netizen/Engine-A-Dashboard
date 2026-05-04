@@ -1030,3 +1030,433 @@ def refresh_prices_yfinance(stock_data):
         return prices, None
     except Exception as e:
         return {}, str(e)
+
+# ============================================================
+# RULES ENGINE — Layer 1-3 Intelligence (FREE, instant)
+# ============================================================
+
+def _pill(label, color, bg=None):
+    if not bg: bg = color + "18"
+    return f"<span style='font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:{bg};color:{color};letter-spacing:.3px;white-space:nowrap;'>{label}</span>"
+
+def market_gate(score):
+    """Layer 1: Market regime from Engine A score."""
+    if score is None: return {"regime":"UNKNOWN","color":"#94a3b8","equity_pct":0,"can_buy":False}
+    if score <= 20: return {"regime":"EXIT ALL","color":"#dc2626","equity_pct":10,"can_buy":False}
+    if score <= 30: return {"regime":"FREEZE","color":"#dc2626","equity_pct":25,"can_buy":False}
+    if score <= 40: return {"regime":"CAUTIOUS","color":"#d97706","equity_pct":40,"can_buy":True}
+    if score <= 52: return {"regime":"ACTIVE","color":"#16a34a","equity_pct":55,"can_buy":True}
+    if score <= 62: return {"regime":"AGGRESSIVE","color":"#059669","equity_pct":70,"can_buy":True}
+    return {"regime":"FULL DEPLOY","color":"#059669","equity_pct":85,"can_buy":True}
+
+def _earnings_freshness(result_date):
+    if not result_date: return "UNKNOWN", 999, "#94a3b8"
+    try:
+        rd = datetime.strptime(str(result_date)[:10], "%Y-%m-%d")
+        days = (datetime.now() - rd).days
+        if days < 45: return "FRESH", days, "#16a34a"
+        if days < 90: return "AGING", days, "#d97706"
+        if days < 150: return "STALE", days, "#ea580c"
+        return "OVERDUE", days, "#dc2626"
+    except: return "UNKNOWN", 999, "#94a3b8"
+
+def _growth_accel(pg_yoy, pg_3yr):
+    if pg_yoy is None or pg_3yr is None: return None, None
+    if pg_3yr == 0: return "NEW GROWTH" if pg_yoy > 0 else "NO GROWTH", "#d97706"
+    ratio = pg_yoy / pg_3yr if pg_3yr != 0 else 0
+    if pg_yoy < 0: return "REVERSAL", "#dc2626"
+    if ratio > 1.5: return "ACCELERATING", "#059669"
+    if ratio > 0.8: return "CONSISTENT", "#16a34a"
+    return "DECELERATING", "#d97706"
+
+def _rev_profit_div(rev_qoq, pg_yoy):
+    if rev_qoq is None or pg_yoy is None: return None, None
+    rev_up = rev_qoq > 0; pg_up = pg_yoy > 0
+    if rev_up and pg_up: return "HEALTHY", "#16a34a"
+    if rev_up and not pg_up: return "MARGIN PRESSURE", "#dc2626"
+    if not rev_up and pg_up: return "COST CUTTING", "#d97706"
+    return "DETERIORATING", "#dc2626"
+
+def _volume_signal(vol_ratio, delivery_pct):
+    vr = vol_ratio or 0; dp = delivery_pct or 0
+    if vr >= 2 and dp >= 60: return "ACCUMULATION", "#059669"
+    if vr >= 1.5 and dp >= 60: return "CONFIRMED", "#16a34a"
+    if vr >= 2 and dp < 40: return "SPECULATIVE", "#dc2626"
+    if vr < 0.8: return "NO INTEREST", "#94a3b8"
+    return "NORMAL", "#64748b"
+
+def _prom_fii(prom, fii):
+    if prom is None: return None, None
+    fii = fii or 0
+    if prom > 50 and fii > 5: return "ALIGNED", "#059669"
+    if prom > 50 and fii < 2: return "UNDISCOVERED", "#2563eb"
+    if prom < 40 and fii > 5: return "FII DOMINANT", "#d97706"
+    if prom < 40 and fii < 2: return "ABANDONED", "#dc2626"
+    return "NEUTRAL", "#64748b"
+
+def _w52_vol_cross(w52_pct, vol_ratio, delivery_pct):
+    vr = vol_ratio or 0; dp = delivery_pct or 0
+    if w52_pct is None: return None, None
+    if w52_pct > 80 and vr > 1.5 and dp > 55: return "BREAKOUT", "#059669"
+    if w52_pct > 80 and vr < 1: return "EXHAUSTION", "#dc2626"
+    if w52_pct < 30 and vr > 1.5 and dp > 55: return "ACCUMULATION", "#059669"
+    if w52_pct < 30 and vr < 1: return "DEAD", "#94a3b8"
+    return None, None
+
+def _risk_reward(price, stop, target):
+    if not price or not stop or not target or price <= 0: return None, None, None
+    down = abs(price - stop)
+    up = abs(target - price)
+    if down <= 0: return None, None, None
+    ratio = round(up / down, 1)
+    color = "#059669" if ratio >= 3 else ("#16a34a" if ratio >= 2 else ("#d97706" if ratio >= 1 else "#dc2626"))
+    return ratio, f"1:{ratio}", color
+
+def _sector_weight(ticker, sector, all_positions):
+    """Count sector % across all engines."""
+    if not sector: return 0, "UNKNOWN", "#94a3b8"
+    total = 0; same = 0
+    for p in all_positions:
+        total += 1
+        if p.get("sector","").lower() == sector.lower(): same += 1
+    if total == 0: return 0, "CLEAR", "#16a34a"
+    pct = round(same / total * 100)
+    if pct >= 30: return pct, "BLOCKED", "#dc2626"
+    if pct >= 25: return pct, "NEAR CAP", "#d97706"
+    return pct, "CLEAR", "#16a34a"
+
+def _comparative(stock, all_stocks, fields):
+    """Compare stock vs engine average on given fields."""
+    result = {}
+    for f in fields:
+        val = stock.get(f)
+        if val is None or val == 0: continue
+        vals = [s.get(f) for s in all_stocks if s.get(f) is not None and s.get(f) != 0]
+        if not vals: continue
+        avg = sum(vals) / len(vals)
+        if avg == 0: continue
+        ratio = round(val / avg, 1)
+        result[f] = {"val": val, "avg": round(avg, 1), "ratio": ratio}
+    return result
+
+def rules_engine_b(stock, ea_score, vol_data, all_pos, c_tickers, d_tickers):
+    """Compute all Layer 1-3 signals for an Engine B stock."""
+    s = {}
+    dur = stock.get("durability"); mom = stock.get("momentum")
+    prev_m = stock.get("prev_momentum")
+    tk = stock.get("ticker","")
+    vr = vol_data.get(tk,{}).get("vol_ratio",0) if isinstance(vol_data.get(tk), dict) else 0
+    dp = stock.get("delivery_pct",0) or 0
+    ltp = stock.get("ltp",0) or 0
+    h52 = stock.get("high_52w"); l52 = stock.get("low_52w")
+    w52 = ((ltp - l52) / (h52 - l52) * 100) if h52 and l52 and h52 > l52 and ltp > 0 else None
+
+    # DVM Gate
+    if dur and dur > 55 and mom and mom > 59: s["dvm"] = ("GREEN GATE", "#059669")
+    elif dur and dur >= 45 or mom and mom >= 49: s["dvm"] = ("GREY GATE", "#d97706")
+    else: s["dvm"] = ("RED GATE", "#dc2626")
+
+    # Velocity
+    if mom and prev_m is not None:
+        vel = mom - prev_m
+        if vel >= 5: s["velocity"] = (f"ACCEL +{vel:.0f}", "#059669")
+        elif vel >= 0: s["velocity"] = (f"STEADY +{vel:.0f}", "#2563eb")
+        elif vel > -5: s["velocity"] = (f"COOLING {vel:.0f}", "#d97706")
+        elif vel > -10: s["velocity"] = (f"DECAYING {vel:.0f}", "#ea580c")
+        else: s["velocity"] = (f"CRASH {vel:.0f}", "#dc2626")
+
+    # Volume
+    vl, vc = _volume_signal(vr, dp)
+    s["volume"] = (vl, vc)
+
+    # Growth Accel
+    ga, gc = _growth_accel(stock.get("profit_growth"), stock.get("profit_growth_3yr"))
+    if ga: s["growth"] = (ga, gc)
+
+    # Rev-Profit
+    rp, rc = _rev_profit_div(stock.get("rev_qoq"), stock.get("profit_growth"))
+    if rp: s["rev_profit"] = (rp, rc)
+
+    # Earnings Freshness
+    el, ed, ec = _earnings_freshness(stock.get("result_date"))
+    if el != "UNKNOWN": s["earnings"] = (f"{el} ({ed}d)", ec)
+
+    # Prom-FII
+    pf, pc = _prom_fii(stock.get("promoter"), stock.get("fii"))
+    if pf: s["alignment"] = (pf, pc)
+
+    # 52W + Volume cross
+    wv, wc = _w52_vol_cross(w52, vr, dp)
+    if wv: s["w52_vol"] = (wv, wc)
+
+    # Fundamental Floor
+    roe = stock.get("roe"); pio = stock.get("piotroski")
+    if roe and roe > 15 and pio and pio >= 7: s["fundament"] = ("QUALITY", "#16a34a")
+    elif roe and roe < 10 or pio and pio < 6: s["fundament"] = ("WEAK BASE", "#dc2626")
+
+    # Cross-engine
+    in_c = tk in c_tickers; in_d = tk in d_tickers
+    if in_c and in_d: s["cross"] = ("ALL 3", "#b45309")
+    elif in_c: s["cross"] = ("+VALUE", "#4338ca")
+    elif in_d: s["cross"] = ("+COMPOUNDER", "#4338ca")
+
+    # Risk-Reward (stop at -15% from peak/current, target = 52W high)
+    peak = max(ltp, stock.get("peak",0) or 0)
+    stop = round(peak * 0.85)
+    target = h52 or ltp
+    rr, rr_txt, rr_c = _risk_reward(ltp, stop, target)
+    if rr and rr_txt: s["rr"] = (f"R:R {rr_txt}", rr_c)
+
+    # Sector
+    sp, sl, sc = _sector_weight(tk, stock.get("sector"), all_pos)
+    if sl != "CLEAR" and sl != "UNKNOWN": s["sector_risk"] = (f"SEC {sp}% {sl}", sc)
+
+    return s
+
+def rules_engine_c(stock, ea_score, vol_data, all_pos, b_tickers, d_tickers):
+    """Compute all Layer 1-3 signals for an Engine C stock."""
+    s = {}
+    tk = stock.get("ticker","")
+    pe = stock.get("pe"); roe = stock.get("roe"); pio = stock.get("piotroski")
+    vr = vol_data.get(tk,{}).get("vol_ratio",0) if isinstance(vol_data.get(tk), dict) else 0
+    dp = stock.get("delivery_pct",0) or 0
+    ltp = stock.get("ltp",0) or 0
+    h52 = stock.get("high_52w"); l52 = stock.get("low_52w")
+
+    # PE Depth
+    if pe:
+        if pe < 12: s["pe_depth"] = ("DEEP DISCOUNT", "#059669")
+        elif pe < 18: s["pe_depth"] = ("SOLID VALUE", "#16a34a")
+        elif pe < 23: s["pe_depth"] = ("MODERATE", "#d97706")
+        else: s["pe_depth"] = ("NEAR CAP", "#dc2626")
+
+    # Value Trap
+    rq = stock.get("rev_qoq"); prom = stock.get("promoter")
+    if rq is not None and prom is not None:
+        if rq > 0 and prom > 40: s["trap"] = ("CLEAN", "#16a34a")
+        elif rq < -10 and prom < 40: s["trap"] = ("VALUE TRAP", "#dc2626")
+        elif rq < -10 and prom > 40: s["trap"] = ("CONTRARIAN", "#d97706")
+        elif rq > 0 and prom < 40: s["trap"] = ("PROM LOW", "#d97706")
+
+    # Piotroski Depth
+    if pio:
+        if pio >= 9: s["pio_depth"] = ("PERFECT 9/9", "#059669")
+        elif pio >= 8: s["pio_depth"] = ("STRONG 8/9", "#16a34a")
+        elif pio >= 7: s["pio_depth"] = ("GOOD 7/9", "#2563eb")
+        else: s["pio_depth"] = ("MIN 6/9", "#d97706")
+
+    # Volume
+    vl, vc = _volume_signal(vr, dp)
+    s["volume"] = (vl, vc)
+
+    # Growth Accel
+    ga, gc = _growth_accel(stock.get("profit_growth"), stock.get("profit_growth_3yr"))
+    if ga: s["growth"] = (ga, gc)
+
+    # Rev-Profit
+    rp, rc = _rev_profit_div(stock.get("rev_qoq"), stock.get("profit_growth"))
+    if rp: s["rev_profit"] = (rp, rc)
+
+    # Earnings Freshness
+    el, ed, ec = _earnings_freshness(stock.get("result_date"))
+    if el != "UNKNOWN": s["earnings"] = (f"{el} ({ed}d)", ec)
+
+    # Prom-FII
+    pf, pc = _prom_fii(stock.get("promoter"), stock.get("fii"))
+    if pf: s["alignment"] = (pf, pc)
+
+    # Cross-engine
+    in_b = tk in b_tickers; in_d = tk in d_tickers
+    if in_b and in_d: s["cross"] = ("ALL 3", "#b45309")
+    elif in_b: s["cross"] = ("+MOMENTUM", "#3b82f6")
+    elif in_d: s["cross"] = ("+COMPOUNDER", "#4338ca")
+
+    # Risk-Reward (stop at -7%, target = PE 25 mapped price)
+    stop = round(ltp * 0.93) if ltp else 0
+    target_pe = 25
+    target = round(ltp * (target_pe / pe)) if pe and pe > 0 and ltp else 0
+    rr, rr_txt, rr_c = _risk_reward(ltp, stop, target)
+    if rr and rr_txt: s["rr"] = (f"R:R {rr_txt}", rr_c)
+
+    # Sector
+    sp, sl, sc = _sector_weight(tk, stock.get("sector"), all_pos)
+    if sl != "CLEAR" and sl != "UNKNOWN": s["sector_risk"] = (f"SEC {sp}% {sl}", sc)
+
+    return s
+
+def rules_engine_d(stock, ea_score, vol_data, all_pos, b_tickers, c_tickers):
+    """Compute all Layer 1-3 signals for an Engine D stock."""
+    s = {}
+    tk = stock.get("ticker","")
+    pg = stock.get("profit_growth"); rq = stock.get("rev_qoq"); peg = stock.get("peg")
+    de = stock.get("de"); prom = stock.get("promoter"); mcap = stock.get("mcap")
+    vr = vol_data.get(tk,{}).get("vol_ratio",0) if isinstance(vol_data.get(tk), dict) else 0
+    dp = stock.get("delivery_pct",0) or 0
+    ltp = stock.get("ltp",0) or 0
+    h52 = stock.get("high_52w"); l52 = stock.get("low_52w")
+
+    # Growth Engine
+    if pg is not None and rq is not None:
+        if pg > 30 and rq > 0: s["growth_eng"] = ("ACCELERATING", "#059669")
+        elif pg > 15 and rq > 0: s["growth_eng"] = ("STEADY", "#16a34a")
+        elif pg > 15: s["growth_eng"] = ("MIXED", "#d97706")
+        elif pg <= 0: s["growth_eng"] = ("NO GROWTH", "#dc2626")
+        else: s["growth_eng"] = ("WEAK", "#d97706")
+
+    # PEG
+    if peg and peg > 0:
+        if peg < 0.5: s["peg_val"] = ("PEG EXTREME", "#059669")
+        elif peg < 0.8: s["peg_val"] = ("PEG UNDER", "#16a34a")
+        elif peg <= 1.2: s["peg_val"] = ("PEG FAIR", "#2563eb")
+        elif peg <= 1.5: s["peg_val"] = ("PEG FULL", "#d97706")
+        else: s["peg_val"] = ("PEG EXPENSIVE", "#dc2626")
+
+    # Kill Shots
+    kills = 0
+    if pg is not None and pg <= 0: kills += 1
+    if de is not None and de > 1.5: kills += 1
+    if prom is not None and prom < 40: kills += 1
+    if rq is not None and rq < -10: kills += 1
+    if kills == 0: s["killshot"] = ("NO KILLS", "#16a34a")
+    elif kills == 1: s["killshot"] = ("1 KILL", "#d97706")
+    else: s["killshot"] = (f"{kills} KILLS", "#dc2626")
+
+    # Compounding Runway
+    if mcap:
+        if mcap < 10000: s["runway"] = ("SMALL CAP", "#7c3aed")
+        elif mcap < 50000: s["runway"] = ("MID CAP", "#2563eb")
+        else: s["runway"] = ("LARGE CAP", "#64748b")
+
+    # Volume
+    vl, vc = _volume_signal(vr, dp)
+    s["volume"] = (vl, vc)
+
+    # Growth Accel
+    ga, gc = _growth_accel(stock.get("profit_growth"), stock.get("profit_growth_3yr"))
+    if ga: s["growth_accel"] = (ga, gc)
+
+    # Rev-Profit
+    rp, rc = _rev_profit_div(rq, pg)
+    if rp: s["rev_profit"] = (rp, rc)
+
+    # Earnings Freshness
+    el, ed, ec = _earnings_freshness(stock.get("result_date"))
+    if el != "UNKNOWN": s["earnings"] = (f"{el} ({ed}d)", ec)
+
+    # Prom-FII
+    pf, pc = _prom_fii(prom, stock.get("fii"))
+    if pf: s["alignment"] = (pf, pc)
+
+    # Cross-engine
+    in_b = tk in b_tickers; in_c = tk in c_tickers
+    if in_b and in_c: s["cross"] = ("ALL 3", "#b45309")
+    elif in_b: s["cross"] = ("+MOMENTUM", "#3b82f6")
+    elif in_c: s["cross"] = ("+VALUE", "#4338ca")
+
+    # Risk-Reward
+    stop = round(ltp * 0.90) if ltp else 0
+    target = round(ltp * (1 / peg)) if peg and peg > 0 and peg < 2 and ltp else (h52 or ltp)
+    rr, rr_txt, rr_c = _risk_reward(ltp, stop, target)
+    if rr and rr_txt: s["rr"] = (f"R:R {rr_txt}", rr_c)
+
+    # Sector
+    sp, sl, sc = _sector_weight(tk, stock.get("sector"), all_pos)
+    if sl != "CLEAR" and sl != "UNKNOWN": s["sector_risk"] = (f"SEC {sp}% {sl}", sc)
+
+    return s
+
+def render_signals_html(signals):
+    """Render a dict of signals as compact pills."""
+    if not signals: return ""
+    pills = []
+    for key, (label, color) in signals.items():
+        pills.append(_pill(label, color))
+    return (
+        f"<div style='display:flex;flex-wrap:wrap;gap:4px;margin:6px 0;'>"
+        f"{''.join(pills)}</div>"
+    )
+
+# ============================================================
+# AI NARRATIVE — Layer 4 (Claude Sonnet API, ~Rs 1-2/stock)
+# ============================================================
+def get_anthropic_key():
+    try: return st.secrets["ANTHROPIC_API_KEY"]
+    except: return None
+
+def ai_narrative(stock, engine, signals, engine_a_score=None):
+    """Call Claude Sonnet API for narrative analysis. Returns HTML or None."""
+    api_key = get_anthropic_key()
+    if not api_key: return None
+
+    nm = stock.get("name","Unknown"); tk = stock.get("ticker","")
+    sec = stock.get("sector","")
+
+    # Build signal summary for AI
+    sig_text = ", ".join(f"{k}: {v[0]}" for k, v in signals.items())
+
+    # Build data summary
+    data_lines = []
+    for k in ["roe","pe","piotroski","de","profit_growth","profit_growth_3yr","rev_qoq",
+              "promoter","fii","inst","peg","mcap","delivery_pct","durability","momentum"]:
+        v = stock.get(k)
+        if v is not None: data_lines.append(f"{k}: {v}")
+    data_text = ", ".join(data_lines)
+
+    h52 = stock.get("high_52w","?"); l52 = stock.get("low_52w","?")
+    ltp = stock.get("ltp",0)
+
+    engine_names = {"B":"Momentum Hunter","C":"Value Warriors","D":"Compounders"}
+    eng_name = engine_names.get(engine, engine)
+
+    prompt = f"""You are an expert Indian equity analyst. Analyze this stock for Engine {engine} ({eng_name}).
+
+STOCK: {nm} ({tk}) | Sector: {sec} | CMP: Rs {ltp} | 52W: Rs {l52} - Rs {h52}
+DATA: {data_text}
+RULES ENGINE SIGNALS: {sig_text}
+ENGINE A SCORE: {engine_a_score or 'N/A'}/100
+
+Write a compact analysis in EXACTLY this format (no markdown, plain text):
+BUSINESS: [1 line - what company does, competitive position]
+BULL: [2-3 strongest buy arguments with specific numbers from data]
+BEAR: [2-3 risks with specific numbers]
+VERDICT: [BUY/ACCUMULATE/WATCH/AVOID] [1 line reason]
+ACTION: [Exact next step - buy X shares at Rs Y, or watch for Z signal]
+
+Keep total under 150 words. Be specific with numbers. No generic statements."""
+
+    try:
+        resp = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json={
+                "model": "claude-sonnet-4-6-20250514",
+                "max_tokens": 400,
+                "messages": [{"role":"user","content":prompt}]
+            },
+            timeout=30
+        )
+        if resp.status_code != 200: return None
+        data = resp.json()
+        text = data.get("content",[{}])[0].get("text","")
+        if not text: return None
+
+        # Parse sections and render
+        lines = text.strip().split("\n")
+        html = "<div style='padding:10px 12px;background:#f8fafc;border-radius:8px;border-left:3px solid #2563eb;margin-top:6px;'>"
+        for line in lines:
+            line = line.strip()
+            if not line: continue
+            for prefix, color in [("BUSINESS:","#475569"),("BULL:","#059669"),("BEAR:","#dc2626"),("VERDICT:","#2563eb"),("ACTION:","#7c3aed")]:
+                if line.upper().startswith(prefix.upper()):
+                    content = line[len(prefix):].strip()
+                    html += f"<div style='margin-bottom:4px;'><span style='font-size:9px;font-weight:700;color:{color};letter-spacing:.5px;'>{prefix[:-1]}</span> <span style='font-size:10px;color:#475569;'>{content}</span></div>"
+                    break
+        html += "</div>"
+        return html
+    except Exception as e:
+        return None
+

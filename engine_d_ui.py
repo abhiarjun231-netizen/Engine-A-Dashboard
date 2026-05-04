@@ -19,6 +19,7 @@ from utils import (
     sector_summary, render_check, peg_reading, compound_stars,
     render_earnings_info, earnings_alert,
     load_stock_analysis, render_volume_badge,
+    rules_engine_d, render_signals_html, ai_narrative,
 )
 
 MAX_POSITIONS = 15
@@ -352,6 +353,9 @@ def show_engine_d():
         wd = data.get("_d_watchlist_date","")
         doubles = sum(1 for s in wl if s.get("is_double"))
         ht = set(s.get("ticker","") for s in pos)
+        bt = set(s.get("ticker","") for s in data.get("engine_b",[])+data.get("engine_b_watchlist",[]))
+        ct2 = set(s.get("ticker","") for s in data.get("engine_c",[])+data.get("engine_c_watchlist",[]))
+        all_pos_list = data.get("engine_b",[]) + data.get("engine_c",[]) + data.get("engine_d",[])
 
                 # STOCK CARDS
         for j,s in enumerate(wl):
@@ -362,6 +366,9 @@ def show_engine_d():
             ah = tk in ht
             mc_label, mc_color = mcap_tag(s.get("mcap"))
             pg = s.get("profit_growth"); peg_val = s.get("peg")
+
+            # RULES ENGINE SIGNALS
+            signals = rules_engine_d(s, ea, analysis, all_pos_list, bt, ct2)
             de_val = s.get("de")
             growth_ok = pg is None or pg > 0
             debt_ok = de_val is None or de_val < 1.5
@@ -396,9 +403,23 @@ def show_engine_d():
                 f"<div style='margin-top:4px;'>"
                 f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div>"
+                f"{render_signals_html(signals)}"
                 f"{render_earnings_info(s)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
+            with st.expander(f"AI Analysis · {nm}", expanded=False):
+                cached_key = f"_ai_d_{tk}"
+                if cached_key in st.session_state:
+                    st.markdown(st.session_state[cached_key], unsafe_allow_html=True)
+                else:
+                    if st.button(f"Generate AI Analysis", key=f"ai_d_{j}"):
+                        with st.spinner("Analyzing..."):
+                            ai_html = ai_narrative(s, "D", signals, ea)
+                            if ai_html:
+                                st.session_state[cached_key] = ai_html
+                                st.markdown(ai_html, unsafe_allow_html=True)
+                            else:
+                                st.warning("Add ANTHROPIC_API_KEY to secrets for AI analysis.")
         if st.button("Clear Watchlist", key="cwl_d"):
             data["engine_d_watchlist"]=[]; data["_d_watchlist_date"]=""
             ok,msg=save_stocks_to_github(data,"Clear Engine D watchlist")
