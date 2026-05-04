@@ -1039,6 +1039,12 @@ def _pill(label, color, bg=None):
     if not bg: bg = color + "18"
     return f"<span style='font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:{bg};color:{color};letter-spacing:.3px;white-space:nowrap;'>{label}</span>"
 
+def _sf(v):
+    """Safe float conversion — returns None if not convertible."""
+    if v is None: return None
+    try: return float(v)
+    except: return None
+
 def market_gate(score):
     """Layer 1: Market regime from Engine A score."""
     if score is None: return {"regime":"UNKNOWN","color":"#94a3b8","equity_pct":0,"can_buy":False}
@@ -1061,6 +1067,7 @@ def _earnings_freshness(result_date):
     except: return "UNKNOWN", 999, "#94a3b8"
 
 def _growth_accel(pg_yoy, pg_3yr):
+    pg_yoy = _sf(pg_yoy); pg_3yr = _sf(pg_3yr)
     if pg_yoy is None or pg_3yr is None: return None, None
     if pg_3yr == 0: return "NEW GROWTH" if pg_yoy > 0 else "NO GROWTH", "#d97706"
     ratio = pg_yoy / pg_3yr if pg_3yr != 0 else 0
@@ -1070,6 +1077,7 @@ def _growth_accel(pg_yoy, pg_3yr):
     return "DECELERATING", "#d97706"
 
 def _rev_profit_div(rev_qoq, pg_yoy):
+    rev_qoq = _sf(rev_qoq); pg_yoy = _sf(pg_yoy)
     if rev_qoq is None or pg_yoy is None: return None, None
     rev_up = rev_qoq > 0; pg_up = pg_yoy > 0
     if rev_up and pg_up: return "HEALTHY", "#16a34a"
@@ -1078,7 +1086,7 @@ def _rev_profit_div(rev_qoq, pg_yoy):
     return "DETERIORATING", "#dc2626"
 
 def _volume_signal(vol_ratio, delivery_pct):
-    vr = vol_ratio or 0; dp = delivery_pct or 0
+    vr = _sf(vol_ratio) or 0; dp = _sf(delivery_pct) or 0
     if vr >= 2 and dp >= 60: return "ACCUMULATION", "#059669"
     if vr >= 1.5 and dp >= 60: return "CONFIRMED", "#16a34a"
     if vr >= 2 and dp < 40: return "SPECULATIVE", "#dc2626"
@@ -1086,6 +1094,7 @@ def _volume_signal(vol_ratio, delivery_pct):
     return "NORMAL", "#64748b"
 
 def _prom_fii(prom, fii):
+    prom = _sf(prom); fii = _sf(fii)
     if prom is None: return None, None
     fii = fii or 0
     if prom > 50 and fii > 5: return "ALIGNED", "#059669"
@@ -1095,7 +1104,7 @@ def _prom_fii(prom, fii):
     return "NEUTRAL", "#64748b"
 
 def _w52_vol_cross(w52_pct, vol_ratio, delivery_pct):
-    vr = vol_ratio or 0; dp = delivery_pct or 0
+    vr = _sf(vol_ratio) or 0; dp = _sf(delivery_pct) or 0; w52_pct = _sf(w52_pct)
     if w52_pct is None: return None, None
     if w52_pct > 80 and vr > 1.5 and dp > 55: return "BREAKOUT", "#059669"
     if w52_pct > 80 and vr < 1: return "EXHAUSTION", "#dc2626"
@@ -1142,13 +1151,13 @@ def _comparative(stock, all_stocks, fields):
 def rules_engine_b(stock, ea_score, vol_data, all_pos, c_tickers, d_tickers):
     """Compute all Layer 1-3 signals for an Engine B stock."""
     s = {}
-    dur = stock.get("durability"); mom = stock.get("momentum")
-    prev_m = stock.get("prev_momentum")
+    dur = _sf(stock.get("durability")); mom = _sf(stock.get("momentum"))
+    prev_m = _sf(stock.get("prev_momentum"))
     tk = stock.get("ticker","")
-    vr = vol_data.get(tk,{}).get("vol_ratio",0) if isinstance(vol_data.get(tk), dict) else 0
-    dp = stock.get("delivery_pct",0) or 0
-    ltp = stock.get("ltp",0) or 0
-    h52 = stock.get("high_52w"); l52 = stock.get("low_52w")
+    vr = _sf(vol_data.get(tk,{}).get("vol_ratio",0)) if isinstance(vol_data.get(tk), dict) else 0
+    dp = _sf(stock.get("delivery_pct")) or 0
+    ltp = _sf(stock.get("ltp")) or 0
+    h52 = _sf(stock.get("high_52w")); l52 = _sf(stock.get("low_52w"))
     w52 = ((ltp - l52) / (h52 - l52) * 100) if h52 and l52 and h52 > l52 and ltp > 0 else None
 
     # DVM Gate
@@ -1190,7 +1199,7 @@ def rules_engine_b(stock, ea_score, vol_data, all_pos, c_tickers, d_tickers):
     if wv: s["w52_vol"] = (wv, wc)
 
     # Fundamental Floor
-    roe = stock.get("roe"); pio = stock.get("piotroski")
+    roe = _sf(stock.get("roe")); pio = _sf(stock.get("piotroski"))
     if roe and roe > 15 and pio and pio >= 7: s["fundament"] = ("QUALITY", "#16a34a")
     elif roe and roe < 10 or pio and pio < 6: s["fundament"] = ("WEAK BASE", "#dc2626")
 
@@ -1201,7 +1210,7 @@ def rules_engine_b(stock, ea_score, vol_data, all_pos, c_tickers, d_tickers):
     elif in_d: s["cross"] = ("+COMPOUNDER", "#4338ca")
 
     # Risk-Reward (stop at -15% from peak/current, target = 52W high)
-    peak = max(ltp, stock.get("peak",0) or 0)
+    peak = max(ltp, _sf(stock.get("peak")) or 0)
     stop = round(peak * 0.85)
     target = h52 or ltp
     rr, rr_txt, rr_c = _risk_reward(ltp, stop, target)
@@ -1217,11 +1226,11 @@ def rules_engine_c(stock, ea_score, vol_data, all_pos, b_tickers, d_tickers):
     """Compute all Layer 1-3 signals for an Engine C stock."""
     s = {}
     tk = stock.get("ticker","")
-    pe = stock.get("pe"); roe = stock.get("roe"); pio = stock.get("piotroski")
-    vr = vol_data.get(tk,{}).get("vol_ratio",0) if isinstance(vol_data.get(tk), dict) else 0
-    dp = stock.get("delivery_pct",0) or 0
-    ltp = stock.get("ltp",0) or 0
-    h52 = stock.get("high_52w"); l52 = stock.get("low_52w")
+    pe = _sf(stock.get("pe")); roe = _sf(stock.get("roe")); pio = _sf(stock.get("piotroski"))
+    vr = _sf(vol_data.get(tk,{}).get("vol_ratio",0)) if isinstance(vol_data.get(tk), dict) else 0
+    dp = _sf(stock.get("delivery_pct")) or 0
+    ltp = _sf(stock.get("ltp")) or 0
+    h52 = _sf(stock.get("high_52w")); l52 = _sf(stock.get("low_52w"))
 
     # PE Depth
     if pe:
@@ -1231,7 +1240,7 @@ def rules_engine_c(stock, ea_score, vol_data, all_pos, b_tickers, d_tickers):
         else: s["pe_depth"] = ("NEAR CAP", "#dc2626")
 
     # Value Trap
-    rq = stock.get("rev_qoq"); prom = stock.get("promoter")
+    rq = _sf(stock.get("rev_qoq")); prom = _sf(stock.get("promoter"))
     if rq is not None and prom is not None:
         if rq > 0 and prom > 40: s["trap"] = ("CLEAN", "#16a34a")
         elif rq < -10 and prom < 40: s["trap"] = ("VALUE TRAP", "#dc2626")
@@ -1288,12 +1297,12 @@ def rules_engine_d(stock, ea_score, vol_data, all_pos, b_tickers, c_tickers):
     """Compute all Layer 1-3 signals for an Engine D stock."""
     s = {}
     tk = stock.get("ticker","")
-    pg = stock.get("profit_growth"); rq = stock.get("rev_qoq"); peg = stock.get("peg")
-    de = stock.get("de"); prom = stock.get("promoter"); mcap = stock.get("mcap")
-    vr = vol_data.get(tk,{}).get("vol_ratio",0) if isinstance(vol_data.get(tk), dict) else 0
-    dp = stock.get("delivery_pct",0) or 0
-    ltp = stock.get("ltp",0) or 0
-    h52 = stock.get("high_52w"); l52 = stock.get("low_52w")
+    pg = _sf(stock.get("profit_growth")); rq = _sf(stock.get("rev_qoq")); peg = _sf(stock.get("peg"))
+    de = _sf(stock.get("de")); prom = _sf(stock.get("promoter")); mcap = _sf(stock.get("mcap"))
+    vr = _sf(vol_data.get(tk,{}).get("vol_ratio",0)) if isinstance(vol_data.get(tk), dict) else 0
+    dp = _sf(stock.get("delivery_pct")) or 0
+    ltp = _sf(stock.get("ltp")) or 0
+    h52 = _sf(stock.get("high_52w")); l52 = _sf(stock.get("low_52w"))
 
     # Growth Engine
     if pg is not None and rq is not None:
@@ -1366,7 +1375,7 @@ def rules_engine_d(stock, ea_score, vol_data, all_pos, b_tickers, c_tickers):
     return s
 
 def _engine_avg(all_wl, field):
-    vals = [s.get(field) for s in all_wl if s.get(field) is not None and s.get(field) != 0]
+    vals = [_sf(s.get(field)) for s in all_wl if _sf(s.get(field)) is not None and _sf(s.get(field)) != 0]
     return round(sum(vals)/len(vals),1) if vals else 0
 
 def _vs_avg(val, avg):
@@ -1384,15 +1393,15 @@ def render_signals_html(signals, engine="B", stock=None, all_wl=None, ea_score=N
     if not all_pos: all_pos = []
 
     nm = stock.get("name",""); tk = stock.get("ticker","")
-    roe = stock.get("roe"); pe = stock.get("pe"); pio = stock.get("piotroski")
-    de = stock.get("de"); pg = stock.get("profit_growth"); pg3 = stock.get("profit_growth_3yr")
-    prom = stock.get("promoter"); fii = stock.get("fii"); inst = stock.get("inst")
-    rq = stock.get("rev_qoq"); peg = stock.get("peg"); mcap = stock.get("mcap")
-    dur = stock.get("durability"); mom = stock.get("momentum")
-    prev_m = stock.get("prev_momentum")
-    dp = stock.get("delivery_pct",0) or 0
-    ltp = stock.get("ltp",0) or 0
-    h52 = stock.get("high_52w",0) or 0; l52 = stock.get("low_52w",0) or 0
+    roe = _sf(stock.get("roe")); pe = _sf(stock.get("pe")); pio = _sf(stock.get("piotroski"))
+    de = _sf(stock.get("de")); pg = _sf(stock.get("profit_growth")); pg3 = _sf(stock.get("profit_growth_3yr"))
+    prom = _sf(stock.get("promoter")); fii = _sf(stock.get("fii")); inst = _sf(stock.get("inst"))
+    rq = _sf(stock.get("rev_qoq")); peg = _sf(stock.get("peg")); mcap = _sf(stock.get("mcap"))
+    dur = _sf(stock.get("durability")); mom = _sf(stock.get("momentum"))
+    prev_m = _sf(stock.get("prev_momentum"))
+    dp = _sf(stock.get("delivery_pct")) or 0
+    ltp = _sf(stock.get("ltp")) or 0
+    h52 = _sf(stock.get("high_52w")) or 0; l52 = _sf(stock.get("low_52w")) or 0
     w52 = round((ltp-l52)/(h52-l52)*100) if h52>l52 and ltp>0 else 50
     is_dbl = stock.get("is_double", False)
     sec = stock.get("sector","")
@@ -1640,7 +1649,7 @@ def render_signals_html(signals, engine="B", stock=None, all_wl=None, ea_score=N
 
         # Quality
         if roe and roe > 25 and pio and pio >= 8:
-            lines.append(f"Quality elite: ROE {roe:.0f}%{_vs_avg(roe,avg_roe)}, Pio {pio:.0f}/9, D/E {de:.1f if de else 'N/A'}. Business machine.")
+            lines.append(f"Quality elite: ROE {roe:.0f}%{_vs_avg(roe,avg_roe)}, Pio {pio:.0f}/9, D/E {de if de is not None else 'N/A'}. Business machine.")
             strengths += 1
 
         # Double + Cross
