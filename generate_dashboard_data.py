@@ -623,12 +623,27 @@ def build():
 
     # ── Manual Inputs ──
     manual_inputs = {}
-    mi_file = os.path.join(DATA_DIR,"manual_inputs.json")
-    if os.path.exists(mi_file):
+    # Try data/manual_inputs.json first, then root manual_inputs.json
+    mi_sources = [os.path.join(DATA_DIR,"manual_inputs.json"), "manual_inputs.json"]
+    # Map long keys (root format) to short keys (dashboard format)
+    long_to_short = {"fii_30day_net_cr":"fii","dii_30day_net_cr":"dii",
+        "breadth_pct_above_200dma":"breadth","yield_curve_inverted":"yield_inverted",
+        "cpi_pct":"cpi","pmi_manufacturing":"pmi"}
+    for mi_file in mi_sources:
+        if not os.path.exists(mi_file): continue
         try:
-            with open(mi_file,"r") as f: manual_inputs = json.load(f)
-            print(f"[OK] Manual inputs loaded: {list(manual_inputs.keys())}")
-        except: pass
+            with open(mi_file,"r") as f: raw = json.load(f)
+            for k,v in raw.items():
+                if k.startswith("_"): continue
+                # Extract .value from nested objects (Streamlit format)
+                val = v.get("value") if isinstance(v, dict) and "value" in v else v
+                # Normalize key to short form
+                short_k = long_to_short.get(k, k)
+                if short_k not in manual_inputs and val is not None:
+                    manual_inputs[short_k] = val
+            print(f"[OK] Manual inputs from {mi_file}: {list(manual_inputs.keys())}")
+        except Exception as e:
+            print(f"[WARN] {mi_file}: {e}")
 
     # ── P&L from positions ──
     pnl = {"total_invested":0,"current_value":0,"pnl":0,"pnl_pct":0,
