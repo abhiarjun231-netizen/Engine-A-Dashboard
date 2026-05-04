@@ -522,15 +522,17 @@ function renderDirector() {
   const mi = D.manualInputs||{};
   if(Object.keys(mi).length>0) {
     html+=`<div class="card"><div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:12px">MANUAL INPUTS (CURRENT)</div>`;
-    const miLabels = {nifty_pe:'Nifty PE',fii:'FII (30-day)',fii_30d:'FII (30-day)',dii:'DII (30-day)',dii_30d:'DII (30-day)',breadth:'Breadth',rbi_stance:'RBI Stance',rbi:'RBI Stance',cpi:'CPI',pmi:'PMI Mfg',yield_inverted:'Yield Inverted'};
-    for(let [k,v] of Object.entries(mi)) {
-      const label = miLabels[k]||k;
+    const miLabels = {nifty_pe:'Nifty PE',fii:'FII (30-day)',fii_30d:'FII (30-day)',fii_30day_net_cr:'FII (30-day)',dii:'DII (30-day)',dii_30d:'DII (30-day)',dii_30day_net_cr:'DII (30-day)',breadth:'Breadth',breadth_pct_above_200dma:'Breadth',rbi_stance:'RBI Stance',rbi:'RBI Stance',cpi:'CPI',cpi_pct:'CPI',pmi:'PMI Mfg',pmi_manufacturing:'PMI Mfg',yield_inverted:'Yield Inverted',yield_curve_inverted:'Yield Inverted'};
+    for(let [k,raw] of Object.entries(mi)) {
+      if(k.startsWith('_'))continue;
+      if(!miLabels[k])continue;
+      const label = miLabels[k];
+      let v = (raw!==null&&typeof raw==='object'&&raw.value!==undefined)?raw.value:raw;
       let display = v;
       if(typeof v==='number') display = v.toLocaleString('en-IN',{maximumFractionDigits:2});
       if(k.includes('fii') && typeof v==='number') display = (v>=0?'+':'')+v.toLocaleString('en-IN')+' Cr';
       if(k.includes('dii') && typeof v==='number') display = (v>=0?'+':'')+v.toLocaleString('en-IN')+' Cr';
-      if(k.includes('breadth') && typeof v==='number') display = v+'%';
-      if(k.includes('cpi') && typeof v==='number') display = v+'%';
+      if((k.includes('breadth')||k.includes('cpi')) && typeof v==='number') display = v+'%';
       html+=`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2)">${label}</span><span style="font-size:14px;font-weight:800;color:var(--text)">${display}</span></div>`;
     }
     html+=`</div>`;
@@ -556,14 +558,15 @@ function renderDirector() {
 
   // Update Manual Inputs (collapsible)
   html+=`<div class="card"><div class="coll-head" onclick="toggleColl('editInputs')"><span class="coll-label">\u270E Update Inputs</span><span class="coll-arrow" id="editInputsArrow">\u25B6</span></div><div class="coll-body" id="editInputs"><div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5">Tap source link, read value, type it in, then Save.</div>`;
-  const inputDefs=[{k:'nifty_pe',l:'Nifty PE Ratio',u:'https://trendlyne.com/equity/1887/NIFTY/nifty-50/',src:'Trendlyne'},{k:'fii',l:'FII 30-day Net (Cr)',u:'https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/',src:'Trendlyne'},{k:'dii',l:'DII 30-day Net (Cr)',u:'https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/',src:'Trendlyne'},{k:'breadth',l:'Breadth (% > 200 DMA)',u:'https://trendlyne.com/fundamentals/stock-screener/797020/nifty-500-above-200-sma/index/NIFTY500/nifty-500/',src:'Trendlyne'}];
-  inputDefs.forEach(f=>{const cv=mi[f.k]||'';html+=`<div class="form-group"><label class="form-label">${f.l}</label><div class="form-hint">Current: ${cv}</div><a class="form-link" href="${f.u}" target="_blank">Open in ${f.src}</a><input type="number" class="form-input" id="mi_${f.k}" value="${cv}" step="0.1"></div>`;});
-  const yv=mi.yield_inverted||mi.yield||'No';
+  const inputDefs=[{k:'nifty_pe',l:'Nifty PE Ratio',u:'https://trendlyne.com/equity/1887/NIFTY/nifty-50/',src:'Trendlyne'},{k:'fii',l:'FII 30-day Net (Cr)',u:'https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/',src:'Trendlyne',alt:'fii_30day_net_cr'},{k:'dii',l:'DII 30-day Net (Cr)',u:'https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/',src:'Trendlyne',alt:'dii_30day_net_cr'},{k:'breadth',l:'Breadth (% > 200 DMA)',u:'https://trendlyne.com/fundamentals/stock-screener/797020/nifty-500-above-200-sma/index/NIFTY500/nifty-500/',src:'Trendlyne',alt:'breadth_pct_above_200dma'}];
+  function miVal(k,alt){var raw=mi[k];if(raw===undefined&&alt)raw=mi[alt];if(raw===null||raw===undefined)return'';if(typeof raw==='object'&&raw.value!==undefined)return raw.value;return raw;}
+  inputDefs.forEach(f=>{const cv=miVal(f.k,f.alt);html+=`<div class="form-group"><label class="form-label">${f.l}</label><div class="form-hint">Current: ${cv}</div><a class="form-link" href="${f.u}" target="_blank">Open in ${f.src}</a><input type="number" class="form-input" id="mi_${f.k}" value="${cv}" step="0.1"></div>`;});
+  const yv=miVal('yield_inverted','yield_curve_inverted')||'No';
   html+=`<div class="form-group"><label class="form-label">Yield Inverted?</label><div class="form-hint">Current: ${yv}</div><a class="form-link" href="https://tradingeconomics.com/india/government-bond-yield" target="_blank">Open in Trading Economics</a><select class="form-select" id="mi_yield"><option value="No"${yv==='No'?' selected':''}>No</option><option value="Yes"${yv==='Yes'?' selected':''}>Yes</option></select></div>`;
-  const rv=mi.rbi_stance||mi.rbi||'Neutral';
+  const rv=miVal('rbi_stance')||'Neutral';
   html+=`<div class="form-group"><label class="form-label">RBI Stance</label><div class="form-hint">Current: ${rv}</div><a class="form-link" href="https://tradingeconomics.com/india/interest-rate" target="_blank">Open in Trading Economics</a><select class="form-select" id="mi_rbi"><option value="Accommodative"${rv==='Accommodative'?' selected':''}>Accommodative</option><option value="Neutral"${rv==='Neutral'?' selected':''}>Neutral</option><option value="Tightening"${rv==='Tightening'?' selected':''}>Tightening</option></select></div>`;
-  html+=`<div class="form-group"><label class="form-label">CPI %</label><div class="form-hint">Current: ${mi.cpi||''}</div><a class="form-link" href="https://tradingeconomics.com/india/inflation-cpi" target="_blank">Open in Trading Economics</a><input type="number" class="form-input" id="mi_cpi" value="${mi.cpi||''}" step="0.1"></div>`;
-  html+=`<div class="form-group"><label class="form-label">PMI Manufacturing</label><div class="form-hint">Current: ${mi.pmi||''}</div><a class="form-link" href="https://tradingeconomics.com/india/manufacturing-pmi" target="_blank">Open in Trading Economics</a><input type="number" class="form-input" id="mi_pmi" value="${mi.pmi||''}" step="0.1"></div>`;
+  html+=`<div class="form-group"><label class="form-label">CPI %</label><div class="form-hint">Current: ${miVal('cpi','cpi_pct')}</div><a class="form-link" href="https://tradingeconomics.com/india/inflation-cpi" target="_blank">Open in Trading Economics</a><input type="number" class="form-input" id="mi_cpi" value="${miVal('cpi','cpi_pct')}" step="0.1"></div>`;
+  html+=`<div class="form-group"><label class="form-label">PMI Manufacturing</label><div class="form-hint">Current: ${miVal('pmi','pmi_manufacturing')}</div><a class="form-link" href="https://tradingeconomics.com/india/manufacturing-pmi" target="_blank">Open in Trading Economics</a><input type="number" class="form-input" id="mi_pmi" value="${miVal('pmi','pmi_manufacturing')}" step="0.1"></div>`;
   html+=`<button class="btn btn-primary" onclick="doSaveInputs()">Save & Rescore</button></div></div>`;
 
 
