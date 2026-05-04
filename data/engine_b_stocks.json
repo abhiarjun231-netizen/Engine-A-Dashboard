@@ -4514,6 +4514,11 @@
       "token": "3518",
       "symbol": "TORNTPHARM-EQ",
       "name": "TORNTPHARM"
+    },
+    "CROMPTON": {
+      "token": "17094",
+      "symbol": "CROMPTON-EQ",
+      "name": "CROMPTON"
     }
   },
   "_last_token_update": "2026-05-04",
