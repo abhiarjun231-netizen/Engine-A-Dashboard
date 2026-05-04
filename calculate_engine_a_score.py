@@ -85,9 +85,16 @@ def load_manual_inputs():
                 "cpi": "cpi_pct",
                 "pmi": "pmi_manufacturing",
             }
-            for short_key, long_key in key_map.items():
-                if short_key in flat and flat[short_key] is not None:
-                    result[long_key] = flat[short_key]
+            # Also handle long keys already in data/ file
+            long_keys = set(key_map.values())
+            for k, raw in flat.items():
+                if k.startswith("_"): continue
+                v = raw.get("value") if isinstance(raw, dict) and "value" in raw else raw
+                if v is None: continue
+                if k in key_map:
+                    result[key_map[k]] = v
+                elif k in long_keys:
+                    result[k] = v
             print(f"  Loaded {len(result)} fields from data/manual_inputs.json")
         except Exception as e:
             print(f"  WARN: data/manual_inputs.json read error: {e}")
