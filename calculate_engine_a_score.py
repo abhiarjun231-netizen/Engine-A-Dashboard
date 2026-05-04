@@ -66,18 +66,54 @@ def load_history():
     return out
 
 def load_manual_inputs():
-    path = Path("manual_inputs.json")
-    if not path.exists():
-        print("ERROR: manual_inputs.json missing")
-        return {}
-    with open(path, "r") as f:
-        data = json.load(f)
-    flat = {}
-    for key, obj in data.items():
-        if key.startswith("_"):
-            continue
-        flat[key] = obj.get("value")
-    return flat
+    result = {}
+
+    # Source 1: data/manual_inputs.json (GitHub Pages flat format)
+    # Keys: nifty_pe, fii, dii, breadth, yield_inverted, rbi_stance, cpi, pmi
+    data_path = Path("data/manual_inputs.json")
+    if data_path.exists():
+        try:
+            with open(data_path, "r") as f:
+                flat = json.load(f)
+            key_map = {
+                "nifty_pe": "nifty_pe",
+                "fii": "fii_30day_net_cr",
+                "dii": "dii_30day_net_cr",
+                "breadth": "breadth_pct_above_200dma",
+                "yield_inverted": "yield_curve_inverted",
+                "rbi_stance": "rbi_stance",
+                "cpi": "cpi_pct",
+                "pmi": "pmi_manufacturing",
+            }
+            for short_key, long_key in key_map.items():
+                if short_key in flat and flat[short_key] is not None:
+                    result[long_key] = flat[short_key]
+            print(f"  Loaded {len(result)} fields from data/manual_inputs.json")
+        except Exception as e:
+            print(f"  WARN: data/manual_inputs.json read error: {e}")
+
+    # Source 2: root manual_inputs.json (Streamlit nested format)
+    # Keys: nifty_pe.value, fii_30day_net_cr.value, etc.
+    root_path = Path("manual_inputs.json")
+    if root_path.exists():
+        try:
+            with open(root_path, "r") as f:
+                data = json.load(f)
+            root_count = 0
+            for key, obj in data.items():
+                if key.startswith("_"):
+                    continue
+                val = obj.get("value") if isinstance(obj, dict) else obj
+                if val is not None and key not in result:
+                    result[key] = val
+                    root_count += 1
+            print(f"  Loaded {root_count} additional fields from manual_inputs.json")
+        except Exception as e:
+            print(f"  WARN: manual_inputs.json read error: {e}")
+
+    if not result:
+        print("ERROR: No manual inputs found in either file")
+    return result
 
 print("\n--- LOADING DATA ---")
 live = load_live_prices()
