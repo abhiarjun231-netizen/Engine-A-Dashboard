@@ -1365,99 +1365,333 @@ def rules_engine_d(stock, ea_score, vol_data, all_pos, b_tickers, c_tickers):
 
     return s
 
-def render_signals_html(signals, engine="B"):
-    """Synthesize all signals into ONE clear verdict + reason + warnings."""
-    if not signals: return ""
+def _engine_avg(all_wl, field):
+    vals = [s.get(field) for s in all_wl if s.get(field) is not None and s.get(field) != 0]
+    return round(sum(vals)/len(vals),1) if vals else 0
 
-    # Count green/red signals
-    greens = []; reds = []; ambers = []
-    for key, (label, color) in signals.items():
-        if color in ("#059669","#16a34a"): greens.append((key, label))
-        elif color in ("#dc2626","#ea580c"): reds.append((key, label))
-        elif color == "#d97706": ambers.append((key, label))
+def _vs_avg(val, avg):
+    if not val or not avg or avg == 0: return ""
+    r = val/avg
+    if r >= 2: return f" ({r:.1f}x avg)"
+    if r >= 1.3: return f" (above avg {avg:.0f})"
+    if r <= 0.7: return f" (below avg {avg:.0f})"
+    return ""
 
-    total = len(greens) + len(reds) + len(ambers)
-    green_pct = len(greens) / total * 100 if total else 0
+def render_signals_html(signals, engine="B", stock=None, all_wl=None, ea_score=None, all_pos=None):
+    """GODMODE: Synthesize all data into contextual analysis paragraph."""
+    if not stock: stock = {}
+    if not all_wl: all_wl = []
+    if not all_pos: all_pos = []
 
-    # VERDICT LOGIC
-    # Hard blockers first
-    dvm = signals.get("dvm",("",""))[0]
-    if engine == "B" and "RED GATE" in dvm:
-        verdict, vc, reason = "AVOID", "#dc2626", "DVM below entry threshold. Not investable."
-    elif engine == "B" and "GREY GATE" in dvm:
-        verdict, vc, reason = "STALK", "#d97706", "DVM in grey zone. Watch for green crossover."
-    elif any("TRAP" in r[1] for r in reds):
-        verdict, vc, reason = "AVOID", "#dc2626", "Value trap detected. Revenue declining + promoter selling."
-    elif any("KILL" in r[1] and "NO" not in r[1] for r in reds):
-        verdict, vc, reason = "AVOID", "#dc2626", "Kill shots detected. Growth or debt failing."
-    elif any("BLOCKED" in r[1] for r in reds):
-        verdict, vc, reason = "BLOCKED", "#dc2626", "Sector already at 30% cap. Sell one first."
-    elif any("CRASH" in r[1] for r in reds):
-        verdict, vc, reason = "EXIT", "#dc2626", "Momentum crashing. Institutional stampede."
-    # Positive synthesis
-    elif green_pct >= 70:
-        # Build specific reason from top greens
-        reasons = []
-        for k, l in greens[:3]:
-            if "GREEN" in l: reasons.append("DVM confirmed")
-            elif "ACCEL" in l: reasons.append("growth accelerating")
-            elif "CONFIRMED" in l or "ACCUMULATION" in l: reasons.append("volume confirmed")
-            elif "DEEP" in l: reasons.append("deep PE discount")
-            elif "CLEAN" in l: reasons.append("no value traps")
-            elif "PERFECT" in l: reasons.append("perfect Piotroski")
-            elif "EXTREME" in l or "UNDER" in l: reasons.append("PEG undervalued")
-            elif "NO KILLS" in l: reasons.append("no kill shots")
-            elif "HEALTHY" in l: reasons.append("revenue + profit aligned")
-            elif "ALL 3" in l: reasons.append("all 3 engines confirm")
-            elif "QUALITY" in l: reasons.append("strong fundamentals")
-        reason_txt = ", ".join(reasons[:3]) if reasons else "multiple positive signals"
-        verdict, vc = "ENTER", "#059669"
-        reason = reason_txt.capitalize() + "."
-    elif green_pct >= 50:
-        # Find the key amber/red concern
-        concerns = []
-        for k, l in (reds + ambers)[:2]:
-            if "EXHAUSTION" in l: concerns.append("near 52W high on low volume")
-            elif "COST CUTTING" in l: concerns.append("profits from cost cuts, not revenue")
-            elif "WEAK BASE" in l: concerns.append("weak fundamentals")
-            elif "SPECULATIVE" in l: concerns.append("speculative volume")
-            elif "DECELERATING" in l: concerns.append("growth slowing")
-            elif "MARGIN" in l: concerns.append("margin pressure")
-            elif "STALE" in l or "OVERDUE" in l: concerns.append("old results data")
-            elif "NEAR CAP" in l: concerns.append("sector near concentration limit")
-            else: concerns.append(l.lower())
-        concern_txt = ", ".join(concerns[:2]) if concerns else "some concerns"
-        verdict, vc = "STALK", "#d97706"
-        reason = f"Mostly positive but {concern_txt}. Wait for improvement."
-    else:
-        # More reds than greens
-        top_reds = []
-        for k, l in reds[:2]:
-            top_reds.append(l.lower())
-        red_txt = " + ".join(top_reds) if top_reds else "multiple red flags"
-        verdict, vc = "AVOID", "#dc2626"
-        reason = f"Too many concerns: {red_txt}."
+    nm = stock.get("name",""); tk = stock.get("ticker","")
+    roe = stock.get("roe"); pe = stock.get("pe"); pio = stock.get("piotroski")
+    de = stock.get("de"); pg = stock.get("profit_growth"); pg3 = stock.get("profit_growth_3yr")
+    prom = stock.get("promoter"); fii = stock.get("fii"); inst = stock.get("inst")
+    rq = stock.get("rev_qoq"); peg = stock.get("peg"); mcap = stock.get("mcap")
+    dur = stock.get("durability"); mom = stock.get("momentum")
+    prev_m = stock.get("prev_momentum")
+    dp = stock.get("delivery_pct",0) or 0
+    ltp = stock.get("ltp",0) or 0
+    h52 = stock.get("high_52w",0) or 0; l52 = stock.get("low_52w",0) or 0
+    w52 = round((ltp-l52)/(h52-l52)*100) if h52>l52 and ltp>0 else 50
+    is_dbl = stock.get("is_double", False)
+    sec = stock.get("sector","")
 
-    # Risk-reward line
-    rr_txt = ""
-    rr = signals.get("rr")
-    if rr:
-        rr_label = rr[0]
-        rr_color = rr[1]
-        ratio_num = rr_label.replace("R:R ","").replace("1:","")
-        try:
-            rv = float(ratio_num)
-            if rv >= 3: rr_txt = f" Risk:Reward {rr_label} — favorable."
-            elif rv >= 1.5: rr_txt = f" Risk:Reward {rr_label} — acceptable."
-            else: rr_txt = f" Risk:Reward {rr_label} — unfavorable."
-        except: pass
+    # Engine averages
+    avg_roe = _engine_avg(all_wl, "roe")
+    avg_pe = _engine_avg(all_wl, "pe")
+    avg_pg = _engine_avg(all_wl, "profit_growth")
 
-    # Key warnings (only show if RED and actionable)
-    warnings_html = ""
-    critical_warnings = [(k,l) for k,l in reds if any(w in l for w in ["TRAP","CRASH","BLOCKED","EXHAUSTION","WEAK BASE","KILL","DETERIORATING"])]
-    if critical_warnings:
-        warn_pills = " ".join(_pill(l, c) for l,c in [(lbl,"#dc2626") for _,lbl in critical_warnings[:3]])
-        warnings_html = f"<div style='margin-top:4px;'>{warn_pills}</div>"
+    lines = []  # Analysis lines
+    verdict = "STALK"
+    vc = "#d97706"
+    red_flags = []
+    strengths = 0
+
+    # ═══════════════════════════════════════════
+    # ENGINE B — MOMENTUM ANALYSIS
+    # ═══════════════════════════════════════════
+    if engine == "B":
+        vel = (mom - prev_m) if mom and prev_m is not None else 0
+
+        # DVM is THE signal for momentum
+        if dur and dur > 55 and mom and mom > 59:
+            if dur > 75:
+                lines.append(f"Durability {dur:.0f} is fortress-level — institutions deeply committed.")
+                strengths += 2
+            else:
+                lines.append(f"DVM green (D:{dur:.0f} M:{mom:.0f}) — institutional buying active.")
+                strengths += 1
+
+            # Velocity adds urgency
+            if vel >= 5:
+                lines.append(f"Momentum accelerating (+{vel:.0f}/wk) — buying pressure increasing.")
+                strengths += 1
+            elif vel < -5:
+                lines.append(f"⚠ Momentum decaying ({vel:.0f}/wk) despite green DVM. Early exit warning.")
+                red_flags.append("velocity decay")
+        elif dur and dur >= 45 and mom and mom >= 49:
+            lines.append(f"DVM in grey zone (D:{dur:.0f} M:{mom:.0f}). Not investable yet — wait for green crossover above D:55/M:59.")
+            verdict = "STALK"; vc = "#d97706"
+        else:
+            lines.append(f"DVM below threshold. No institutional interest. Skip.")
+            verdict = "AVOID"; vc = "#dc2626"
+
+        # Volume tells you if the move is real
+        vr = signals.get("volume",("",""))[0]
+        if "ACCUMULATION" in vr or "CONFIRMED" in vr:
+            lines.append(f"Volume confirms — {'delivery '+str(dp)+'%' if dp>55 else 'above-average activity'}. Real buying, not speculation.")
+            strengths += 1
+        elif "SPECULATIVE" in vr:
+            lines.append(f"⚠ High volume but low delivery ({dp:.0f}%). This is traders, not institutions.")
+            red_flags.append("speculative volume")
+        elif "NO INTEREST" in vr:
+            lines.append(f"Volume dead. Momentum score may be stale — needs fresh confirmation.")
+
+        # Fundamental floor check — BUT framed for momentum
+        if roe and roe < 10 and pio and pio <= 6:
+            lines.append(f"⚠ Weak fundamentals (ROE:{roe:.0f}%, Pio:{pio:.0f}). Momentum on shaky ground — if DVM turns, crash will be severe. Smaller position.")
+            red_flags.append("weak fundamentals")
+        elif roe and roe > 20 and pio and pio >= 7:
+            lines.append(f"Strong fundamentals back the momentum (ROE:{roe:.0f}%{_vs_avg(roe,avg_roe)}, Pio:{pio:.0f}/9). If DVM stays green, this has legs.")
+            strengths += 1
+
+        # 52W context matters for momentum timing
+        if w52 > 90:
+            lines.append(f"At {w52}% of 52W range — near highs. If volume is thin, this is exhaustion, not breakout.")
+            if not ("ACCUMULATION" in vr or "CONFIRMED" in vr):
+                red_flags.append("near highs, thin volume")
+        elif w52 < 30:
+            lines.append(f"At {w52}% of 52W range — near lows. Unusual for a green DVM stock. Potential early accumulation.")
+
+        # PG is bonus context for momentum
+        if pg and pg > 50:
+            lines.append(f"Profit growth +{pg:.0f}%{_vs_avg(pg,avg_pg)} gives fundamental tailwind to momentum.")
+
+        # Cross-engine adds conviction
+        cross = signals.get("cross")
+        if cross and "ALL 3" in cross[0]:
+            lines.append(f"Confirmed across all 3 engines — momentum + value + growth. Highest conviction.")
+            strengths += 1
+        elif cross:
+            lines.append(f"Also in {cross[0].replace('+','')} screener — momentum has fundamental backing.")
+
+        # VERDICT
+        if "AVOID" not in verdict:
+            if len(red_flags) >= 2: verdict, vc = "AVOID", "#dc2626"
+            elif strengths >= 3 and not red_flags: verdict, vc = "ENTER", "#059669"
+            elif strengths >= 2 and len(red_flags) <= 1: verdict, vc = "STALK", "#d97706"
+            elif red_flags: verdict, vc = "STALK", "#d97706"
+
+        # Risk-reward
+        if ltp and h52:
+            stop = round(max(ltp, h52) * 0.85)
+            down = ltp - stop; up = h52 - ltp
+            if down > 0 and up > 0:
+                rr = round(up/down, 1)
+                lines.append(f"Stop: ₹{stop:,} (-15%). Target: ₹{h52:,} (52W high). Risk:Reward 1:{rr}{'— favorable.' if rr>=2 else '— tight.' if rr>=1 else '— unfavorable. Most upside captured.'}")
+
+    # ═══════════════════════════════════════════
+    # ENGINE C — VALUE ANALYSIS
+    # ═══════════════════════════════════════════
+    elif engine == "C":
+        # PE is THE signal for value
+        if pe:
+            room = round(((25-pe)/pe)*100) if pe < 25 else 0
+            if pe < 12:
+                lines.append(f"PE {pe:.0f} is a deep discount — {room}% expansion room to cap of 25. Market is sleeping on this.")
+                strengths += 2
+            elif pe < 18:
+                lines.append(f"PE {pe:.0f}{' (vs avg '+str(avg_pe)+')' if avg_pe else ''} with {room}% room. Solid value — sweet spot for accumulation.")
+                strengths += 1
+            elif pe < 23:
+                lines.append(f"PE {pe:.0f} — moderate value, {room}% room left. Enter only if quality is exceptional.")
+            else:
+                lines.append(f"PE {pe:.0f} — near the cap of 25. Minimal PE expansion upside remaining.")
+                red_flags.append("PE near cap")
+
+        # Quality is what separates value from trap
+        quality_score = 0
+        quality_parts = []
+        if roe and roe > 20: quality_score += 2; quality_parts.append(f"ROE {roe:.0f}%{_vs_avg(roe,avg_roe)}")
+        elif roe and roe > 15: quality_score += 1; quality_parts.append(f"ROE {roe:.0f}%")
+        if pio and pio >= 8: quality_score += 2; quality_parts.append(f"Piotroski {pio:.0f}/9")
+        elif pio and pio >= 7: quality_score += 1; quality_parts.append(f"Pio {pio:.0f}/9")
+        if de is not None and de < 0.5: quality_score += 1; quality_parts.append(f"D/E {de:.1f}")
+        if quality_score >= 4:
+            lines.append(f"Exceptional quality: {', '.join(quality_parts)}. This is cheap AND strong — rare combination.")
+            strengths += 2
+        elif quality_score >= 2:
+            lines.append(f"Good quality: {', '.join(quality_parts)}. Meets all thresholds.")
+            strengths += 1
+
+        # Value trap detection — THE critical safety check
+        rev_ok = rq is None or rq > -10
+        prom_ok = prom is None or prom > 40
+        if not rev_ok and not prom_ok:
+            lines.append(f"🚨 VALUE TRAP: Revenue declining ({rq:+.0f}% QoQ) AND promoter low ({prom:.0f}%). Cheap for a reason. Skip.")
+            red_flags.append("value trap")
+            verdict, vc = "AVOID", "#dc2626"
+        elif not rev_ok:
+            lines.append(f"⚠ Revenue declining ({rq:+.0f}% QoQ). Watch if this is seasonal or structural.")
+            red_flags.append("revenue decline")
+        elif not prom_ok:
+            lines.append(f"⚠ Promoter at {prom:.0f}%. Low skin in the game — monitor for further selling.")
+
+        # Growth acceleration
+        if pg and pg3:
+            if pg > pg3 * 1.5 and pg > 15:
+                lines.append(f"Growth accelerating: YoY +{pg:.0f}% vs 3Yr +{pg3:.0f}%. Recent quarters outperforming history.")
+                strengths += 1
+            elif pg < pg3 * 0.5 and pg3 > 15:
+                lines.append(f"⚠ Growth decelerating: YoY +{pg:.0f}% vs 3Yr +{pg3:.0f}%. Recent quarters weaker than history.")
+                red_flags.append("growth slowing")
+        elif pg and pg > 20:
+            lines.append(f"Profit growth +{pg:.0f}%{_vs_avg(pg,avg_pg)}. Earnings momentum supports the value thesis.")
+            strengths += 1
+
+        # Double screener
+        if is_dbl:
+            lines.append(f"Passed BOTH 4-filter and 6-filter screener. Stricter quality filters (D/E<1, PG>15%) also confirm.")
+            strengths += 1
+
+        # Cross-engine
+        cross = signals.get("cross")
+        if cross and "ALL 3" in cross[0]:
+            lines.append(f"All 3 engines confirm — value + momentum + growth. Highest conviction entry.")
+            strengths += 1
+        elif cross:
+            lines.append(f"Also in {cross[0].replace('+','')} screener — multiple angles validate this stock.")
+
+        # VERDICT
+        if "AVOID" not in verdict:
+            if strengths >= 4 and not red_flags: verdict, vc = "ENTER", "#059669"
+            elif strengths >= 3 and len(red_flags) <= 1: verdict, vc = "ENTER", "#059669"
+            elif strengths >= 2: verdict, vc = "STALK", "#d97706"
+            elif red_flags: verdict, vc = "AVOID", "#dc2626"
+
+        # Targets
+        if pe and pe < 25 and ltp:
+            t25 = round(ltp * (pe*1.3)/pe); t50 = round(ltp * (pe*1.5)/pe); t75 = round(ltp * (pe*1.8)/pe)
+            stop = round(ltp * 0.93)
+            lines.append(f"Stop: ₹{stop:,} (-7%). Targets: Book 25% at ₹{t25:,}, 50% at ₹{t50:,}, 75% at ₹{t75:,}.")
+
+    # ═══════════════════════════════════════════
+    # ENGINE D — COMPOUNDER ANALYSIS
+    # ═══════════════════════════════════════════
+    elif engine == "D":
+        # Growth is THE thesis
+        if pg and pg > 30 and rq and rq > 0:
+            lines.append(f"Growth engine firing on all cylinders: profit +{pg:.0f}% YoY, revenue +{rq:.0f}% QoQ. Both top-line and bottom-line growing.")
+            strengths += 2
+        elif pg and pg > 15 and rq and rq > 0:
+            lines.append(f"Steady growth: profit +{pg:.0f}% YoY with revenue +{rq:.0f}% QoQ. Compounder thesis intact.")
+            strengths += 1
+        elif pg and pg > 15 and (rq is None or rq <= 0):
+            lines.append(f"⚠ Profit growing (+{pg:.0f}%) but revenue {'declining ('+str(rq)+' QoQ)' if rq and rq<0 else 'flat'}. Profits may be from cost cuts, not real growth.")
+            red_flags.append("revenue disconnect")
+        elif pg and pg <= 0:
+            lines.append(f"🚨 Profit declining ({pg:+.0f}%). Compounder thesis broken. Do not enter.")
+            red_flags.append("no growth")
+            verdict, vc = "AVOID", "#dc2626"
+
+        # PEG tells you if you're paying fair price for growth
+        if peg and peg > 0:
+            if peg < 0.5:
+                lines.append(f"PEG {peg:.1f} — market is severely underpricing this growth. Extreme value relative to earnings trajectory.")
+                strengths += 2
+            elif peg < 0.8:
+                lines.append(f"PEG {peg:.1f} — growth not fully priced in. Good entry window.")
+                strengths += 1
+            elif peg <= 1.2:
+                lines.append(f"PEG {peg:.1f} — fairly valued for growth. Enter on dips only.")
+            else:
+                lines.append(f"PEG {peg:.1f} — paying premium for growth. Wait for correction or acceleration.")
+                red_flags.append("expensive PEG")
+
+        # Kill shots
+        kills = []
+        if pg is not None and pg <= 0: kills.append("growth failing")
+        if de is not None and de > 1.5: kills.append("debt creeping")
+        if prom is not None and prom < 35: kills.append("promoter disengaged")
+        if rq is not None and rq < -15: kills.append("revenue collapsing")
+        if kills:
+            lines.append(f"⚠ Kill shots: {', '.join(kills)}. {'2+ disqualifiers — REJECT.' if len(kills)>=2 else 'Monitor closely.'}")
+            if len(kills) >= 2: red_flags.append("multiple kills"); verdict, vc = "AVOID", "#dc2626"
+        else:
+            lines.append(f"No kill shots. Growth + debt + promoter all clean.")
+            strengths += 1
+
+        # Growth acceleration
+        if pg and pg3:
+            if pg > pg3 * 1.5:
+                lines.append(f"Growth accelerating: recent +{pg:.0f}% vs 3Yr trend +{pg3:.0f}%. Compounding is intensifying.")
+                strengths += 1
+            elif pg < pg3 * 0.5 and pg3 > 15:
+                lines.append(f"⚠ Growth decelerating: +{pg:.0f}% vs 3Yr +{pg3:.0f}%. Watch for further slowdown.")
+
+        # MCap runway
+        if mcap:
+            if mcap < 10000:
+                lines.append(f"Small cap (₹{mcap:,.0f}Cr) — maximum compounding runway. Can 5-10x if growth sustains.")
+                strengths += 1
+            elif mcap < 50000:
+                lines.append(f"Mid cap (₹{mcap:,.0f}Cr) — still has 2-3x potential. Sweet spot for compounders.")
+
+        # Quality
+        if roe and roe > 25 and pio and pio >= 8:
+            lines.append(f"Quality elite: ROE {roe:.0f}%{_vs_avg(roe,avg_roe)}, Pio {pio:.0f}/9, D/E {de:.1f if de else 'N/A'}. Business machine.")
+            strengths += 1
+
+        # Double + Cross
+        if is_dbl:
+            lines.append(f"Double screener (PEG + PE filters both confirm). Higher conviction.")
+            strengths += 1
+        cross = signals.get("cross")
+        if cross and "ALL 3" in cross[0]:
+            lines.append(f"All 3 engines confirm. Momentum + value + growth aligned.")
+            strengths += 1
+
+        # VERDICT
+        if "AVOID" not in verdict:
+            if strengths >= 4 and not red_flags: verdict, vc = "ENTER", "#059669"
+            elif strengths >= 3 and len(red_flags) <= 1: verdict, vc = "ENTER", "#059669"
+            elif strengths >= 2: verdict, vc = "STALK", "#d97706"
+            elif red_flags: verdict, vc = "AVOID", "#dc2626"
+
+        # Target from PEG normalization
+        if peg and peg > 0 and peg < 1.5 and ltp:
+            target = round(ltp / peg) if peg < 1 else round(ltp * 1.5)
+            stop = round(ltp * 0.90)
+            rr = round((target-ltp)/(ltp-stop),1) if (ltp-stop) > 0 else 0
+            lines.append(f"Stop: ₹{stop:,} (-10%). Target: ₹{target:,}. Risk:Reward 1:{rr}{'— favorable.' if rr>=2 else '.'}")
+
+    # ═══════════════════════════════════════════
+    # Sector concentration warning (all engines)
+    # ═══════════════════════════════════════════
+    sec_sig = signals.get("sector_risk")
+    if sec_sig and "BLOCKED" in sec_sig[0]:
+        lines.append(f"🚫 Sector {sec} already at 30%+ of portfolio. Cannot add — sell one from this sector first.")
+        verdict, vc = "BLOCKED", "#dc2626"
+    elif sec_sig and "NEAR CAP" in sec_sig[0]:
+        lines.append(f"Sector {sec} near 30% cap. Room for this stock, but no more after.")
+
+    # Earnings freshness
+    earn_sig = signals.get("earnings")
+    if earn_sig and ("STALE" in earn_sig[0] or "OVERDUE" in earn_sig[0]):
+        lines.append(f"⚠ Results data is old ({earn_sig[0]}). Numbers may change significantly with next filing.")
+
+    # Engine A gate check
+    if ea_score and ea_score <= 30:
+        lines.append(f"🚫 Engine A at {ea_score}/100 — FREEZE mode. No new buys regardless of stock quality.")
+        verdict, vc = "FREEZE", "#dc2626"
+    elif ea_score and ea_score <= 20:
+        verdict, vc = "EXIT ALL", "#dc2626"
+
+    # ═══════════════════════════════════════════
+    # BUILD HTML
+    # ═══════════════════════════════════════════
+    bg = "#f0fdf4" if vc == "#059669" else ("#fffbeb" if vc == "#d97706" else "#fef2f2")
 
     # Cross-engine badge
     cross = signals.get("cross")
@@ -1465,18 +1699,15 @@ def render_signals_html(signals, engine="B"):
     if cross:
         cross_html = f" {_pill(cross[0], cross[1])}"
 
-    # Build final HTML
+    analysis_text = " ".join(lines[:6])  # Cap at 6 most important lines
+
     html = (
-        f"<div style='margin:8px 0;padding:8px 12px;border-radius:8px;"
-        f"background:{'#f0fdf4' if vc=='#059669' else '#fffbeb' if vc=='#d97706' else '#fef2f2'};"
-        f"border-left:4px solid {vc};'>"
-        f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
-        f"<span style='font-size:13px;font-weight:800;color:{vc};letter-spacing:1px;'>{verdict}</span>"
-        f"<span style='display:flex;gap:4px;'>{cross_html}"
-        f"{'  '+_pill(signals.get('earnings',('',''))[0], signals.get('earnings',('',''))[1]) if signals.get('earnings') else ''}"
-        f"</span></div>"
-        f"<div style='font-size:11px;color:#475569;margin-top:3px;line-height:1.4;'>{reason}{rr_txt}</div>"
-        f"{warnings_html}"
+        f"<div style='margin:8px 0;padding:10px 14px;border-radius:10px;"
+        f"background:{bg};border-left:4px solid {vc};'>"
+        f"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>"
+        f"<span style='font-size:14px;font-weight:800;color:{vc};letter-spacing:1px;'>{verdict}</span>"
+        f"<span>{cross_html}</span></div>"
+        f"<div style='font-size:11px;color:#334155;line-height:1.6;'>{analysis_text}</div>"
         f"</div>"
     )
     return html

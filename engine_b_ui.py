@@ -288,7 +288,7 @@ def show_engine_b():
                 f"<div style='margin-top:4px;'>"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}"
                 f"{overlap_badges}</div>"
-                f"{render_signals_html(signals, engine="B")}"
+                f"{render_signals_html(signals, engine="B", stock=s, all_wl=wl, ea_score=ea, all_pos=all_pos_list)}"
                 f"{render_earnings_info(s)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
