@@ -4499,6 +4499,21 @@
       "token": "1808",
       "symbol": "KAJARIACER-EQ",
       "name": "KAJARIACER"
+    },
+    "KEI": {
+      "token": "13310",
+      "symbol": "KEI-EQ",
+      "name": "KEI"
+    },
+    "THELEELA": {
+      "token": "757014",
+      "symbol": "THELEELA-EQ",
+      "name": "THELEELA"
+    },
+    "TORNTPHARM": {
+      "token": "3518",
+      "symbol": "TORNTPHARM-EQ",
+      "name": "TORNTPHARM"
     }
   },
   "_last_token_update": "2026-05-04",
