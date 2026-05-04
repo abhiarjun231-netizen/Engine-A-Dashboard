@@ -1,2 +1,2 @@
 timestamp,raw_score,smoothed_score,market_condition,score_valuation,score_trend,score_breadth,score_volatility,score_flows,score_macro,score_global,score_crude,red_flag,pe_bubble,equity_pct,engine_b_pct,engine_c_pct,debt_pct,gold_pct,duration_signal,gold_signal,nifty_close,nifty_200dma,pct_vs_dma,dma_direction
-2026-05-04 04:45:08,46,46,NEUTRAL,9,5,6,4,6,10,6,0,NO,NO,55,25,30,30,15,MEDIUM DURATION,ACCUMULATE,24218.6,25090.76,-3.5,Falling
+2026-05-04 05:39:54,46,46,NEUTRAL,9,5,6,4,6,10,6,0,NO,NO,55,25,30,30,15,MEDIUM DURATION,ACCUMULATE,24197.75,25090.76,-3.6,Falling
