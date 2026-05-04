@@ -715,11 +715,34 @@ def build():
 
                         # Collect for display
                         if disp_eng in positions_display:
-                            positions_display[disp_eng].append({
+                            pos_entry = {
                                 "ticker":t,"qty":int(qty),"buy_price":round(buy,2),
                                 "current_price":round(cur,2),"pnl":gain,"pnl_pct":gain_pct,
-                                "buy_date":buy_date_str,"is_ltcg":is_ltcg
-                            })
+                                "buy_date":buy_date_str,"is_ltcg":is_ltcg,
+                                # Rich fields from engine_b_stocks.json
+                                "name":p.get("name", t),
+                                "peak":round(safe_float(p.get("peak", max(buy, cur))), 2),
+                                "sector":p.get("sector",""),
+                            }
+                            # Engine B (Momentum) specific
+                            if disp_eng == "momentum":
+                                pos_entry["durability"] = safe_float(p.get("durability", 0))
+                                pos_entry["momentum"] = safe_float(p.get("momentum", 0))
+                                pos_entry["prev_momentum"] = safe_float(p.get("prev_momentum", 0))
+                                pos_entry["conviction"] = int(safe_float(p.get("conviction", 0)))
+                            # Engine C (Value) specific
+                            elif disp_eng == "value":
+                                pos_entry["entry_pe"] = safe_float(p.get("entry_pe", 0))
+                                pos_entry["current_pe"] = safe_float(p.get("current_pe", 0))
+                                pos_entry["vds"] = int(safe_float(p.get("value_depth_score", 0)))
+                                pos_entry["is_double"] = p.get("is_double", False)
+                            # Engine D (Compounder) specific
+                            elif disp_eng == "compounders":
+                                pos_entry["dna"] = int(safe_float(p.get("dna_score", 0)))
+                                pos_entry["is_double"] = p.get("is_double", False)
+                                pos_entry["is_immortal"] = p.get("is_immortal", False)
+                                pos_entry["is_legendary"] = p.get("is_legendary", False)
+                            positions_display[disp_eng].append(pos_entry)
 
             pnl["total_invested"] = round(total_inv, 2)
             pnl["current_value"] = round(total_cur, 2)
