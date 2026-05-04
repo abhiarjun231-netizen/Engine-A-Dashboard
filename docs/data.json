@@ -1,11 +1,11 @@
 {
   "engineA": {
-    "score": 15,
-    "prevScore": 15,
+    "score": 46,
+    "prevScore": 46,
     "components": [
       {
         "name": "Valuation",
-        "score": 0,
+        "score": 9,
         "max": 15
       },
       {
@@ -15,7 +15,7 @@
       },
       {
         "name": "Breadth",
-        "score": 0,
+        "score": 6,
         "max": 12
       },
       {
@@ -25,12 +25,12 @@
       },
       {
         "name": "Flows",
-        "score": 0,
+        "score": 6,
         "max": 12
       },
       {
         "name": "Macro",
-        "score": 0,
+        "score": 10,
         "max": 12
       },
       {
@@ -45,13 +45,13 @@
       }
     ],
     "history": [
-      15
+      46
     ],
     "capital": 500000,
     "allocation": {
-      "equity": 10,
-      "debt": 65,
-      "gold": 25
+      "equity": 55,
+      "debt": 30,
+      "gold": 15
     }
   },
   "momentum": [
@@ -82,7 +82,7 @@
       "multi": "ALL 3",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 28,
+      "ai_score": 32,
       "verdict": "STRONG BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -115,7 +115,7 @@
       "multi": "ALL 3",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 25,
+      "ai_score": 29,
       "verdict": "STRONG BUY",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -148,8 +148,8 @@
       "multi": "ALL 3",
       "stage": "STRIKE",
       "conviction": 9,
-      "ai_score": 24,
-      "verdict": "BUY",
+      "ai_score": 28,
+      "verdict": "STRONG BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -181,8 +181,8 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 10,
-      "ai_score": 23,
-      "verdict": "BUY",
+      "ai_score": 27,
+      "verdict": "STRONG BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -214,8 +214,8 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 9,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -247,7 +247,7 @@
       "multi": "ALL 3",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "Momentum steady.",
       "velocity": "+2",
@@ -280,7 +280,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -313,7 +313,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "DVM fortress. Volume unusual.",
       "velocity": "+2",
@@ -346,7 +346,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 19,
+      "ai_score": 23,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -379,7 +379,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 19,
+      "ai_score": 23,
       "verdict": "BUY",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -412,7 +412,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 19,
+      "ai_score": 23,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -445,7 +445,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -478,7 +478,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 8,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -511,8 +511,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -544,8 +544,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -577,8 +577,8 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 16,
-      "verdict": "ACCUMULATE",
+      "ai_score": 20,
+      "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -610,8 +610,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 16,
-      "verdict": "ACCUMULATE",
+      "ai_score": 20,
+      "verdict": "BUY",
       "signal": "Momentum steady.",
       "velocity": "-2",
       "vel_label": "COOLING"
@@ -643,8 +643,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 6,
-      "ai_score": 16,
-      "verdict": "ACCUMULATE",
+      "ai_score": 20,
+      "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -676,8 +676,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 19,
+      "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -709,8 +709,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 19,
+      "verdict": "BUY",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -742,8 +742,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 18,
+      "verdict": "BUY",
       "signal": "momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -775,7 +775,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -808,7 +808,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -841,7 +841,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 6,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -874,7 +874,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -907,7 +907,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge. Volume unusual.",
       "velocity": "+5",
@@ -940,7 +940,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. Volume unusual. institutional accumulation.",
       "velocity": "+2",
@@ -973,7 +973,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 12,
+      "ai_score": 16,
       "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -1006,7 +1006,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 12,
+      "ai_score": 16,
       "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -1038,7 +1038,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 12,
+      "ai_score": 16,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge. institutional accumulation.",
       "velocity": "+5",
@@ -1071,7 +1071,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 12,
+      "ai_score": 16,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -1104,7 +1104,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 12,
+      "ai_score": 16,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. institutional accumulation.",
       "velocity": "+2",
@@ -1137,7 +1137,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 12,
+      "ai_score": 16,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -1170,8 +1170,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 11,
-      "verdict": "WAIT",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1203,8 +1203,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 11,
-      "verdict": "WAIT",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1236,8 +1236,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 11,
-      "verdict": "WAIT",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1269,8 +1269,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 11,
-      "verdict": "WAIT",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1302,8 +1302,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 10,
-      "verdict": "WAIT",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1335,8 +1335,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 10,
-      "verdict": "WAIT",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1368,8 +1368,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 10,
-      "verdict": "WAIT",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress. Volume unusual.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1401,8 +1401,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 10,
-      "verdict": "WAIT",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1434,8 +1434,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 9,
-      "verdict": "WAIT",
+      "ai_score": 13,
+      "verdict": "ACCUMULATE",
       "signal": "Momentum steady.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1467,8 +1467,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 9,
-      "verdict": "WAIT",
+      "ai_score": 13,
+      "verdict": "ACCUMULATE",
       "signal": "institutional accumulation.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1500,8 +1500,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 4,
-      "verdict": "AVOID",
+      "ai_score": 8,
+      "verdict": "WAIT",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1535,7 +1535,7 @@
       "vol_ratio": 1.01,
       "multi": "ALL 3",
       "vds": 10,
-      "ai_score": 28,
+      "ai_score": 32,
       "verdict": "STRONG BUY",
       "signal": "exceptional ROE.",
       "trap": {
@@ -1575,7 +1575,7 @@
       "double_screener": true,
       "multi": "+COMPOUNDER",
       "vds": 10,
-      "ai_score": 27,
+      "ai_score": 31,
       "verdict": "STRONG BUY",
       "signal": "Attractive PE. high delivery confirms buying. exceptional ROE.",
       "trap": {
@@ -1616,7 +1616,7 @@
       "vol_ratio": 0.75,
       "multi": "ALL 3",
       "vds": 7,
-      "ai_score": 25,
+      "ai_score": 29,
       "verdict": "STRONG BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -1656,7 +1656,7 @@
       "double_screener": true,
       "multi": "+COMPOUNDER",
       "vds": 11,
-      "ai_score": 25,
+      "ai_score": 29,
       "verdict": "STRONG BUY",
       "signal": "PE extreme discount. high delivery confirms buying. exceptional ROE. revenue declining \u2014 watch.",
       "trap": {
@@ -1697,8 +1697,8 @@
       "vol_ratio": 1.33,
       "multi": "ALL 3",
       "vds": 10,
-      "ai_score": 24,
-      "verdict": "BUY",
+      "ai_score": 28,
+      "verdict": "STRONG BUY",
       "signal": "PE extreme discount. exceptional ROE.",
       "trap": {
         "rev": true,
@@ -1738,8 +1738,8 @@
       "vol_ratio": 0.93,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 23,
-      "verdict": "BUY",
+      "ai_score": 27,
+      "verdict": "STRONG BUY",
       "signal": "Value opportunity.",
       "trap": {
         "rev": true,
@@ -1779,8 +1779,8 @@
       "vol_ratio": 1.67,
       "multi": "+COMPOUNDER",
       "vds": 9,
-      "ai_score": 23,
-      "verdict": "BUY",
+      "ai_score": 27,
+      "verdict": "STRONG BUY",
       "signal": "exceptional ROE.",
       "trap": {
         "rev": true,
@@ -1820,8 +1820,8 @@
       "vol_ratio": 1.73,
       "multi": "+COMPOUNDER",
       "vds": 8,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "PE extreme discount. revenue declining \u2014 watch.",
       "trap": {
         "rev": false,
@@ -1861,8 +1861,8 @@
       "vol_ratio": 0.67,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "Value opportunity.",
       "trap": {
         "rev": true,
@@ -1902,8 +1902,8 @@
       "vol_ratio": 14.64,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "Value opportunity.",
       "trap": {
         "rev": true,
@@ -1943,8 +1943,8 @@
       "vol_ratio": 0.45,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 25,
+      "verdict": "STRONG BUY",
       "signal": "Attractive PE.",
       "trap": {
         "rev": true,
@@ -1984,8 +1984,8 @@
       "vol_ratio": 0.48,
       "multi": "+COMPOUNDER",
       "vds": 8,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 25,
+      "verdict": "STRONG BUY",
       "signal": "Attractive PE.",
       "trap": {
         "rev": true,
@@ -2025,7 +2025,7 @@
       "vol_ratio": 0.77,
       "multi": "ALL 3",
       "vds": 7,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "PE extreme discount.",
       "trap": {
@@ -2066,7 +2066,7 @@
       "vol_ratio": 0.57,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2107,7 +2107,7 @@
       "vol_ratio": 0.92,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2148,7 +2148,7 @@
       "vol_ratio": 0.54,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2189,7 +2189,7 @@
       "vol_ratio": 0.78,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 19,
+      "ai_score": 23,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2230,7 +2230,7 @@
       "vol_ratio": 0.56,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "Attractive PE. high delivery confirms buying.",
       "trap": {
@@ -2271,7 +2271,7 @@
       "vol_ratio": 0.82,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2312,8 +2312,8 @@
       "vol_ratio": 0.87,
       "multi": "+COMPOUNDER",
       "vds": 9,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "Attractive PE. exceptional ROE.",
       "trap": {
         "rev": true,
@@ -2353,8 +2353,8 @@
       "vol_ratio": 0.18,
       "multi": "+COMPOUNDER",
       "vds": 8,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "exceptional ROE.",
       "trap": {
         "rev": true,
@@ -2394,8 +2394,8 @@
       "vol_ratio": 0.29,
       "multi": "",
       "vds": 5,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "PE extreme discount.",
       "trap": {
         "rev": true,
@@ -2435,8 +2435,8 @@
       "vol_ratio": 0.59,
       "multi": "",
       "vds": 4,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "high delivery confirms buying.",
       "trap": {
         "rev": true,
@@ -2476,7 +2476,7 @@
       "vol_ratio": 0.41,
       "multi": "+COMPOUNDER",
       "vds": 5,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "Attractive PE.",
       "trap": {
@@ -2520,7 +2520,7 @@
       "multi": "ALL 3",
       "dna": 15,
       "stars": 4,
-      "ai_score": 28,
+      "ai_score": 32,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.54 extreme undervalue. strong profit growth. perfect Piotroski.",
       "killshot": {
@@ -2558,7 +2558,7 @@
       "multi": "+VALUE",
       "dna": 15,
       "stars": 4,
-      "ai_score": 27,
+      "ai_score": 31,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.04 extreme undervalue. strong profit growth. delivery 100.0% accumulation.",
       "killshot": {
@@ -2597,7 +2597,7 @@
       "multi": "ALL 3",
       "dna": 12,
       "stars": 3,
-      "ai_score": 25,
+      "ai_score": 29,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.21 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -2635,7 +2635,7 @@
       "multi": "+VALUE",
       "dna": 12,
       "stars": 3,
-      "ai_score": 25,
+      "ai_score": 29,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.02 extreme undervalue. strong profit growth. delivery 65.0% accumulation.",
       "killshot": {
@@ -2674,8 +2674,8 @@
       "multi": "ALL 3",
       "dna": 10,
       "stars": 3,
-      "ai_score": 24,
-      "verdict": "BUY",
+      "ai_score": 28,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.0 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2713,8 +2713,8 @@
       "multi": "+VALUE",
       "dna": 12,
       "stars": 3,
-      "ai_score": 23,
-      "verdict": "BUY",
+      "ai_score": 27,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.07 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2752,8 +2752,8 @@
       "multi": "+MOMENTUM",
       "dna": 13,
       "stars": 4,
-      "ai_score": 23,
-      "verdict": "BUY",
+      "ai_score": 27,
+      "verdict": "STRONG BUY",
       "signal": "strong profit growth. perfect Piotroski.",
       "killshot": {
         "growth": true,
@@ -2791,8 +2791,8 @@
       "multi": "+VALUE",
       "dna": 16,
       "stars": 5,
-      "ai_score": 23,
-      "verdict": "BUY",
+      "ai_score": 27,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.42 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2830,8 +2830,8 @@
       "multi": "+VALUE",
       "dna": 10,
       "stars": 3,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.21 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2869,8 +2869,8 @@
       "multi": "+MOMENTUM",
       "dna": 12,
       "stars": 3,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2908,8 +2908,8 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.16 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2947,8 +2947,8 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 22,
-      "verdict": "BUY",
+      "ai_score": 26,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.39 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2986,8 +2986,8 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 25,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.12 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3025,8 +3025,8 @@
       "multi": "+VALUE",
       "dna": 13,
       "stars": 4,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 25,
+      "verdict": "STRONG BUY",
       "signal": "PEG 0.57 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3064,7 +3064,7 @@
       "multi": "+MOMENTUM",
       "dna": 11,
       "stars": 3,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "PEG 0.5 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3103,7 +3103,7 @@
       "multi": "+VALUE",
       "dna": 10,
       "stars": 3,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "PEG 0.36 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3142,7 +3142,7 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
@@ -3181,7 +3181,7 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "PEG 0.41 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3220,7 +3220,7 @@
       "multi": "+MOMENTUM",
       "dna": 11,
       "stars": 3,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "PEG 0.41 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3259,7 +3259,7 @@
       "multi": "ALL 3",
       "dna": 7,
       "stars": 2,
-      "ai_score": 20,
+      "ai_score": 24,
       "verdict": "BUY",
       "signal": "Compounding candidate.",
       "killshot": {
@@ -3298,7 +3298,7 @@
       "multi": "+MOMENTUM",
       "dna": 10,
       "stars": 3,
-      "ai_score": 19,
+      "ai_score": 23,
       "verdict": "BUY",
       "signal": "PEG 0.45 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3337,7 +3337,7 @@
       "multi": "+MOMENTUM",
       "dna": 11,
       "stars": 3,
-      "ai_score": 19,
+      "ai_score": 23,
       "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
@@ -3376,7 +3376,7 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 19,
+      "ai_score": 23,
       "verdict": "BUY",
       "signal": "perfect Piotroski.",
       "killshot": {
@@ -3415,7 +3415,7 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "PEG 0.6 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3454,7 +3454,7 @@
       "multi": "+MOMENTUM",
       "dna": 7,
       "stars": 2,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
@@ -3493,7 +3493,7 @@
       "multi": "",
       "dna": 7,
       "stars": 2,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "PEG 0.78 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3532,7 +3532,7 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "PEG 0.57 extreme undervalue.",
       "killshot": {
@@ -3570,7 +3570,7 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "PEG 0.32 extreme undervalue. strong profit growth. perfect Piotroski.",
       "killshot": {
@@ -3609,7 +3609,7 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 18,
+      "ai_score": 22,
       "verdict": "BUY",
       "signal": "PEG -4.15 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3648,8 +3648,8 @@
       "multi": "",
       "dna": 12,
       "stars": 3,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "PEG 0.47 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3687,8 +3687,8 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "PEG -57.0 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3726,8 +3726,8 @@
       "multi": "+VALUE",
       "dna": 12,
       "stars": 3,
-      "ai_score": 17,
-      "verdict": "ACCUMULATE",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "Compounding candidate.",
       "killshot": {
         "growth": true,
@@ -3765,8 +3765,8 @@
       "multi": "+MOMENTUM",
       "dna": 8,
       "stars": 2,
-      "ai_score": 16,
-      "verdict": "ACCUMULATE",
+      "ai_score": 20,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3804,8 +3804,8 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 16,
-      "verdict": "ACCUMULATE",
+      "ai_score": 20,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3843,8 +3843,8 @@
       "multi": "",
       "dna": 12,
       "stars": 3,
-      "ai_score": 16,
-      "verdict": "ACCUMULATE",
+      "ai_score": 20,
+      "verdict": "BUY",
       "signal": "PEG 0.6 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3882,8 +3882,8 @@
       "multi": "",
       "dna": 9,
       "stars": 2,
-      "ai_score": 16,
-      "verdict": "ACCUMULATE",
+      "ai_score": 20,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3921,8 +3921,8 @@
       "multi": "",
       "dna": 8,
       "stars": 2,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 19,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3960,8 +3960,8 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 19,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3999,8 +3999,8 @@
       "multi": "",
       "dna": 8,
       "stars": 2,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 19,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4038,8 +4038,8 @@
       "multi": "",
       "dna": 8,
       "stars": 2,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 19,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4077,8 +4077,8 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 18,
+      "verdict": "BUY",
       "signal": "PEG 0.75 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4116,8 +4116,8 @@
       "multi": "",
       "dna": 9,
       "stars": 2,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 18,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4154,8 +4154,8 @@
       "multi": "",
       "dna": 10,
       "stars": 3,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 18,
+      "verdict": "BUY",
       "signal": "PEG 0.63 extreme undervalue. strong profit growth. delivery 70.7% accumulation.",
       "killshot": {
         "growth": true,
@@ -4193,8 +4193,8 @@
       "multi": "",
       "dna": 9,
       "stars": 2,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 18,
+      "verdict": "BUY",
       "signal": "PEG -8.95 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4232,7 +4232,7 @@
       "multi": "+VALUE",
       "dna": 4,
       "stars": 1,
-      "ai_score": 13,
+      "ai_score": 17,
       "verdict": "ACCUMULATE",
       "signal": "Compounding candidate.",
       "killshot": {
@@ -4271,8 +4271,8 @@
       "multi": "",
       "dna": 4,
       "stars": 1,
-      "ai_score": 9,
-      "verdict": "WAIT",
+      "ai_score": 13,
+      "verdict": "ACCUMULATE",
       "signal": "Compounding candidate.",
       "killshot": {
         "growth": true,
@@ -4304,10 +4304,10 @@
     "instrument": "Corporate Bond Funds",
     "gold_signal": "ACCUMULATE",
     "gvix": 18.5,
-    "crude": 108.2,
+    "crude": 108.3,
     "inr": 94.88,
-    "debt_alloc": 325000,
-    "gold_alloc": 125000,
+    "debt_alloc": 150000,
+    "gold_alloc": 75000,
     "bharatbond": {
       "name": "BHARATBOND-APR30",
       "nav": 0,
@@ -4330,9 +4330,9 @@
     "dualCount": 26,
     "totalPositions": 80,
     "engineHealth": {
-      "b": 37,
-      "c": 51,
-      "d": 47,
+      "b": 47,
+      "c": 61,
+      "d": 57,
       "e": 90
     }
   },
@@ -4343,7 +4343,7 @@
       "guard": 0,
       "weak": 18,
       "exit": 0,
-      "strong_buy": 2,
+      "strong_buy": 5,
       "avg_d": 78.8,
       "avg_m": 65.9,
       "sectors": [
@@ -4449,7 +4449,7 @@
       "deep": 0,
       "solid": 9,
       "moderate": 15,
-      "strong_buy": 4,
+      "strong_buy": 12,
       "traps": 2,
       "avg_pe": 16.3,
       "sectors": [
@@ -4537,7 +4537,7 @@
       "elite": 1,
       "strong": 24,
       "potential": 21,
-      "strong_buy": 4,
+      "strong_buy": 14,
       "kills": 1,
       "avg_peg": 1.16,
       "sectors": [
@@ -4702,17 +4702,17 @@
     {
       "ticker": "CHENNPETRO",
       "date": "2026-03-31",
-      "verdict": "BUY"
+      "verdict": "STRONG BUY"
     },
     {
       "ticker": "GVT&D",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "STRONG BUY"
     },
     {
       "ticker": "MCX",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "STRONG BUY"
     },
     {
       "ticker": "J&KBANK",
@@ -4757,37 +4757,37 @@
     {
       "ticker": "NLCINDIA",
       "date": "2025-12-31",
-      "verdict": "ACCUMULATE"
+      "verdict": "BUY"
     },
     {
       "ticker": "SOLARINDS",
       "date": "2025-12-31",
-      "verdict": "ACCUMULATE"
+      "verdict": "BUY"
     },
     {
       "ticker": "HINDCOPPER",
       "date": "2025-12-31",
-      "verdict": "ACCUMULATE"
+      "verdict": "BUY"
     },
     {
       "ticker": "LUPIN",
       "date": "2025-12-31",
-      "verdict": "ACCUMULATE"
+      "verdict": "BUY"
     },
     {
       "ticker": "POWERINDIA",
       "date": "2025-12-31",
-      "verdict": "ACCUMULATE"
+      "verdict": "BUY"
     },
     {
       "ticker": "HINDALCO",
       "date": "2025-12-31",
-      "verdict": "ACCUMULATE"
+      "verdict": "BUY"
     },
     {
       "ticker": "ATUL",
       "date": "2026-03-31",
-      "verdict": "ACCUMULATE"
+      "verdict": "BUY"
     }
   ],
   "indianMarkets": {
@@ -4799,10 +4799,10 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.38,
-    "DXY": 98.19,
+    "DXY": 98.18,
     "Global VIX": 16.99,
     "INR/USD": 94.88,
-    "Brent Crude": 108.16
+    "Brent Crude": 108.29
   },
   "manualInputs": {
     "_comment": "Engine A manual inputs. Update from Trendlyne + Trading Economics Sunday morning.",
@@ -4900,11 +4900,11 @@
     "cash_available": 274579.83,
     "positions": 39,
     "b_deployed": 71688.27,
-    "b_budget": 15000.0,
+    "b_budget": 82500.0,
     "c_deployed": 72093.09000000001,
-    "c_budget": 15000.0,
+    "c_budget": 82500.0,
     "d_deployed": 81638.81,
-    "d_budget": 20000.0
+    "d_budget": 110000.0
   },
   "safety": {
     "red_flag": false,
@@ -5591,6 +5591,6 @@
     "unrealized_stcg": 1240.9,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "04 May 2026, 02:53 AM",
+  "lastUpdate": "04 May 2026, 03:03 AM",
   "version": "3.1"
 }
