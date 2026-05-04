@@ -4245,7 +4245,7 @@
     },
     {
       "ticker": "LUMAXIND",
-      "price": 5051.5,
+      "price": 5090.6,
       "change": 0,
       "mcap": 4759.0,
       "badge": "SMALL",
@@ -4304,8 +4304,8 @@
     "instrument": "Corporate Bond Funds",
     "gold_signal": "ACCUMULATE",
     "gvix": 18.3,
-    "crude": 113.3,
-    "inr": 95.08,
+    "crude": 113.9,
+    "inr": 95.07,
     "debt_alloc": 150000,
     "gold_alloc": 75000,
     "bharatbond": {
@@ -4799,10 +4799,10 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.44,
-    "DXY": 98.43,
-    "Global VIX": 18.03,
-    "INR/USD": 95.08,
-    "Brent Crude": 113.32
+    "DXY": 98.46,
+    "Global VIX": 18.07,
+    "INR/USD": 95.07,
+    "Brent Crude": 113.87
   },
   "manualInputs": {
     "nifty_pe": 20.9,
@@ -5513,6 +5513,6 @@
     "unrealized_stcg": 3055.05,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "04 May 2026, 06:27 PM",
+  "lastUpdate": "04 May 2026, 06:30 PM",
   "version": "3.1"
 }
