@@ -17,8 +17,6 @@ from utils import (
     calculate_trailing_stop_d, get_profit_stage_d,
     mcap_tag, render_mini_bar, render_52w_position,
     sector_summary, render_check, peg_reading, compound_stars,
-    smart_signal_d,
-    ai_analyst,
     render_earnings_info, earnings_alert,
     load_stock_analysis, render_volume_badge,
 )
@@ -356,35 +354,7 @@ def show_engine_d():
         doubles = sum(1 for s in wl if s.get("is_double"))
         ht = set(s.get("ticker","") for s in pos)
 
-        # INTELLIGENCE SUMMARY
-        elites = [s for s in wl if s.get("dns",0)>=16]
-        strongs = [s for s in wl if 11<=s.get("dns",0)<16]
-        potentials = [s for s in wl if s.get("dns",0)<11]
-        low_peg = sum(1 for s in wl if s.get("peg") is not None and s.get("peg",99)<=0.5)
-
-        st.markdown(
-            "<div class='data-card' style='border-left:4px solid #059669;padding:16px 18px;'>"
-            "<div style='font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;"
-            "font-weight:700;margin-bottom:10px;'>COMPOUNDER INTELLIGENCE</div>"
-            f"<div style='display:flex;gap:12px;margin-bottom:10px;'>"
-            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
-            f"color:#059669;'>{len(elites)}</div><div style='font-size:10px;color:#94a3b8;'>ELITE</div></div>"
-            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
-            f"color:#2563eb;'>{len(strongs)}</div><div style='font-size:10px;color:#94a3b8;'>STRONG</div></div>"
-            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
-            f"color:#4338ca;'>{doubles}</div><div style='font-size:10px;color:#94a3b8;'>DOUBLES</div></div>"
-            f"<div style='text-align:center;flex:1;'><div style='font-size:20px;font-weight:800;"
-            f"color:#1e293b;'>{len(wl)}</div><div style='font-size:10px;color:#94a3b8;'>TOTAL</div></div>"
-            f"</div>"
-            f"<div style='font-size:11px;color:#64748b;margin-bottom:6px;'>"
-            f"<b style='color:#16a34a;'>{low_peg} stocks</b> with PEG ≤ 0.5 (extreme value)</div>"
-            f"{earnings_alert(wl)}"
-            f"<div style='margin-top:8px;'>{sector_summary(wl)}</div>"
-            f"<div style='font-size:10px;color:#94a3b8;margin-top:6px;'>Uploaded: {wd}</div>"
-            "</div>",
-            unsafe_allow_html=True)
-
-        # STOCK CARDS
+                # STOCK CARDS
         for j,s in enumerate(wl):
             nm=s.get("name",""); tk=s.get("ticker",""); lp=s.get("ltp",0) or 0
             cp2=prices.get(tk,lp); opp=((cp2-lp)/lp*100) if lp>0 and cp2>0 else 0
@@ -437,34 +407,9 @@ def show_engine_d():
                 f"{render_badge('DOUBLE','#e0e7ff','#4338ca') if s.get('is_double') else render_badge(scr,'#f1f5f9','#64748b')}"
                 f" {render_stage_badge(vd)}"
                 f"{'  '+render_badge('HELD','#94a3b8') if ah else ''}</div>"
-                f"{smart_signal_d(s, dns2)}"
                 f"{render_earnings_info(s)}</div>"
             )
             st.markdown(card_html, unsafe_allow_html=True)
-            with st.expander(f"AI Analysis · {nm}", expanded=False):
-                _, _, ai_html = ai_analyst(s, engine="D", engine_score=ea, held=ah)
-                st.markdown(ai_html, unsafe_allow_html=True)
-            if not ah and ea and ea>30 and len(pos)<MAX_POSITIONS:
-                with st.expander(f"Buy {nm}", expanded=False):
-                    bp=st.number_input("Price ₹",value=float(cp2),key=f"bp_d_{j}",format="%.2f")
-                    mx2=round(min(d_cap-ti, d_cap*MAX_PCT/100), 2)
-                    if dns2>=16: sz=10
-                    elif dns2>=11: sz=7
-                    else: sz=4
-                    mx3=min(mx2, d_cap*sz/100)
-                    sq=int(mx3/bp) if bp>0 else 0
-                    bq=st.number_input("Qty",value=max(sq,1),min_value=1,key=f"bq_d_{j}")
-                    st.markdown(f"**₹{bp*bq:,.0f}** ({sz}% sizing for DNA {dns2})")
-                    if st.button(f"Confirm Buy",type="primary",use_container_width=True,key=f"cb_d_{j}"):
-                        data["engine_d"].append({
-                            "name":nm,"ticker":tk,"entry":bp,"qty":bq,
-                            "buy_date":date.today().strftime("%Y-%m-%d"),"peak":bp,
-                            "dna_score":dns2,"is_double":s.get("is_double",False),
-                            "is_immortal":False,"is_legendary":False,
-                            "sector":s.get("sector","")})
-                        ok,msg=save_stocks_to_github(data,f"Buy {nm} Engine D")
-                        if ok: st.success(f"Bought {nm}"); trigger_workflow(); st.rerun()
-                        else: st.error(msg)
         if st.button("Clear Watchlist", key="cwl_d"):
             data["engine_d_watchlist"]=[]; data["_d_watchlist_date"]=""
             ok,msg=save_stocks_to_github(data,"Clear Engine D watchlist")
