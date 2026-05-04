@@ -1,11 +1,11 @@
 {
   "engineA": {
-    "score": 46,
-    "prevScore": 46,
+    "score": 15,
+    "prevScore": 15,
     "components": [
       {
         "name": "Valuation",
-        "score": 9,
+        "score": 0,
         "max": 15
       },
       {
@@ -15,7 +15,7 @@
       },
       {
         "name": "Breadth",
-        "score": 6,
+        "score": 0,
         "max": 12
       },
       {
@@ -25,12 +25,12 @@
       },
       {
         "name": "Flows",
-        "score": 6,
+        "score": 0,
         "max": 12
       },
       {
         "name": "Macro",
-        "score": 10,
+        "score": 0,
         "max": 12
       },
       {
@@ -45,13 +45,13 @@
       }
     ],
     "history": [
-      46
+      15
     ],
     "capital": 500000,
     "allocation": {
-      "equity": 55,
-      "debt": 30,
-      "gold": 15
+      "equity": 10,
+      "debt": 65,
+      "gold": 25
     }
   },
   "momentum": [
@@ -82,7 +82,7 @@
       "multi": "ALL 3",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 32,
+      "ai_score": 28,
       "verdict": "STRONG BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -115,7 +115,7 @@
       "multi": "ALL 3",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 29,
+      "ai_score": 25,
       "verdict": "STRONG BUY",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -148,8 +148,8 @@
       "multi": "ALL 3",
       "stage": "STRIKE",
       "conviction": 9,
-      "ai_score": 28,
-      "verdict": "STRONG BUY",
+      "ai_score": 24,
+      "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -181,8 +181,8 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 10,
-      "ai_score": 27,
-      "verdict": "STRONG BUY",
+      "ai_score": 23,
+      "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -214,8 +214,8 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 9,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -247,7 +247,7 @@
       "multi": "ALL 3",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "Momentum steady.",
       "velocity": "+2",
@@ -280,7 +280,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -313,7 +313,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "DVM fortress. Volume unusual.",
       "velocity": "+2",
@@ -346,7 +346,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 23,
+      "ai_score": 19,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -379,7 +379,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 23,
+      "ai_score": 19,
       "verdict": "BUY",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -412,7 +412,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 23,
+      "ai_score": 19,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -445,7 +445,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -478,7 +478,7 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 8,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -511,8 +511,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -544,8 +544,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -577,8 +577,8 @@
       "multi": "+COMPOUNDER",
       "stage": "STRIKE",
       "conviction": 7,
-      "ai_score": 20,
-      "verdict": "BUY",
+      "ai_score": 16,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -610,8 +610,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 20,
-      "verdict": "BUY",
+      "ai_score": 16,
+      "verdict": "ACCUMULATE",
       "signal": "Momentum steady.",
       "velocity": "-2",
       "vel_label": "COOLING"
@@ -643,8 +643,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 6,
-      "ai_score": 20,
-      "verdict": "BUY",
+      "ai_score": 16,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -676,8 +676,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 19,
-      "verdict": "BUY",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -709,8 +709,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 19,
-      "verdict": "BUY",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -742,8 +742,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 18,
-      "verdict": "BUY",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -775,7 +775,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -808,7 +808,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -841,7 +841,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 6,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
@@ -874,7 +874,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -907,7 +907,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge. Volume unusual.",
       "velocity": "+5",
@@ -940,7 +940,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. Volume unusual. institutional accumulation.",
       "velocity": "+2",
@@ -973,7 +973,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 16,
+      "ai_score": 12,
       "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -1006,7 +1006,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 16,
+      "ai_score": 12,
       "verdict": "ACCUMULATE",
       "signal": "momentum surge.",
       "velocity": "+5",
@@ -1038,7 +1038,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 16,
+      "ai_score": 12,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. momentum surge. institutional accumulation.",
       "velocity": "+5",
@@ -1071,7 +1071,7 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 16,
+      "ai_score": 12,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -1104,7 +1104,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 16,
+      "ai_score": 12,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress. institutional accumulation.",
       "velocity": "+2",
@@ -1137,7 +1137,7 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 16,
+      "ai_score": 12,
       "verdict": "ACCUMULATE",
       "signal": "DVM fortress.",
       "velocity": "+2",
@@ -1170,8 +1170,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 1,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 11,
+      "verdict": "WAIT",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1203,8 +1203,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 11,
+      "verdict": "WAIT",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1236,8 +1236,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 11,
+      "verdict": "WAIT",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1269,8 +1269,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 15,
-      "verdict": "ACCUMULATE",
+      "ai_score": 11,
+      "verdict": "WAIT",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1302,8 +1302,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 10,
+      "verdict": "WAIT",
       "signal": "momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1335,8 +1335,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 10,
+      "verdict": "WAIT",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1368,8 +1368,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 10,
+      "verdict": "WAIT",
       "signal": "DVM fortress. Volume unusual.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1401,8 +1401,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 5,
-      "ai_score": 14,
-      "verdict": "ACCUMULATE",
+      "ai_score": 10,
+      "verdict": "WAIT",
       "signal": "DVM fortress.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1434,8 +1434,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 2,
-      "ai_score": 13,
-      "verdict": "ACCUMULATE",
+      "ai_score": 9,
+      "verdict": "WAIT",
       "signal": "Momentum steady.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1467,8 +1467,8 @@
       "multi": "",
       "stage": "WEAK",
       "conviction": 3,
-      "ai_score": 13,
-      "verdict": "ACCUMULATE",
+      "ai_score": 9,
+      "verdict": "WAIT",
       "signal": "institutional accumulation.",
       "velocity": "+2",
       "vel_label": "STEADY"
@@ -1500,8 +1500,8 @@
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
-      "ai_score": 8,
-      "verdict": "WAIT",
+      "ai_score": 4,
+      "verdict": "AVOID",
       "signal": "DVM fortress. momentum surge.",
       "velocity": "+5",
       "vel_label": "ACCELERATING"
@@ -1535,7 +1535,7 @@
       "vol_ratio": 1.01,
       "multi": "ALL 3",
       "vds": 10,
-      "ai_score": 32,
+      "ai_score": 28,
       "verdict": "STRONG BUY",
       "signal": "exceptional ROE.",
       "trap": {
@@ -1575,7 +1575,7 @@
       "double_screener": true,
       "multi": "+COMPOUNDER",
       "vds": 10,
-      "ai_score": 31,
+      "ai_score": 27,
       "verdict": "STRONG BUY",
       "signal": "Attractive PE. high delivery confirms buying. exceptional ROE.",
       "trap": {
@@ -1616,7 +1616,7 @@
       "vol_ratio": 0.75,
       "multi": "ALL 3",
       "vds": 7,
-      "ai_score": 29,
+      "ai_score": 25,
       "verdict": "STRONG BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -1656,7 +1656,7 @@
       "double_screener": true,
       "multi": "+COMPOUNDER",
       "vds": 11,
-      "ai_score": 29,
+      "ai_score": 25,
       "verdict": "STRONG BUY",
       "signal": "PE extreme discount. high delivery confirms buying. exceptional ROE. revenue declining \u2014 watch.",
       "trap": {
@@ -1697,8 +1697,8 @@
       "vol_ratio": 1.33,
       "multi": "ALL 3",
       "vds": 10,
-      "ai_score": 28,
-      "verdict": "STRONG BUY",
+      "ai_score": 24,
+      "verdict": "BUY",
       "signal": "PE extreme discount. exceptional ROE.",
       "trap": {
         "rev": true,
@@ -1738,8 +1738,8 @@
       "vol_ratio": 0.93,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 27,
-      "verdict": "STRONG BUY",
+      "ai_score": 23,
+      "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
         "rev": true,
@@ -1779,8 +1779,8 @@
       "vol_ratio": 1.67,
       "multi": "+COMPOUNDER",
       "vds": 9,
-      "ai_score": 27,
-      "verdict": "STRONG BUY",
+      "ai_score": 23,
+      "verdict": "BUY",
       "signal": "exceptional ROE.",
       "trap": {
         "rev": true,
@@ -1820,8 +1820,8 @@
       "vol_ratio": 1.73,
       "multi": "+COMPOUNDER",
       "vds": 8,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "PE extreme discount. revenue declining \u2014 watch.",
       "trap": {
         "rev": false,
@@ -1861,8 +1861,8 @@
       "vol_ratio": 0.67,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
         "rev": true,
@@ -1902,8 +1902,8 @@
       "vol_ratio": 14.64,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
         "rev": true,
@@ -1943,8 +1943,8 @@
       "vol_ratio": 0.45,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 25,
-      "verdict": "STRONG BUY",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "Attractive PE.",
       "trap": {
         "rev": true,
@@ -1984,8 +1984,8 @@
       "vol_ratio": 0.48,
       "multi": "+COMPOUNDER",
       "vds": 8,
-      "ai_score": 25,
-      "verdict": "STRONG BUY",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "Attractive PE.",
       "trap": {
         "rev": true,
@@ -2025,7 +2025,7 @@
       "vol_ratio": 0.77,
       "multi": "ALL 3",
       "vds": 7,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "PE extreme discount.",
       "trap": {
@@ -2066,7 +2066,7 @@
       "vol_ratio": 0.57,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2107,7 +2107,7 @@
       "vol_ratio": 0.92,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2148,7 +2148,7 @@
       "vol_ratio": 0.54,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2189,7 +2189,7 @@
       "vol_ratio": 0.78,
       "multi": "+COMPOUNDER",
       "vds": 7,
-      "ai_score": 23,
+      "ai_score": 19,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2230,7 +2230,7 @@
       "vol_ratio": 0.56,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "Attractive PE. high delivery confirms buying.",
       "trap": {
@@ -2271,7 +2271,7 @@
       "vol_ratio": 0.82,
       "multi": "+COMPOUNDER",
       "vds": 6,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "Value opportunity.",
       "trap": {
@@ -2312,8 +2312,8 @@
       "vol_ratio": 0.87,
       "multi": "+COMPOUNDER",
       "vds": 9,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "Attractive PE. exceptional ROE.",
       "trap": {
         "rev": true,
@@ -2353,8 +2353,8 @@
       "vol_ratio": 0.18,
       "multi": "+COMPOUNDER",
       "vds": 8,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "exceptional ROE.",
       "trap": {
         "rev": true,
@@ -2394,8 +2394,8 @@
       "vol_ratio": 0.29,
       "multi": "",
       "vds": 5,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "PE extreme discount.",
       "trap": {
         "rev": true,
@@ -2435,8 +2435,8 @@
       "vol_ratio": 0.59,
       "multi": "",
       "vds": 4,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "high delivery confirms buying.",
       "trap": {
         "rev": true,
@@ -2476,7 +2476,7 @@
       "vol_ratio": 0.41,
       "multi": "+COMPOUNDER",
       "vds": 5,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "Attractive PE.",
       "trap": {
@@ -2520,7 +2520,7 @@
       "multi": "ALL 3",
       "dna": 15,
       "stars": 4,
-      "ai_score": 32,
+      "ai_score": 28,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.54 extreme undervalue. strong profit growth. perfect Piotroski.",
       "killshot": {
@@ -2558,7 +2558,7 @@
       "multi": "+VALUE",
       "dna": 15,
       "stars": 4,
-      "ai_score": 31,
+      "ai_score": 27,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.04 extreme undervalue. strong profit growth. delivery 100.0% accumulation.",
       "killshot": {
@@ -2597,7 +2597,7 @@
       "multi": "ALL 3",
       "dna": 12,
       "stars": 3,
-      "ai_score": 29,
+      "ai_score": 25,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.21 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -2635,7 +2635,7 @@
       "multi": "+VALUE",
       "dna": 12,
       "stars": 3,
-      "ai_score": 29,
+      "ai_score": 25,
       "verdict": "STRONG BUY",
       "signal": "PEG 0.02 extreme undervalue. strong profit growth. delivery 65.0% accumulation.",
       "killshot": {
@@ -2674,8 +2674,8 @@
       "multi": "ALL 3",
       "dna": 10,
       "stars": 3,
-      "ai_score": 28,
-      "verdict": "STRONG BUY",
+      "ai_score": 24,
+      "verdict": "BUY",
       "signal": "PEG 0.0 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2713,8 +2713,8 @@
       "multi": "+VALUE",
       "dna": 12,
       "stars": 3,
-      "ai_score": 27,
-      "verdict": "STRONG BUY",
+      "ai_score": 23,
+      "verdict": "BUY",
       "signal": "PEG 0.07 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2752,8 +2752,8 @@
       "multi": "+MOMENTUM",
       "dna": 13,
       "stars": 4,
-      "ai_score": 27,
-      "verdict": "STRONG BUY",
+      "ai_score": 23,
+      "verdict": "BUY",
       "signal": "strong profit growth. perfect Piotroski.",
       "killshot": {
         "growth": true,
@@ -2791,8 +2791,8 @@
       "multi": "+VALUE",
       "dna": 16,
       "stars": 5,
-      "ai_score": 27,
-      "verdict": "STRONG BUY",
+      "ai_score": 23,
+      "verdict": "BUY",
       "signal": "PEG 0.42 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2830,8 +2830,8 @@
       "multi": "+VALUE",
       "dna": 10,
       "stars": 3,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "PEG 0.21 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2869,8 +2869,8 @@
       "multi": "+MOMENTUM",
       "dna": 12,
       "stars": 3,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2908,8 +2908,8 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "PEG 0.16 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2947,8 +2947,8 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 26,
-      "verdict": "STRONG BUY",
+      "ai_score": 22,
+      "verdict": "BUY",
       "signal": "PEG 0.39 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -2986,8 +2986,8 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 25,
-      "verdict": "STRONG BUY",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "PEG 0.12 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3025,8 +3025,8 @@
       "multi": "+VALUE",
       "dna": 13,
       "stars": 4,
-      "ai_score": 25,
-      "verdict": "STRONG BUY",
+      "ai_score": 21,
+      "verdict": "BUY",
       "signal": "PEG 0.57 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3064,7 +3064,7 @@
       "multi": "+MOMENTUM",
       "dna": 11,
       "stars": 3,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "PEG 0.5 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3103,7 +3103,7 @@
       "multi": "+VALUE",
       "dna": 10,
       "stars": 3,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "PEG 0.36 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3142,7 +3142,7 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
@@ -3181,7 +3181,7 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "PEG 0.41 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3220,7 +3220,7 @@
       "multi": "+MOMENTUM",
       "dna": 11,
       "stars": 3,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "PEG 0.41 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3259,7 +3259,7 @@
       "multi": "ALL 3",
       "dna": 7,
       "stars": 2,
-      "ai_score": 24,
+      "ai_score": 20,
       "verdict": "BUY",
       "signal": "Compounding candidate.",
       "killshot": {
@@ -3298,7 +3298,7 @@
       "multi": "+MOMENTUM",
       "dna": 10,
       "stars": 3,
-      "ai_score": 23,
+      "ai_score": 19,
       "verdict": "BUY",
       "signal": "PEG 0.45 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3337,7 +3337,7 @@
       "multi": "+MOMENTUM",
       "dna": 11,
       "stars": 3,
-      "ai_score": 23,
+      "ai_score": 19,
       "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
@@ -3376,7 +3376,7 @@
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
-      "ai_score": 23,
+      "ai_score": 19,
       "verdict": "BUY",
       "signal": "perfect Piotroski.",
       "killshot": {
@@ -3415,7 +3415,7 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "PEG 0.6 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3454,7 +3454,7 @@
       "multi": "+MOMENTUM",
       "dna": 7,
       "stars": 2,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "strong profit growth.",
       "killshot": {
@@ -3493,7 +3493,7 @@
       "multi": "",
       "dna": 7,
       "stars": 2,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "PEG 0.78 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3532,7 +3532,7 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "PEG 0.57 extreme undervalue.",
       "killshot": {
@@ -3570,7 +3570,7 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "PEG 0.32 extreme undervalue. strong profit growth. perfect Piotroski.",
       "killshot": {
@@ -3609,7 +3609,7 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 22,
+      "ai_score": 18,
       "verdict": "BUY",
       "signal": "PEG -4.15 extreme undervalue. strong profit growth.",
       "killshot": {
@@ -3648,8 +3648,8 @@
       "multi": "",
       "dna": 12,
       "stars": 3,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "PEG 0.47 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3687,8 +3687,8 @@
       "multi": "+VALUE",
       "dna": 9,
       "stars": 2,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "PEG -57.0 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3726,8 +3726,8 @@
       "multi": "+VALUE",
       "dna": 12,
       "stars": 3,
-      "ai_score": 21,
-      "verdict": "BUY",
+      "ai_score": 17,
+      "verdict": "ACCUMULATE",
       "signal": "Compounding candidate.",
       "killshot": {
         "growth": true,
@@ -3765,8 +3765,8 @@
       "multi": "+MOMENTUM",
       "dna": 8,
       "stars": 2,
-      "ai_score": 20,
-      "verdict": "BUY",
+      "ai_score": 16,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3804,8 +3804,8 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 20,
-      "verdict": "BUY",
+      "ai_score": 16,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3843,8 +3843,8 @@
       "multi": "",
       "dna": 12,
       "stars": 3,
-      "ai_score": 20,
-      "verdict": "BUY",
+      "ai_score": 16,
+      "verdict": "ACCUMULATE",
       "signal": "PEG 0.6 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3882,8 +3882,8 @@
       "multi": "",
       "dna": 9,
       "stars": 2,
-      "ai_score": 20,
-      "verdict": "BUY",
+      "ai_score": 16,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3921,8 +3921,8 @@
       "multi": "",
       "dna": 8,
       "stars": 2,
-      "ai_score": 19,
-      "verdict": "BUY",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3960,8 +3960,8 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 19,
-      "verdict": "BUY",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -3999,8 +3999,8 @@
       "multi": "",
       "dna": 8,
       "stars": 2,
-      "ai_score": 19,
-      "verdict": "BUY",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4038,8 +4038,8 @@
       "multi": "",
       "dna": 8,
       "stars": 2,
-      "ai_score": 19,
-      "verdict": "BUY",
+      "ai_score": 15,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4077,8 +4077,8 @@
       "multi": "",
       "dna": 11,
       "stars": 3,
-      "ai_score": 18,
-      "verdict": "BUY",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "PEG 0.75 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4116,8 +4116,8 @@
       "multi": "",
       "dna": 9,
       "stars": 2,
-      "ai_score": 18,
-      "verdict": "BUY",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4154,8 +4154,8 @@
       "multi": "",
       "dna": 10,
       "stars": 3,
-      "ai_score": 18,
-      "verdict": "BUY",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "PEG 0.63 extreme undervalue. strong profit growth. delivery 70.7% accumulation.",
       "killshot": {
         "growth": true,
@@ -4193,8 +4193,8 @@
       "multi": "",
       "dna": 9,
       "stars": 2,
-      "ai_score": 18,
-      "verdict": "BUY",
+      "ai_score": 14,
+      "verdict": "ACCUMULATE",
       "signal": "PEG -8.95 extreme undervalue. strong profit growth.",
       "killshot": {
         "growth": true,
@@ -4232,7 +4232,7 @@
       "multi": "+VALUE",
       "dna": 4,
       "stars": 1,
-      "ai_score": 17,
+      "ai_score": 13,
       "verdict": "ACCUMULATE",
       "signal": "Compounding candidate.",
       "killshot": {
@@ -4271,8 +4271,8 @@
       "multi": "",
       "dna": 4,
       "stars": 1,
-      "ai_score": 13,
-      "verdict": "ACCUMULATE",
+      "ai_score": 9,
+      "verdict": "WAIT",
       "signal": "Compounding candidate.",
       "killshot": {
         "growth": true,
@@ -4284,15 +4284,30 @@
     }
   ],
   "fortress": {
-    "rbi": "Neutral",
+    "rbi": {
+      "value": "Neutral",
+      "input_type": "dropdown",
+      "options": [
+        "Accommodative-Cutting",
+        "Accommodative-Paused",
+        "Neutral",
+        "Tightening-Paused",
+        "Tightening-Hiking"
+      ],
+      "source": "manual",
+      "where_to_find": "https://tradingeconomics.com/india/interest-rate",
+      "source_label": "Trading Economics",
+      "update_frequency": "after RBI policy (6x/year)",
+      "notes": "Check repo rate timeline. Recent cuts = Accommodative-Cutting. Holds = Paused. Hikes = Tightening-Hiking."
+    },
     "duration": "MEDIUM",
     "instrument": "Corporate Bond Funds",
     "gold_signal": "ACCUMULATE",
     "gvix": 18.5,
     "crude": 108.2,
     "inr": 94.88,
-    "debt_alloc": 150000,
-    "gold_alloc": 75000,
+    "debt_alloc": 325000,
+    "gold_alloc": 125000,
     "bharatbond": {
       "name": "BHARATBOND-APR30",
       "nav": 0,
@@ -4315,9 +4330,9 @@
     "dualCount": 26,
     "totalPositions": 80,
     "engineHealth": {
-      "b": 47,
-      "c": 61,
-      "d": 57,
+      "b": 37,
+      "c": 51,
+      "d": 47,
       "e": 90
     }
   },
@@ -4328,7 +4343,7 @@
       "guard": 0,
       "weak": 18,
       "exit": 0,
-      "strong_buy": 5,
+      "strong_buy": 2,
       "avg_d": 78.8,
       "avg_m": 65.9,
       "sectors": [
@@ -4434,7 +4449,7 @@
       "deep": 0,
       "solid": 9,
       "moderate": 15,
-      "strong_buy": 12,
+      "strong_buy": 4,
       "traps": 2,
       "avg_pe": 16.3,
       "sectors": [
@@ -4522,7 +4537,7 @@
       "elite": 1,
       "strong": 24,
       "potential": 21,
-      "strong_buy": 14,
+      "strong_buy": 4,
       "kills": 1,
       "avg_peg": 1.16,
       "sectors": [
@@ -4687,17 +4702,17 @@
     {
       "ticker": "CHENNPETRO",
       "date": "2026-03-31",
-      "verdict": "STRONG BUY"
+      "verdict": "BUY"
     },
     {
       "ticker": "GVT&D",
       "date": "2025-12-31",
-      "verdict": "STRONG BUY"
+      "verdict": "BUY"
     },
     {
       "ticker": "MCX",
       "date": "2025-12-31",
-      "verdict": "STRONG BUY"
+      "verdict": "BUY"
     },
     {
       "ticker": "J&KBANK",
@@ -4742,37 +4757,37 @@
     {
       "ticker": "NLCINDIA",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "ACCUMULATE"
     },
     {
       "ticker": "SOLARINDS",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "ACCUMULATE"
     },
     {
       "ticker": "HINDCOPPER",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "ACCUMULATE"
     },
     {
       "ticker": "LUPIN",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "ACCUMULATE"
     },
     {
       "ticker": "POWERINDIA",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "ACCUMULATE"
     },
     {
       "ticker": "HINDALCO",
       "date": "2025-12-31",
-      "verdict": "BUY"
+      "verdict": "ACCUMULATE"
     },
     {
       "ticker": "ATUL",
       "date": "2026-03-31",
-      "verdict": "BUY"
+      "verdict": "ACCUMULATE"
     }
   ],
   "indianMarkets": {
@@ -4784,20 +4799,98 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.38,
-    "DXY": 98.21,
+    "DXY": 98.19,
     "Global VIX": 16.99,
     "INR/USD": 94.88,
-    "Brent Crude": 108.17
+    "Brent Crude": 108.16
   },
   "manualInputs": {
-    "nifty_pe": 20.9,
-    "fii": -70135,
-    "dii": 51063,
-    "breadth": 42.2,
-    "yield_inverted": "No",
-    "rbi_stance": "Neutral",
-    "cpi": 3.4,
-    "pmi": 55.9
+    "_comment": "Engine A manual inputs. Update from Trendlyne + Trading Economics Sunday morning.",
+    "_last_updated": "2026-05-03",
+    "_updated_by": "abhishek",
+    "nifty_pe": {
+      "value": 20.9,
+      "input_type": "number",
+      "source": "manual",
+      "where_to_find": "https://trendlyne.com/equity/1887/NIFTY/nifty-50/",
+      "source_label": "Trendlyne",
+      "update_frequency": "weekly",
+      "notes": "Nifty 50 PE from Trendlyne main page. Used for Valuation score (max 15)."
+    },
+    "fii_30day_net_cr": {
+      "value": -70135,
+      "input_type": "number",
+      "source": "manual",
+      "where_to_find": "https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/",
+      "source_label": "Trendlyne",
+      "update_frequency": "weekly",
+      "notes": "FII Net 30-day in Rs Crores. Negative = net sellers. Used for Flows score."
+    },
+    "dii_30day_net_cr": {
+      "value": 51063,
+      "input_type": "number",
+      "source": "manual",
+      "where_to_find": "https://trendlyne.com/macro-data/fii-dii/latest/snapshot-day/",
+      "source_label": "Trendlyne",
+      "update_frequency": "weekly",
+      "notes": "DII Net 30-day in Rs Crores. Positive = net buyers. Used for Flows score."
+    },
+    "breadth_pct_above_200dma": {
+      "value": 42.2,
+      "input_type": "number",
+      "source": "manual",
+      "where_to_find": "https://trendlyne.com/fundamentals/stock-screener/797020/nifty-500-above-200-sma/index/NIFTY500/nifty-500/",
+      "source_label": "Trendlyne",
+      "update_frequency": "weekly",
+      "notes": "Count of Nifty 500 above 200 SMA, divided by 500, times 100. Used for Breadth score (max 12)."
+    },
+    "yield_curve_inverted": {
+      "value": "No",
+      "input_type": "dropdown",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "source": "manual",
+      "where_to_find": "https://tradingeconomics.com/india/government-bond-yield",
+      "source_label": "Trading Economics",
+      "update_frequency": "weekly",
+      "notes": "Yes if 1Y yield greater than 10Y yield. Check yield curve chart on Trading Economics."
+    },
+    "rbi_stance": {
+      "value": "Neutral",
+      "input_type": "dropdown",
+      "options": [
+        "Accommodative-Cutting",
+        "Accommodative-Paused",
+        "Neutral",
+        "Tightening-Paused",
+        "Tightening-Hiking"
+      ],
+      "source": "manual",
+      "where_to_find": "https://tradingeconomics.com/india/interest-rate",
+      "source_label": "Trading Economics",
+      "update_frequency": "after RBI policy (6x/year)",
+      "notes": "Check repo rate timeline. Recent cuts = Accommodative-Cutting. Holds = Paused. Hikes = Tightening-Hiking."
+    },
+    "cpi_pct": {
+      "value": 3.4,
+      "input_type": "number",
+      "source": "manual",
+      "where_to_find": "https://tradingeconomics.com/india/inflation-cpi",
+      "source_label": "Trading Economics",
+      "update_frequency": "monthly (around 12th)",
+      "notes": "Latest YoY headline CPI inflation percent from MoSPI release."
+    },
+    "pmi_manufacturing": {
+      "value": 55.9,
+      "input_type": "number",
+      "source": "manual",
+      "where_to_find": "https://tradingeconomics.com/india/manufacturing-pmi",
+      "source_label": "Trading Economics",
+      "update_frequency": "monthly (1st)",
+      "notes": "Latest HSBC/S&P Global India Manufacturing PMI. Above 50 = expansion."
+    }
   },
   "pnl": {
     "total_invested": 225420.17,
@@ -4807,16 +4900,16 @@
     "cash_available": 274579.83,
     "positions": 39,
     "b_deployed": 71688.27,
-    "b_budget": 82500.0,
+    "b_budget": 15000.0,
     "c_deployed": 72093.09000000001,
-    "c_budget": 82500.0,
+    "c_budget": 15000.0,
     "d_deployed": 81638.81,
-    "d_budget": 110000.0
+    "d_budget": 20000.0
   },
   "safety": {
     "red_flag": false,
     "pe_bubble": false,
-    "nifty_pe": 20.9
+    "nifty_pe": 0
   },
   "positions": {
     "momentum": [
@@ -4828,7 +4921,14 @@
         "pnl": 1063.2,
         "pnl_pct": 13.35,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Chennai Petroleum",
+        "peak": 1147.9,
+        "sector": "Oil & Gas",
+        "durability": 85.0,
+        "momentum": 71.0,
+        "prev_momentum": 71.0,
+        "conviction": 8
       },
       {
         "ticker": "NATIONALUM",
@@ -4838,7 +4938,14 @@
         "pnl": -752.4,
         "pnl_pct": -9.48,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "National Aluminium",
+        "peak": 443.75,
+        "sector": "Metals & Mining",
+        "durability": 85.0,
+        "momentum": 75.0,
+        "prev_momentum": 75.0,
+        "conviction": 9
       },
       {
         "ticker": "MCX",
@@ -4848,7 +4955,14 @@
         "pnl": 496.5,
         "pnl_pct": 5.9,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Multi Commodity Exchange",
+        "peak": 2980.4,
+        "sector": "Banking and Finance",
+        "durability": 85.0,
+        "momentum": 71.0,
+        "prev_momentum": 71.0,
+        "conviction": 9
       },
       {
         "ticker": "WELCORP",
@@ -4858,7 +4972,14 @@
         "pnl": 327.6,
         "pnl_pct": 4.5,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Welspun Corp",
+        "peak": 1281.45,
+        "sector": "Metals & Mining",
+        "durability": 70.0,
+        "momentum": 67.0,
+        "prev_momentum": 67.0,
+        "conviction": 3
       },
       {
         "ticker": "SCI",
@@ -4868,7 +4989,14 @@
         "pnl": 286.72,
         "pnl_pct": 3.48,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Shipping Corporation",
+        "peak": 312.43,
+        "sector": "Transportation",
+        "durability": 90.0,
+        "momentum": 67.0,
+        "prev_momentum": 67.0,
+        "conviction": 5
       },
       {
         "ticker": "GESHIP",
@@ -4878,7 +5006,14 @@
         "pnl": 753.5,
         "pnl_pct": 10.57,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Great Eastern",
+        "peak": 1583.0,
+        "sector": "Transportation",
+        "durability": 70.0,
+        "momentum": 60.0,
+        "prev_momentum": 60.0,
+        "conviction": 2
       },
       {
         "ticker": "GVT&D",
@@ -4888,7 +5023,14 @@
         "pnl": -197.4,
         "pnl_pct": -2.16,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "GE T&D",
+        "peak": 4570.6,
+        "sector": "General Industrials",
+        "durability": 90.0,
+        "momentum": 71.0,
+        "prev_momentum": 71.0,
+        "conviction": 9
       },
       {
         "ticker": "HINDALCO",
@@ -4898,7 +5040,14 @@
         "pnl": -161.7,
         "pnl_pct": -2.18,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Hindalco Industries",
+        "peak": 1078.05,
+        "sector": "Metals & Mining",
+        "durability": 80.0,
+        "momentum": 68.0,
+        "prev_momentum": 68.0,
+        "conviction": 4
       },
       {
         "ticker": "HINDZINC",
@@ -4908,7 +5057,14 @@
         "pnl": -419.9,
         "pnl_pct": -5.14,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Hindustan Zinc",
+        "peak": 628.6,
+        "sector": "Metals & Mining",
+        "durability": 80.0,
+        "momentum": 65.0,
+        "prev_momentum": 65.0,
+        "conviction": 8
       }
     ],
     "value": [
@@ -4920,7 +5076,14 @@
         "pnl": -559.65,
         "pnl_pct": -9.73,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "National Aluminium",
+        "peak": 443.75,
+        "sector": "Metals & Mining",
+        "entry_pe": 13.21,
+        "current_pe": 13.21,
+        "vds": 11,
+        "is_double": true
       },
       {
         "ticker": "WAAREEINDO",
@@ -4930,7 +5093,14 @@
         "pnl": 0.0,
         "pnl_pct": 0.0,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Indosolar",
+        "peak": 466.85,
+        "sector": "Consumer Durables",
+        "entry_pe": 7.88,
+        "current_pe": 7.88,
+        "vds": 10,
+        "is_double": true
       },
       {
         "ticker": "HINDZINC",
@@ -4940,7 +5110,14 @@
         "pnl": -283.95,
         "pnl_pct": -5.03,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Hindustan Zinc",
+        "peak": 631.0,
+        "sector": "Metals & Mining",
+        "entry_pe": 18.99,
+        "current_pe": 18.99,
+        "vds": 10,
+        "is_double": true
       },
       {
         "ticker": "CHENNPETRO",
@@ -4950,7 +5127,14 @@
         "pnl": 638.25,
         "pnl_pct": 12.76,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Chennai Petroleum",
+        "peak": 1147.9,
+        "sector": "Oil & Gas",
+        "entry_pe": 4.77,
+        "current_pe": 4.77,
+        "vds": 10,
+        "is_double": true
       },
       {
         "ticker": "WEBELSOLAR",
@@ -4960,7 +5144,14 @@
         "pnl": -280.28,
         "pnl_pct": -4.91,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Websol Energy",
+        "peak": 128.31,
+        "sector": "Consumer Durables",
+        "entry_pe": 21.66,
+        "current_pe": 21.66,
+        "vds": 9,
+        "is_double": true
       },
       {
         "ticker": "SUMEETINDS",
@@ -4970,7 +5161,14 @@
         "pnl": 87.75,
         "pnl_pct": 1.52,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Sumeet Industries",
+        "peak": 30.33,
+        "sector": "Textiles Apparels & Accessories",
+        "entry_pe": 16.43,
+        "current_pe": 16.43,
+        "vds": 9,
+        "is_double": true
       },
       {
         "ticker": "INDUSTOWER",
@@ -4980,7 +5178,14 @@
         "pnl": 108.5,
         "pnl_pct": 1.93,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Indus Towers",
+        "peak": 419.4,
+        "sector": "Telecom Services",
+        "entry_pe": 14.84,
+        "current_pe": 14.84,
+        "vds": 9,
+        "is_double": true
       },
       {
         "ticker": "GVPIL",
@@ -4990,7 +5195,14 @@
         "pnl": 0.0,
         "pnl_pct": 0.0,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "GE Power",
+        "peak": 544.05,
+        "sector": "General Industrials",
+        "entry_pe": 12.05,
+        "current_pe": 12.05,
+        "vds": 9,
+        "is_double": true
       },
       {
         "ticker": "POKARNA",
@@ -5000,7 +5212,14 @@
         "pnl": -230.4,
         "pnl_pct": -4.22,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Pokarna",
+        "peak": 917.65,
+        "sector": "Cement and Construction",
+        "entry_pe": 24.85,
+        "current_pe": 24.85,
+        "vds": 8,
+        "is_double": true
       },
       {
         "ticker": "PTC",
@@ -5010,7 +5229,14 @@
         "pnl": 388.89,
         "pnl_pct": 6.9,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "PTC",
+        "peak": 210.04,
+        "sector": "Utilities",
+        "entry_pe": 6.72,
+        "current_pe": 6.72,
+        "vds": 8,
+        "is_double": true
       },
       {
         "ticker": "SWARAJENG",
@@ -5020,7 +5246,14 @@
         "pnl": -16.5,
         "pnl_pct": -0.42,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Swaraj Engines",
+        "peak": 3999.0,
+        "sector": "Automobiles & Auto Components",
+        "entry_pe": 24.4,
+        "current_pe": 24.4,
+        "vds": 7,
+        "is_double": true
       },
       {
         "ticker": "GOKULAGRO",
@@ -5030,7 +5263,14 @@
         "pnl": 65.38,
         "pnl_pct": 2.05,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Gokul Agro Resources",
+        "peak": 237.68,
+        "sector": "FMCG",
+        "entry_pe": 22.53,
+        "current_pe": 22.53,
+        "vds": 7,
+        "is_double": true
       },
       {
         "ticker": "JAYNECOIND",
@@ -5040,7 +5280,14 @@
         "pnl": 228.78,
         "pnl_pct": 7.14,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Jayaswal Neco Ind",
+        "peak": 112.33,
+        "sector": "Metals & Mining",
+        "entry_pe": 21.54,
+        "current_pe": 21.54,
+        "vds": 6,
+        "is_double": true
       },
       {
         "ticker": "PIXTRANS",
@@ -5050,7 +5297,14 @@
         "pnl": 134.2,
         "pnl_pct": 4.52,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Pix Transmissions",
+        "peak": 1575.6,
+        "sector": "Automobiles & Auto Components",
+        "entry_pe": 18.45,
+        "current_pe": 18.45,
+        "vds": 6,
+        "is_double": true
       },
       {
         "ticker": "ENGINERSIN",
@@ -5060,7 +5314,14 @@
         "pnl": -96.96,
         "pnl_pct": -3.11,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Engineers India",
+        "peak": 260.28,
+        "sector": "Commercial Services & Supplies",
+        "entry_pe": 18.8,
+        "current_pe": 18.8,
+        "vds": 6,
+        "is_double": true
       }
     ],
     "compounders": [
@@ -5072,7 +5333,14 @@
         "pnl": -723.35,
         "pnl_pct": -9.63,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "National Aluminium",
+        "peak": 443.75,
+        "sector": "Metals & Mining",
+        "dna": 15,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "HINDZINC",
@@ -5082,7 +5350,14 @@
         "pnl": -353.4,
         "pnl_pct": -4.71,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Hindustan Zinc",
+        "peak": 631.0,
+        "sector": "Metals & Mining",
+        "dna": 14,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "INDUSTOWER",
@@ -5092,7 +5367,14 @@
         "pnl": 129.2,
         "pnl_pct": 1.69,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Indus Towers",
+        "peak": 419.4,
+        "sector": "Telecom Services",
+        "dna": 12,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "GVPIL",
@@ -5102,7 +5384,14 @@
         "pnl": 0.0,
         "pnl_pct": 0.0,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "GE Power",
+        "peak": 544.05,
+        "sector": "General Industrials",
+        "dna": 12,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "SUMEETINDS",
@@ -5112,7 +5401,14 @@
         "pnl": 114.4,
         "pnl_pct": 1.49,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Sumeet Industries",
+        "peak": 30.33,
+        "sector": "Textiles Apparels & Accessories",
+        "dna": 11,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "WEBELSOLAR",
@@ -5122,7 +5418,14 @@
         "pnl": -378.18,
         "pnl_pct": -4.92,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Websol Energy",
+        "peak": 128.31,
+        "sector": "Consumer Durables",
+        "dna": 11,
+        "is_double": false,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "JAYNECOIND",
@@ -5132,7 +5435,14 @@
         "pnl": 309.96,
         "pnl_pct": 7.14,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Jayaswal Neco Ind",
+        "peak": 112.33,
+        "sector": "Metals & Mining",
+        "dna": 10,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "WAAREEINDO",
@@ -5142,7 +5452,14 @@
         "pnl": 0.0,
         "pnl_pct": 0.0,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Indosolar",
+        "peak": 466.85,
+        "sector": "Consumer Durables",
+        "dna": 10,
+        "is_double": false,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "PTC",
@@ -5152,7 +5469,14 @@
         "pnl": 295.02,
         "pnl_pct": 6.9,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "PTC",
+        "peak": 210.04,
+        "sector": "Utilities",
+        "dna": 10,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "GVT&D",
@@ -5162,7 +5486,14 @@
         "pnl": -98.8,
         "pnl_pct": -2.16,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "GE T&D",
+        "peak": 4570.6,
+        "sector": "General Industrials",
+        "dna": 10,
+        "is_double": false,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "SWARAJENG",
@@ -5172,7 +5503,14 @@
         "pnl": -16.5,
         "pnl_pct": -0.42,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Swaraj Engines",
+        "peak": 3999.0,
+        "sector": "Automobiles & Auto Components",
+        "dna": 9,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "CHENNPETRO",
@@ -5182,7 +5520,14 @@
         "pnl": 508.8,
         "pnl_pct": 12.71,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Chennai Petroleum",
+        "peak": 1147.9,
+        "sector": "Oil & Gas",
+        "dna": 9,
+        "is_double": false,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "MCX",
@@ -5192,7 +5537,14 @@
         "pnl": 156.5,
         "pnl_pct": 5.56,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Multi Commodity Exchange",
+        "peak": 2980.4,
+        "sector": "Banking and Finance",
+        "dna": 9,
+        "is_double": false,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "ENGINERSIN",
@@ -5202,7 +5554,14 @@
         "pnl": -129.28,
         "pnl_pct": -3.11,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Engineers India",
+        "peak": 260.25,
+        "sector": "Commercial Services & Supplies",
+        "dna": 9,
+        "is_double": true,
+        "is_immortal": false,
+        "is_legendary": false
       },
       {
         "ticker": "POKARNA",
@@ -5212,7 +5571,14 @@
         "pnl": -153.6,
         "pnl_pct": -4.22,
         "buy_date": "2026-04-27",
-        "is_ltcg": false
+        "is_ltcg": false,
+        "name": "Pokarna",
+        "peak": 917.65,
+        "sector": "Cement and Construction",
+        "dna": 9,
+        "is_double": false,
+        "is_immortal": false,
+        "is_legendary": false
       }
     ]
   },
@@ -5225,6 +5591,6 @@
     "unrealized_stcg": 1240.9,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "03 May 2026, 07:50 PM",
+  "lastUpdate": "04 May 2026, 02:53 AM",
   "version": "3.1"
 }
