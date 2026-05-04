@@ -1365,16 +1365,121 @@ def rules_engine_d(stock, ea_score, vol_data, all_pos, b_tickers, c_tickers):
 
     return s
 
-def render_signals_html(signals):
-    """Render a dict of signals as compact pills."""
+def render_signals_html(signals, engine="B"):
+    """Synthesize all signals into ONE clear verdict + reason + warnings."""
     if not signals: return ""
-    pills = []
+
+    # Count green/red signals
+    greens = []; reds = []; ambers = []
     for key, (label, color) in signals.items():
-        pills.append(_pill(label, color))
-    return (
-        f"<div style='display:flex;flex-wrap:wrap;gap:4px;margin:6px 0;'>"
-        f"{''.join(pills)}</div>"
+        if color in ("#059669","#16a34a"): greens.append((key, label))
+        elif color in ("#dc2626","#ea580c"): reds.append((key, label))
+        elif color == "#d97706": ambers.append((key, label))
+
+    total = len(greens) + len(reds) + len(ambers)
+    green_pct = len(greens) / total * 100 if total else 0
+
+    # VERDICT LOGIC
+    # Hard blockers first
+    dvm = signals.get("dvm",("",""))[0]
+    if engine == "B" and "RED GATE" in dvm:
+        verdict, vc, reason = "AVOID", "#dc2626", "DVM below entry threshold. Not investable."
+    elif engine == "B" and "GREY GATE" in dvm:
+        verdict, vc, reason = "STALK", "#d97706", "DVM in grey zone. Watch for green crossover."
+    elif any("TRAP" in r[1] for r in reds):
+        verdict, vc, reason = "AVOID", "#dc2626", "Value trap detected. Revenue declining + promoter selling."
+    elif any("KILL" in r[1] and "NO" not in r[1] for r in reds):
+        verdict, vc, reason = "AVOID", "#dc2626", "Kill shots detected. Growth or debt failing."
+    elif any("BLOCKED" in r[1] for r in reds):
+        verdict, vc, reason = "BLOCKED", "#dc2626", "Sector already at 30% cap. Sell one first."
+    elif any("CRASH" in r[1] for r in reds):
+        verdict, vc, reason = "EXIT", "#dc2626", "Momentum crashing. Institutional stampede."
+    # Positive synthesis
+    elif green_pct >= 70:
+        # Build specific reason from top greens
+        reasons = []
+        for k, l in greens[:3]:
+            if "GREEN" in l: reasons.append("DVM confirmed")
+            elif "ACCEL" in l: reasons.append("growth accelerating")
+            elif "CONFIRMED" in l or "ACCUMULATION" in l: reasons.append("volume confirmed")
+            elif "DEEP" in l: reasons.append("deep PE discount")
+            elif "CLEAN" in l: reasons.append("no value traps")
+            elif "PERFECT" in l: reasons.append("perfect Piotroski")
+            elif "EXTREME" in l or "UNDER" in l: reasons.append("PEG undervalued")
+            elif "NO KILLS" in l: reasons.append("no kill shots")
+            elif "HEALTHY" in l: reasons.append("revenue + profit aligned")
+            elif "ALL 3" in l: reasons.append("all 3 engines confirm")
+            elif "QUALITY" in l: reasons.append("strong fundamentals")
+        reason_txt = ", ".join(reasons[:3]) if reasons else "multiple positive signals"
+        verdict, vc = "ENTER", "#059669"
+        reason = reason_txt.capitalize() + "."
+    elif green_pct >= 50:
+        # Find the key amber/red concern
+        concerns = []
+        for k, l in (reds + ambers)[:2]:
+            if "EXHAUSTION" in l: concerns.append("near 52W high on low volume")
+            elif "COST CUTTING" in l: concerns.append("profits from cost cuts, not revenue")
+            elif "WEAK BASE" in l: concerns.append("weak fundamentals")
+            elif "SPECULATIVE" in l: concerns.append("speculative volume")
+            elif "DECELERATING" in l: concerns.append("growth slowing")
+            elif "MARGIN" in l: concerns.append("margin pressure")
+            elif "STALE" in l or "OVERDUE" in l: concerns.append("old results data")
+            elif "NEAR CAP" in l: concerns.append("sector near concentration limit")
+            else: concerns.append(l.lower())
+        concern_txt = ", ".join(concerns[:2]) if concerns else "some concerns"
+        verdict, vc = "STALK", "#d97706"
+        reason = f"Mostly positive but {concern_txt}. Wait for improvement."
+    else:
+        # More reds than greens
+        top_reds = []
+        for k, l in reds[:2]:
+            top_reds.append(l.lower())
+        red_txt = " + ".join(top_reds) if top_reds else "multiple red flags"
+        verdict, vc = "AVOID", "#dc2626"
+        reason = f"Too many concerns: {red_txt}."
+
+    # Risk-reward line
+    rr_txt = ""
+    rr = signals.get("rr")
+    if rr:
+        rr_label = rr[0]
+        rr_color = rr[1]
+        ratio_num = rr_label.replace("R:R ","").replace("1:","")
+        try:
+            rv = float(ratio_num)
+            if rv >= 3: rr_txt = f" Risk:Reward {rr_label} — favorable."
+            elif rv >= 1.5: rr_txt = f" Risk:Reward {rr_label} — acceptable."
+            else: rr_txt = f" Risk:Reward {rr_label} — unfavorable."
+        except: pass
+
+    # Key warnings (only show if RED and actionable)
+    warnings_html = ""
+    critical_warnings = [(k,l) for k,l in reds if any(w in l for w in ["TRAP","CRASH","BLOCKED","EXHAUSTION","WEAK BASE","KILL","DETERIORATING"])]
+    if critical_warnings:
+        warn_pills = " ".join(_pill(l, c) for l,c in [(lbl,"#dc2626") for _,lbl in critical_warnings[:3]])
+        warnings_html = f"<div style='margin-top:4px;'>{warn_pills}</div>"
+
+    # Cross-engine badge
+    cross = signals.get("cross")
+    cross_html = ""
+    if cross:
+        cross_html = f" {_pill(cross[0], cross[1])}"
+
+    # Build final HTML
+    html = (
+        f"<div style='margin:8px 0;padding:8px 12px;border-radius:8px;"
+        f"background:{'#f0fdf4' if vc=='#059669' else '#fffbeb' if vc=='#d97706' else '#fef2f2'};"
+        f"border-left:4px solid {vc};'>"
+        f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
+        f"<span style='font-size:13px;font-weight:800;color:{vc};letter-spacing:1px;'>{verdict}</span>"
+        f"<span style='display:flex;gap:4px;'>{cross_html}"
+        f"{'  '+_pill(signals.get('earnings',('',''))[0], signals.get('earnings',('',''))[1]) if signals.get('earnings') else ''}"
+        f"</span></div>"
+        f"<div style='font-size:11px;color:#475569;margin-top:3px;line-height:1.4;'>{reason}{rr_txt}</div>"
+        f"{warnings_html}"
+        f"</div>"
     )
+    return html
 
 # ============================================================
 # AI NARRATIVE — Layer 4 (Claude Sonnet API, ~Rs 1-2/stock)
