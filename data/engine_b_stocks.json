@@ -84,7 +84,7 @@
       "entry": 4564.9,
       "qty": 2,
       "buy_date": "2026-04-27",
-      "peak": 4579.3,
+      "peak": 4602.9,
       "durability": 90,
       "momentum": 71,
       "prev_momentum": 71,
@@ -439,7 +439,7 @@
       "entry": 4565,
       "qty": 1,
       "buy_date": "2026-04-27",
-      "peak": 4579.3,
+      "peak": 4602.9,
       "dna_score": 10,
       "is_double": false,
       "is_immortal": false,
@@ -4521,6 +4521,6 @@
       "name": "CROMPTON"
     }
   },
-  "_last_token_update": "2026-05-05",
+  "_last_token_update": "2026-05-06",
   "capital": 500000
 }
