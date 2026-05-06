@@ -1,7 +1,7 @@
 {
   "engineA": {
-    "score": 50,
-    "prevScore": 50,
+    "score": 48,
+    "prevScore": 48,
     "components": [
       {
         "name": "Valuation",
@@ -40,12 +40,12 @@
       },
       {
         "name": "Crude",
-        "score": 2,
+        "score": 0,
         "max": 12
       }
     ],
     "history": [
-      50
+      48
     ],
     "capital": 500000,
     "allocation": {
@@ -4327,7 +4327,7 @@
     "instrument": "Corporate Bond Funds",
     "gold_signal": "HOLD",
     "gvix": 16.7,
-    "crude": 98.0,
+    "crude": 100.0,
     "inr": 94.61,
     "debt_alloc": 150000,
     "gold_alloc": 75000,
@@ -4815,10 +4815,10 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.42,
-    "DXY": 97.72,
-    "Global VIX": 16.36,
+    "DXY": 97.82,
+    "Global VIX": 16.42,
     "INR/USD": 94.61,
-    "Brent Crude": 98.04
+    "Brent Crude": 100.04
   },
   "manualInputs": {
     "nifty_pe": 20.9,
@@ -5529,6 +5529,6 @@
     "unrealized_stcg": 4945.14,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "06 May 2026, 11:33 AM",
+  "lastUpdate": "06 May 2026, 12:11 PM",
   "version": "3.1"
 }
