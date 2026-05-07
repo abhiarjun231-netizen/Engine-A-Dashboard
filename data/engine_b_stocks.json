@@ -3887,8 +3887,13 @@
       "token": "17094",
       "symbol": "CROMPTON-EQ",
       "name": "CROMPTON"
+    },
+    "POLYCAB": {
+      "token": "9590",
+      "symbol": "POLYCAB-EQ",
+      "name": "POLYCAB"
     }
   },
-  "_last_token_update": "2026-05-06",
+  "_last_token_update": "2026-05-07",
   "capital": 500000
 }
