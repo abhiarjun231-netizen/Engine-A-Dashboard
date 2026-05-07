@@ -3892,6 +3892,21 @@
       "token": "9590",
       "symbol": "POLYCAB-EQ",
       "name": "POLYCAB"
+    },
+    "PETRONET": {
+      "token": "11351",
+      "symbol": "PETRONET-EQ",
+      "name": "PETRONET"
+    },
+    "THYROCARE": {
+      "token": "17032",
+      "symbol": "THYROCARE-EQ",
+      "name": "THYROCARE"
+    },
+    "RADICO": {
+      "token": "10990",
+      "symbol": "RADICO-EQ",
+      "name": "RADICO"
     }
   },
   "_last_token_update": "2026-05-07",

@@ -1957,6 +1957,7 @@
       "w52_pos": 52,
       "earnings": "2026-03-31",
       "double_screener": false,
+      "vol_ratio": 1.09,
       "multi": "+COMPOUNDER",
       "vds": 5,
       "ai_score": 18,
@@ -3051,6 +3052,7 @@
       "w52_pos": 50,
       "earnings": "2025-12-31",
       "double_screener": false,
+      "vol_ratio": 1.26,
       "multi": "",
       "dna": 8,
       "stars": 2,
@@ -3128,6 +3130,7 @@
       "w52_pos": 80,
       "earnings": "2026-03-31",
       "double_screener": false,
+      "vol_ratio": 1.3,
       "multi": "",
       "dna": 10,
       "stars": 3,
@@ -3204,6 +3207,7 @@
       "w52_pos": 61,
       "earnings": "2026-03-31",
       "double_screener": false,
+      "vol_ratio": 1.12,
       "multi": "",
       "dna": 10,
       "stars": 3,
@@ -3242,6 +3246,7 @@
       "w52_pos": 52,
       "earnings": "2026-03-31",
       "double_screener": false,
+      "vol_ratio": 1.09,
       "multi": "+VALUE",
       "dna": 4,
       "stars": 1,
@@ -3358,6 +3363,7 @@
       "w52_pos": 69,
       "earnings": "2025-12-31",
       "double_screener": false,
+      "vol_ratio": 3.46,
       "multi": "",
       "dna": 6,
       "stars": 1,
@@ -3914,10 +3920,10 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.36,
-    "DXY": 97.9,
+    "DXY": 97.92,
     "Global VIX": 17.39,
     "INR/USD": 94.6,
-    "Brent Crude": 101.74
+    "Brent Crude": 101.69
   },
   "manualInputs": {
     "nifty_pe": 20.9,
@@ -4628,6 +4634,6 @@
     "unrealized_stcg": 4945.14,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "07 May 2026, 01:58 AM",
+  "lastUpdate": "07 May 2026, 02:02 AM",
   "version": "3.1"
 }
