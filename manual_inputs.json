@@ -1,6 +1,6 @@
 {
   "_comment": "Engine A manual inputs. Update from Trendlyne + Trading Economics Sunday morning.",
-  "_last_updated": "2026-05-04",
+  "_last_updated": "2026-05-08",
   "_updated_by": "abhishek",
   "nifty_pe": {
     "value": 21.0,
@@ -30,7 +30,7 @@
     "notes": "DII Net 30-day in Rs Crores. Positive = net buyers. Used for Flows score."
   },
   "breadth_pct_above_200dma": {
-    "value": 44.6,
+    "value": 51.2,
     "input_type": "number",
     "source": "manual",
     "where_to_find": "https://trendlyne.com/fundamentals/stock-screener/797020/nifty-500-above-200-sma/index/NIFTY500/nifty-500/",
