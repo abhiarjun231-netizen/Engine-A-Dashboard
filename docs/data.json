@@ -1752,7 +1752,7 @@
       "w52_pos": 74,
       "earnings": "2025-12-31",
       "double_screener": true,
-      "vol_ratio": 2.74,
+      "vol_ratio": 2.75,
       "multi": "+COMPOUNDER",
       "vds": 7,
       "ai_score": 25,
@@ -2389,7 +2389,7 @@
       "w52_pos": 74,
       "earnings": "2025-12-31",
       "double_screener": true,
-      "vol_ratio": 2.74,
+      "vol_ratio": 2.75,
       "multi": "+VALUE",
       "dna": 11,
       "stars": 3,
@@ -3363,7 +3363,7 @@
       "w52_pos": 69,
       "earnings": "2025-12-31",
       "double_screener": false,
-      "vol_ratio": 13.18,
+      "vol_ratio": 13.19,
       "multi": "",
       "dna": 6,
       "stars": 1,
@@ -3478,7 +3478,7 @@
     "instrument": "Corporate Bond Funds",
     "gold_signal": "ACCUMULATE",
     "gvix": 16.8,
-    "crude": 100.9,
+    "crude": 100.5,
     "inr": 94.47,
     "debt_alloc": 150000,
     "gold_alloc": 75000,
@@ -3920,10 +3920,10 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.39,
-    "DXY": 97.93,
-    "Global VIX": 17.14,
+    "DXY": 97.97,
+    "Global VIX": 17.11,
     "INR/USD": 94.47,
-    "Brent Crude": 100.86
+    "Brent Crude": 100.54
   },
   "manualInputs": {
     "nifty_pe": 20.9,
@@ -4634,6 +4634,6 @@
     "unrealized_stcg": 5839.22,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "08 May 2026, 10:11 AM",
+  "lastUpdate": "08 May 2026, 11:27 AM",
   "version": "3.1"
 }
