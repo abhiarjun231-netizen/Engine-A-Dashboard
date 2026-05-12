@@ -3478,7 +3478,7 @@
     "instrument": "Corporate Bond Funds",
     "gold_signal": "ACCUMULATE",
     "gvix": 19.3,
-    "crude": 107.5,
+    "crude": 107.7,
     "inr": 95.62,
     "debt_alloc": 150000,
     "gold_alloc": 75000,
@@ -3920,10 +3920,10 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.41,
-    "DXY": 98.28,
-    "Global VIX": 18.86,
+    "DXY": 98.3,
+    "Global VIX": 18.78,
     "INR/USD": 95.62,
-    "Brent Crude": 107.48
+    "Brent Crude": 107.69
   },
   "manualInputs": {
     "nifty_pe": 20.9,
@@ -4634,6 +4634,6 @@
     "unrealized_stcg": -1596.42,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "12 May 2026, 11:37 AM",
+  "lastUpdate": "12 May 2026, 12:27 PM",
   "version": "3.1"
 }
