@@ -110,7 +110,7 @@
       "entry": 628.25,
       "qty": 13,
       "buy_date": "2026-04-27",
-      "peak": 651.35,
+      "peak": 670.8,
       "durability": 80,
       "momentum": 65,
       "prev_momentum": 65,
@@ -151,7 +151,7 @@
       "entry": 627.5,
       "qty": 9,
       "buy_date": "2026-04-27",
-      "peak": 651.35,
+      "peak": 670.8,
       "entry_pe": 18.99,
       "current_pe": 18.99,
       "value_depth_score": 10,
@@ -335,7 +335,7 @@
       "entry": 625.4,
       "qty": 12,
       "buy_date": "2026-04-27",
-      "peak": 651.35,
+      "peak": 670.8,
       "dna_score": 14,
       "is_double": true,
       "is_immortal": false,
@@ -3909,6 +3909,6 @@
       "name": "RADICO"
     }
   },
-  "_last_token_update": "2026-05-12",
+  "_last_token_update": "2026-05-13",
   "capital": 500000
 }
