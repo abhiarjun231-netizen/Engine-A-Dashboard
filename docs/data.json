@@ -540,7 +540,7 @@
       "sector": "General Industrials",
       "w52_pos": 66,
       "earnings": "2025-12-31",
-      "vol_ratio": 3.62,
+      "vol_ratio": 3.63,
       "multi": "",
       "stage": "STALK",
       "conviction": 4,
@@ -3363,7 +3363,7 @@
       "w52_pos": 69,
       "earnings": "2025-12-31",
       "double_screener": false,
-      "vol_ratio": 0.26,
+      "vol_ratio": 0.27,
       "multi": "",
       "dna": 6,
       "stars": 1,
@@ -3478,7 +3478,7 @@
     "instrument": "Corporate Bond Funds",
     "gold_signal": "ACCUMULATE",
     "gvix": 18.8,
-    "crude": 109.3,
+    "crude": 108.6,
     "inr": 95.96,
     "debt_alloc": 150000,
     "gold_alloc": 75000,
@@ -3920,10 +3920,10 @@
   },
   "globalMarkets": {
     "US 10Y Yield": 4.46,
-    "DXY": 99.21,
-    "Global VIX": 18.88,
+    "DXY": 99.14,
+    "Global VIX": 18.72,
     "INR/USD": 95.96,
-    "Brent Crude": 109.28
+    "Brent Crude": 108.63
   },
   "manualInputs": {
     "nifty_pe": 20.9,
@@ -4634,6 +4634,6 @@
     "unrealized_stcg": 1606.27,
     "unrealized_ltcg": 0
   },
-  "lastUpdate": "15 May 2026, 10:09 AM",
+  "lastUpdate": "15 May 2026, 10:41 AM",
   "version": "3.1"
 }
