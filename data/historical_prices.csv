@@ -230,6 +230,7 @@ date,symbol,close,source
 2026-05-12,Brent Crude,105.3499984741211,yfinance
 2026-05-13,Brent Crude,106.45999908447266,yfinance
 2026-05-14,Brent Crude,105.80000305175781,yfinance
+2026-05-15,Brent Crude,107.41999816894531,yfinance
 2025-06-18,DXY,98.91000366210938,yfinance
 2025-06-20,DXY,98.70999908447266,yfinance
 2025-06-23,DXY,98.41999816894531,yfinance
@@ -461,6 +462,7 @@ date,symbol,close,source
 2026-05-12,DXY,98.18000030517578,yfinance
 2026-05-13,DXY,98.37799835205078,yfinance
 2026-05-14,DXY,98.48300170898438,yfinance
+2026-05-15,DXY,99.13400268554688,yfinance
 2025-06-18,Global VIX,20.139999389648438,yfinance
 2025-06-20,Global VIX,20.6200008392334,yfinance
 2025-06-23,Global VIX,19.829999923706055,yfinance
@@ -928,6 +930,7 @@ date,symbol,close,source
 2026-05-12,INR/USD,95.54000091552734,yfinance
 2026-05-13,INR/USD,95.6510009765625,yfinance
 2026-05-14,INR/USD,95.73500061035156,yfinance
+2026-05-15,INR/USD,95.91000366210938,yfinance
 2025-06-19,India VIX,14.26,AngelOne
 2025-06-20,India VIX,13.67,AngelOne
 2025-06-23,India VIX,14.05,AngelOne
@@ -1372,6 +1375,8 @@ date,symbol,close,source
 2026-05-11,Nifty 50,23931.55,AngelOne
 2026-05-12,Nifty 50,23379.55,AngelOne
 2026-05-13,Nifty 50,23497.45,AngelOne
+2026-05-14,Nifty 50,23689.6,AngelOne
+2026-05-15,Nifty 50,23732.45,AngelOne
 2025-06-19,Nifty 500,22763.5,AngelOne
 2025-06-20,Nifty 500,23041.1,AngelOne
 2025-06-23,Nifty 500,23001.5,AngelOne
@@ -1586,6 +1591,7 @@ date,symbol,close,source
 2026-05-08,Nifty 500,23160.2,AngelOne
 2026-05-11,Nifty 500,22887.35,AngelOne
 2026-05-13,Nifty 500,22470.05,AngelOne
+2026-05-15,Nifty 500,22604.15,AngelOne
 2025-06-19,Nifty Midcap 100,57159.95,AngelOne
 2025-06-20,Nifty Midcap 100,57995.5,AngelOne
 2025-06-23,Nifty Midcap 100,58206.8,AngelOne
@@ -2014,6 +2020,7 @@ date,symbol,close,source
 2026-05-08,Nifty Midcap 50,17671.65,AngelOne
 2026-05-11,Nifty Midcap 50,17512.15,AngelOne
 2026-05-13,Nifty Midcap 50,17240.95,AngelOne
+2026-05-15,Nifty Midcap 50,17303.5,AngelOne
 2025-06-18,US 10Y Yield,4.396999835968018,yfinance
 2025-06-20,US 10Y Yield,4.375,yfinance
 2025-06-23,US 10Y Yield,4.320000171661377,yfinance
@@ -2241,3 +2248,4 @@ date,symbol,close,source
 2026-05-11,US 10Y Yield,4.409999847412109,yfinance
 2026-05-12,US 10Y Yield,4.4629998207092285,yfinance
 2026-05-13,US 10Y Yield,4.480999946594238,yfinance
+2026-05-14,US 10Y Yield,4.460999965667725,yfinance
