@@ -691,6 +691,7 @@ date,symbol,close,source
 2026-05-12,Global VIX,18.93000030517578,yfinance
 2026-05-13,Global VIX,17.979999542236328,yfinance
 2026-05-14,Global VIX,17.790000915527344,yfinance
+2026-05-15,Global VIX,18.030000686645508,yfinance
 2025-06-18,INR/USD,86.36270141601562,yfinance
 2025-06-19,INR/USD,86.61360168457031,yfinance
 2025-06-20,INR/USD,86.58380126953125,yfinance
@@ -1806,6 +1807,7 @@ date,symbol,close,source
 2026-05-08,Nifty Midcap 100,61972.1,AngelOne
 2026-05-11,Nifty Midcap 100,61435.65,AngelOne
 2026-05-13,Nifty Midcap 100,60469.9,AngelOne
+2026-05-15,Nifty Midcap 100,60928.55,AngelOne
 2025-06-19,Nifty Midcap 50,16102.0,AngelOne
 2025-06-20,Nifty Midcap 50,16357.25,AngelOne
 2025-06-23,Nifty Midcap 50,16420.8,AngelOne
